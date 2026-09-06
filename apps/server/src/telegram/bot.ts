@@ -3,9 +3,9 @@ import { config, isTelegramConfigured } from '../config';
 import { portfolioStore } from '../services/portfolioStore';
 import { formatPortfolioTelegram, formatExecutionTelegram } from './formatters';
 import { processNaturalLanguageIntent } from '../agent/agent';
-import { telegramWalletStore } from './userWalletStore';
 import { BASE_EXPLORER_URL, BASE_USDC, ERC20_ABI } from '@baseindex/shared';
-import { executeServerBuyOnAerodrome } from '../services/aerodromeExecution';
+import { telegramWalletStore } from './userWalletStore';
+import { executeServerBuyOnAerodrome, executeServerSellOrSwapOnAerodrome } from '../services/aerodromeExecution';
 import { createWalletClient, http, parseUnits } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { base } from 'viem/chains';
@@ -416,10 +416,87 @@ export function initializeTelegramBot(): Telegraf | null {
       if (text.startsWith('/')) return;
 
       const userId = `tg_${ctx.from.id}`;
-      await ctx.sendChatAction('typing');
-
       const userWallet = telegramWalletStore.getWallet(userId);
       const textLower = text.toLowerCase();
+
+      // Check if this is a sell / liquidate / swap to ETH or USDC intent
+      const isSellIntent =
+        textLower.includes('sell') ||
+        textLower.includes('liquidate') ||
+        textLower.includes('dump') ||
+        textLower.includes('cash out');
+
+      if (isSellIntent) {
+        if (!userWallet) {
+          await ctx.replyWithMarkdown(
+            `⚡ *No Active Agentic Wallet Linked Yet*\n\n` +
+            `To sell tokens on Base Mainnet, you need to link your wallet.\n\n` +
+            `Send: \`/import <your_private_key>\` to link your funded wallet.`
+          );
+          return;
+        }
+
+        const supportedTokens = ['AERO', 'WETH', 'CBBTC', 'VIRTUAL', 'DEGEN', 'NVDA', 'TSLA', 'SPY'];
+        let fromToken = 'AERO';
+        const contractMatch = text.match(/0x[a-fA-F0-9]{40}/);
+        if (contractMatch && contractMatch[0].toLowerCase() !== userWallet.address.toLowerCase()) {
+          fromToken = contractMatch[0];
+        } else {
+          for (const tok of supportedTokens) {
+            const re = new RegExp(`\\b${tok}\\b|\\$${tok}`, 'i');
+            if (re.test(text)) {
+              fromToken = tok;
+              break;
+            }
+          }
+        }
+
+        let toToken = 'ETH';
+        if (textLower.includes('to usdc') || textLower.includes('into usdc') || textLower.includes('for usdc') || textLower.includes('to usd')) {
+          toToken = 'USDC';
+        } else if (textLower.includes('to eth') || textLower.includes('for eth') || textLower.includes('into eth')) {
+          toToken = 'ETH';
+        } else if (textLower.includes('to weth') || textLower.includes('for weth')) {
+          toToken = 'WETH';
+        }
+
+        const isAll = textLower.includes('all') || textLower.includes('100%') || textLower.includes('everything');
+        const amountMatch = text.match(/(?:\$|\b)(\d+(?:\.\d+)?|\.\d+)/);
+        const amountToSell = (!isAll && amountMatch) ? parseFloat(amountMatch[1]) : undefined;
+
+        await ctx.replyWithMarkdown(
+          `⏳ *Executing 100% Real Swap on Base Mainnet (Aerodrome DEX)...*\n\n` +
+          `• *Action:* Sell \`${fromToken}\` &rarr; \`${toToken}\`\n` +
+          `• *Wallet:* \`${userWallet.address}\`\n` +
+          `• *Router:* Aerodrome Router (\`0xcF77...4E43\`)`
+        );
+
+        try {
+          const result = await executeServerSellOrSwapOnAerodrome({
+            privateKey: userWallet.privateKey,
+            fromTokenOrSymbol: fromToken,
+            toTokenOrSymbol: toToken,
+            amountToSell,
+            isAll,
+            userId
+          });
+
+          const sellCard =
+            `⚡ *Base Mainnet On-Chain Swap Confirmed!*\n\n` +
+            `✅ *Liquidated:* \`${result.amountSold.toFixed(6)} ${result.fromSymbol}\`\n` +
+            `💰 *Received:* \`${result.amountReceived.toFixed(6)} ${result.toSymbol}\`\n` +
+            `⛽ *Gas Incurred:* \`~$${result.gasUsedUSD.toFixed(4)} USD\`\n\n` +
+            `🔍 *BaseScan Explorer:*\n[View Confirmed Transaction](${result.explorerUrl})\n\n` +
+            `_Funds have been credited directly to your Base deposit address!_`;
+
+          await ctx.replyWithMarkdown(sellCard, { link_preview_options: { is_disabled: false } });
+          return;
+        } catch (sellErr: any) {
+          console.error('Server Aerodrome sell error:', sellErr);
+          await ctx.replyWithMarkdown(`❌ *On-Chain Swap Failed:*\n${sellErr?.message || 'Transaction error on Base node'}`);
+          return;
+        }
+      }
 
       // Check if this is a buy/trade intent
       const isTradeIntent =
