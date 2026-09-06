@@ -4,6 +4,7 @@ node_modules/
 out/
 dist/
 !packages/shared/dist/**
+!apps/server/dist/**
 build/
 .turbo/
 *.tgz
