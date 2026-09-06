@@ -246,10 +246,14 @@ export async function processNaturalLanguageIntent(
 
     if (agentExecutor) {
       try {
-        const probeRes = await agentExecutor.invoke({
-          input: 'Give a brief 1-sentence confirmation of your status, engine, and readiness to trade tokenized stocks on Base Mainnet.',
-          chat_history: []
-        });
+        const timeoutP = new Promise((_, reject) => setTimeout(() => reject(new Error('Probe timeout')), 3500));
+        const probeRes: any = await Promise.race([
+          agentExecutor.invoke({
+            input: 'Give a brief 1-sentence confirmation of your status, engine, and readiness to trade tokenized stocks on Base Mainnet.',
+            chat_history: []
+          }),
+          timeoutP
+        ]);
         modelReply = probeRes.output;
       } catch (e: any) {
         modelReply = `Model probe note: ${e?.message}`;
