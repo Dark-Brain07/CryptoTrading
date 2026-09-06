@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { portfolioStore } from '../services/portfolioStore';
-import { getLiveGasMetrics } from '../services/blockchain';
+import { getLiveGasMetrics, scanWalletLiveHoldings } from '../services/blockchain';
 import { VERIFIED_BASE_TOKENIZED_STOCKS } from '@baseindex/shared';
 
 export const portfolioRouter = Router();
@@ -8,6 +8,23 @@ export const portfolioRouter = Router();
 // Get holdings for a wallet
 portfolioRouter.get('/', async (req: Request, res: Response) => {
   const wallet = (req.query.wallet as string) || 'default';
+
+  if (wallet.startsWith('0x') && wallet.length === 42) {
+    try {
+      const liveData = await scanWalletLiveHoldings(wallet as `0x${string}`);
+      res.json({
+        success: true,
+        network: 'Base Mainnet',
+        wallet,
+        totalValueUSD: liveData.totalUSD,
+        holdings: liveData.holdings
+      });
+      return;
+    } catch (e) {
+      console.warn('Could not scan live holdings for wallet, falling back:', e);
+    }
+  }
+
   const holdings = portfolioStore.getHoldings(wallet);
   const totalUSD = portfolioStore.getTotalValueUSD(wallet);
 

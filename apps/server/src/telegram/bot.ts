@@ -9,7 +9,7 @@ import { executeServerBuyOnAerodrome, executeServerSellOrSwapOnAerodrome } from 
 import { createWalletClient, http, fallback, parseUnits, formatUnits } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { base } from 'viem/chains';
-import { publicClient, getOnChainTokenBalance } from '../services/blockchain';
+import { publicClient, getOnChainTokenBalance, scanWalletLiveHoldings } from '../services/blockchain';
 
 let bot: Telegraf | null = null;
 
@@ -78,23 +78,29 @@ export function initializeTelegramBot(): Telegraf | null {
       }
 
       await ctx.sendChatAction('typing');
-      const balances = await telegramWalletStore.getBalances(wallet.address);
+      const scan = await scanWalletLiveHoldings(wallet.address);
       const explorerLink = `${BASE_EXPLORER_URL}/address/${wallet.address}`;
 
-      const walletMsg = `💼 *Your BaseIndex Agentic Wallet*\n\n` +
+      let walletMsg = `💼 *Your BaseIndex Wallet & Holdings*\n\n` +
         `• *Network:* Base Mainnet (Chain ID 8453)\n` +
-        `• *Deposit Address:*\n\`${wallet.address}\`\n\n` +
-        `💰 *Live Balances:*\n` +
-        `• *USDC (Trading):* \`$${balances.usdc.toFixed(2)} USDC\`\n` +
-        `• *ETH (Gas):* \`${balances.eth.toFixed(4)} ETH\` (~$0.001/tx)\n\n` +
-        `🔍 [View on BaseScan](${explorerLink})\n\n` +
-        `_Deposit Base USDC & ETH to this address to execute 100% real on-chain swaps!_`;
+        `• *Deposit Address:*\n\`${wallet.address}\`\n` +
+        `• *Total Estimated Value:* ~$${scan.totalUSD.toFixed(2)} USD\n\n` +
+        `💰 *Every Token in Your Wallet (Exact Live Balances):*\n`;
+
+      for (const h of scan.holdings) {
+        const displayBal = h.formattedBalance || (h.balance < 0.0001 ? h.balance.toFixed(8) : h.balance.toFixed(4));
+        const valUSD = (h.balanceUSD || 0).toFixed(2);
+        walletMsg += `• *${h.ticker}:* \`${displayBal} ${h.ticker}\` ($${valUSD})\n`;
+      }
+
+      walletMsg += `\n🔍 [View on BaseScan](${explorerLink})\n\n` +
+        `_Minimum micro-amounts & dust are fully tracked with up to 8-decimal precision!_`;
 
       await ctx.replyWithMarkdown(
         walletMsg,
         Markup.inlineKeyboard([
           [Markup.button.callback('🛡️ Backup Key', 'btn_backup'), Markup.button.callback('📤 Withdraw', 'btn_withdraw_info')],
-          [Markup.button.callback('🔄 Refresh Balances', 'btn_wallet')]
+          [Markup.button.callback('🔄 Refresh Balances', 'btn_wallet'), Markup.button.callback('📊 Full Portfolio', 'btn_portfolio')]
         ])
       );
     });
@@ -396,14 +402,18 @@ export function initializeTelegramBot(): Telegraf | null {
         await ctx.reply('No wallet linked. Send /createwallet or /import <key>.');
         return;
       }
-      const balances = await telegramWalletStore.getBalances(wallet.address);
-      await ctx.replyWithMarkdown(
-        `💼 *Wallet Status:*\n` +
+      const scan = await scanWalletLiveHoldings(wallet.address);
+      let msg = `💼 *Wallet Status & Holdings (Base Mainnet):*\n` +
         `• *Address:* \`${wallet.address}\`\n` +
-        `• *USDC:* \`$${balances.usdc.toFixed(2)}\`\n` +
-        `• *ETH:* \`${balances.eth.toFixed(4)}\`\n` +
-        `[View on BaseScan](https://basescan.org/address/${wallet.address})`
-      );
+        `• *Total Value:* ~$${scan.totalUSD.toFixed(2)} USD\n\n` +
+        `💰 *Token Balances (Exact Precision):*\n`;
+
+      for (const h of scan.holdings) {
+        const displayBal = h.formattedBalance || (h.balance < 0.0001 ? h.balance.toFixed(8) : h.balance.toFixed(4));
+        msg += `• *${h.ticker}:* \`${displayBal} ${h.ticker}\` ($${h.balanceUSD.toFixed(2)})\n`;
+      }
+      msg += `\n[View on BaseScan](https://basescan.org/address/${wallet.address})`;
+      await ctx.replyWithMarkdown(msg);
     });
 
     bot.action('btn_create_wallet', async (ctx) => {
@@ -431,13 +441,20 @@ export function initializeTelegramBot(): Telegraf | null {
     bot.action('btn_withdraw_info', async (ctx) => {
       await ctx.answerCbQuery();
       await ctx.replyWithMarkdown(
-        `📤 *Withdrawal:*\nType: \`/withdraw <amount> <your_address>\``
+        `📤 *Withdrawal:*\nType: \`/withdraw <amount> ETH <destination_address>\` or \`/withdraw <amount> USDC <destination_address>\``
       );
     });
 
     bot.action('btn_portfolio', async (ctx) => {
       await ctx.answerCbQuery();
       const userId = `tg_${ctx.from.id}`;
+      const wallet = telegramWalletStore.getWallet(userId);
+      if (wallet) {
+        const scan = await scanWalletLiveHoldings(wallet.address);
+        const message = formatPortfolioTelegram(scan.holdings, scan.totalUSD, wallet.address);
+        await ctx.replyWithMarkdown(message, { link_preview_options: { is_disabled: true } });
+        return;
+      }
       const holdings = portfolioStore.getHoldings(userId);
       const totalUSD = portfolioStore.getTotalValueUSD(userId);
       const message = formatPortfolioTelegram(holdings, totalUSD);
@@ -447,6 +464,14 @@ export function initializeTelegramBot(): Telegraf | null {
     // /portfolio command
     bot.command('portfolio', async (ctx) => {
       const userId = `tg_${ctx.from.id}`;
+      const wallet = telegramWalletStore.getWallet(userId);
+      if (wallet) {
+        await ctx.sendChatAction('typing');
+        const scan = await scanWalletLiveHoldings(wallet.address);
+        const message = formatPortfolioTelegram(scan.holdings, scan.totalUSD, wallet.address);
+        await ctx.replyWithMarkdown(message, { link_preview_options: { is_disabled: true } });
+        return;
+      }
       const holdings = portfolioStore.getHoldings(userId);
       const totalUSD = portfolioStore.getTotalValueUSD(userId);
       const message = formatPortfolioTelegram(holdings, totalUSD);
