@@ -11,6 +11,7 @@ import { cdpExecutionManager } from './tools/cdpActionProvider';
 import { getSimulatedOrLiveQuote } from '../services/aerodrome';
 import { portfolioStore } from '../services/portfolioStore';
 import { publicClient } from '../services/blockchain';
+import { getBaseMarketIntelligence, getRecentBaseWhaleTransactions } from '../services/marketAnalytics';
 
 const tools = [stockRegistryTool, quoteTool, executeTradeTool];
 
@@ -109,6 +110,76 @@ export async function processNaturalLanguageIntent(
         `You can deposit additional Base USDC anytime, or use the **"Withdraw Funds"** button on your Agent bar to return capital to your main personal wallet.`,
       steps: [
         { id: '1', title: 'Base Mainnet RPC Query', detail: `Checked balances for ${currentAddr ? currentAddr.substring(0, 10) + '...' : 'default wallet'}`, status: 'completed' as const }
+      ]
+    };
+  }
+
+  // 1b. Handle Market Gainers / Liquidity / Marketcap queries
+  if (
+    (promptLower.includes('gain') || promptLower.includes('gainer') || promptLower.includes('top token') || promptLower.includes('best performing')) ||
+    promptLower.includes('liquidity') ||
+    promptLower.includes('marketcap') ||
+    promptLower.includes('what token') ||
+    promptLower.includes('30 day') ||
+    promptLower.includes('gain more')
+  ) {
+    const market = await getBaseMarketIntelligence();
+    let reply = `📊 **Base Mainnet Market Intelligence & Liquidity Leaders**\n\n` +
+      `🌐 **Base Network TVL:** \`$${(market.chainTVL / 1e9).toFixed(2)} Billion USD\` (Source: DeFiLlama)\n\n` +
+      `🏆 **Top Liquid Base Tokens & Real-Time Performance:**\n\n`;
+
+    for (const t of market.tokens) {
+      const changeSign = t.change24h >= 0 ? '+' : '';
+      const liqM = (t.liquidityUSD / 1e6).toFixed(2);
+      const volM = (t.volume24hUSD / 1e6).toFixed(2);
+      const mcapM = t.marketCapUSD >= 1e9 ? `$${(t.marketCapUSD / 1e9).toFixed(2)}B` : `$${(t.marketCapUSD / 1e6).toFixed(1)}M`;
+      
+      reply += `🔹 **${t.symbol}** (${t.name})\n` +
+        `   • Price: \`$${t.priceUSD >= 1 ? t.priceUSD.toFixed(2) : t.priceUSD.toFixed(4)}\` | 24h: \`${changeSign}${t.change24h.toFixed(2)}%\`\n` +
+        `   • DEX Liquidity: \`$${liqM}M USD\` | 24h Vol: \`$${volM}M\`\n` +
+        `   • Market Cap / FDV: \`${mcapM}\`\n` +
+        `   • [View Pair on DexScreener](${t.pairUrl})\n\n`;
+    }
+
+    if (market.topGainer24h) {
+      reply += `🚀 **Top 24h Gainer on Base:** **${market.topGainer24h.symbol}** with \`+${market.topGainer24h.change24h.toFixed(2)}%\` gain today!\n\n`;
+    }
+    reply += `_You can trade any of these tokens directly on Aerodrome DEX by saying "Buy $0.10 of AERO" or "Buy 0.10 of VIRTUAL"!_`;
+
+    return {
+      reply,
+      steps: [
+        { id: '1', title: 'DexScreener & DeFiLlama Analytics Query', detail: 'Fetched live Base liquidity, volume, and marketcap metrics', status: 'completed' as const }
+      ]
+    };
+  }
+
+  // 1c. Handle Whale Transactions / Big Amount Queries
+  if (
+    (promptLower.includes('big') || promptLower.includes('large') || promptLower.includes('whale') || promptLower.includes('biggest')) &&
+    (promptLower.includes('transaction') || promptLower.includes('ammount') || promptLower.includes('amount') || promptLower.includes('trade') || promptLower.includes('transfer') || promptLower.includes('swap'))
+  ) {
+    const whales = await getRecentBaseWhaleTransactions(5);
+    let reply = `🐋 **Recent Whale & High-Value Transactions on Base Mainnet**\n\n` +
+      `Here are recent high-value transactions verified directly from Base Mainnet blocks:\n\n`;
+
+    if (whales.length === 0) {
+      reply += `No transactions above 1.0 ETH detected in the most recent 12 blocks.\n`;
+    } else {
+      whales.forEach((w, idx) => {
+        reply += `${idx + 1}️⃣ **${w.valueETH.toFixed(4)} ETH** (~$${w.valueUSD.toLocaleString()} USD)\n` +
+          `   • **Block:** \`${w.blockNumber}\`\n` +
+          `   • **From:** \`${w.from.substring(0, 10)}...${w.from.slice(-6)}\`\n` +
+          `   • 🔗 [View on BaseScan](${w.explorerUrl})\n\n`;
+      });
+    }
+
+    reply += `_Scanned in real-time across recent Base Mainnet blocks (Chain ID 8453)._`;
+
+    return {
+      reply,
+      steps: [
+        { id: '1', title: 'Base Mainnet Node Block Inspection', detail: 'Scanned recent blocks for whale transactions >= 1.0 ETH', status: 'completed' as const }
       ]
     };
   }
