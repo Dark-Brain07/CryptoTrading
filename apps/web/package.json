@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@baseindex/shared": "file:../../packages/shared/baseindex-shared-1.0.0.tgz",
+    "@baseindex/shared": "file:../../packages/shared",
     "@rainbow-me/rainbowkit": "^2.1.4",
     "@tanstack/react-query": "^5.51.23",
     "@x402/evm": "^2.25.0",
