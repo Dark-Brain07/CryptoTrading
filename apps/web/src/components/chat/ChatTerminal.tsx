@@ -119,7 +119,6 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
         executionResult: {
           success: true,
           totalAllocatedUSD: liveTx.amountIn,
-          action: 'BUY',
           overallTxHash: liveTx.txHash,
           allocations: [{
             ticker: liveTx.symbol,
