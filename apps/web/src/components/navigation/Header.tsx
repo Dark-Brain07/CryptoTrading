@@ -27,7 +27,8 @@ export function Header() {
   useEffect(() => {
     const fetchGas = async () => {
       try {
-        const res = await fetch('http://localhost:4000/api/portfolio/gas');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const res = await fetch(`${apiUrl}/api/portfolio/gas`);
         if (res.ok) {
           const json = await res.json();
           if (json.gas) setGasData(json.gas);
@@ -47,12 +48,16 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Logo & Network Status */}
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-base-blue flex items-center justify-center text-white font-bold text-base shadow-lg shadow-base-blue/30 group-hover:scale-105 transition-transform">
-              B
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative w-10 h-10 flex-shrink-0 flex items-center justify-center group-hover:scale-105 transition-all duration-300">
+              <img
+                src="/logo.png"
+                alt="BaseIndex Agent Logo"
+                className="w-10 h-10 object-contain drop-shadow-[0_0_10px_rgba(0,82,255,0.5)] group-hover:drop-shadow-[0_0_16px_rgba(0,240,255,0.8)] transition-all duration-300"
+              />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold tracking-tight text-white flex items-center gap-1.5 text-base">
+              <span className="font-bold tracking-tight text-white flex items-center gap-1.5 text-base group-hover:text-cyan-300 transition-colors">
                 BaseIndex <span className="text-xs font-mono px-1.5 py-0.5 rounded bg-base-blue/20 text-blue-400 border border-base-blue/30">AGENT</span>
               </span>
               <span className="text-[10px] text-slate-400 -mt-1 font-mono">
