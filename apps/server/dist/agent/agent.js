@@ -512,12 +512,36 @@ async function processNaturalLanguageIntent(userPrompt, walletKey = 'default', w
         network: 'Base Mainnet',
         gasUsedUSD: 0.0038
     };
+    const isRealOnChain = Boolean(currentAddr && currentUsdc >= totalUSD && currentEth >= 0.00003);
     const tradeBreakdown = executedTrades
-        .map(t => `• **${t.ticker}**: ${t.shares} shares ($${t.amountUSD.toFixed(2)}) → [View BaseScan](${t.explorerUrl})`)
+        .map(t => {
+        if (isRealOnChain) {
+            return `• **${t.ticker}**: ${t.shares} shares ($${t.amountUSD.toFixed(2)}) → [View BaseScan](${t.explorerUrl})`;
+        }
+        else {
+            return `• **${t.ticker}**: ${t.shares} shares ($${t.amountUSD.toFixed(2)}) *(Paper Trading Allocation)*`;
+        }
+    })
         .join('\n');
-    const reply = `Autonomous index allocation complete on **Base Mainnet**:\n\n` +
-        `**Total Capital Allocated:** $${totalUSD.toFixed(2)} USDC\n` +
-        `**Assets Executed:**\n${tradeBreakdown}\n\n` +
-        `Portfolio weights and on-chain holdings have been synchronized.`;
+    let reply = '';
+    if (isRealOnChain) {
+        reply = `⚡ **Autonomous Index Allocation Confirmed on Base Mainnet**:\n\n` +
+            `**Total Capital Allocated:** $${totalUSD.toFixed(2)} USDC\n` +
+            `**Assets Executed:**\n${tradeBreakdown}\n\n` +
+            `Portfolio weights and on-chain holdings have been synchronized on Base Mainnet.`;
+    }
+    else {
+        reply = `📝 **Simulated Trade Executed (Paper Trading Mode)**\n\n` +
+            `**Capital Staged:** $${totalUSD.toFixed(2)} USDC\n` +
+            `**Assets Allocated:**\n${tradeBreakdown}\n\n` +
+            `🔍 **Why this is not on BaseScan Explorer yet:**\n` +
+            `BaseScan only tracks transactions that spend real gas on the blockchain. Your Agentic Wallet currently has:\n` +
+            `• **USDC Available:** \`$${currentUsdc.toFixed(2)} USDC\` (Need: \`$${totalUSD.toFixed(2)}\`)\n` +
+            `• **ETH for Gas:** \`${currentEth.toFixed(4)} ETH\` (Need: \`~0.0005 ETH\` / ~$0.002)\n\n` +
+            `💡 **To broadcast REAL transactions visible on BaseScan:**\n` +
+            `1. Click the **"Deposit"** button on your Agent bar.\n` +
+            `2. Send \`$${totalUSD.toFixed(2)} USDC\` and a tiny fraction of ETH to: \`${currentAddr || 'Create Agent Wallet above'}\`.\n\n` +
+            `*Your trade is currently tracked in your local portfolio dashboard below.*`;
+    }
     return { reply, steps, executionResult };
 }
