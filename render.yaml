@@ -5,7 +5,7 @@ services:
   - type: web
     name: baseindex-agent-backend
     runtime: node
-    plan: starter
+    plan: free
     region: oregon
     rootDir: apps/server
     buildCommand: npm install --install-links && npm run build
@@ -22,7 +22,7 @@ services:
       - key: BASE_CHAIN_ID
         value: "8453"
       - key: FRONTEND_URL
-        value: https://baseindex.vercel.app
+        value: https://baseindex-agent-md-raju-ahmeds-projects-a8ce4550.vercel.app
       - key: OPENAI_API_KEY
         sync: false
       - key: CDP_API_KEY_NAME
