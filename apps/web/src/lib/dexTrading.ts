@@ -236,7 +236,7 @@ export async function discoverTokenMetadata(
   } catch {}
 
   // 2. Discover best Aerodrome liquidity route (1 USDC test query)
-  const testUSDC = 1_000_000n; // 1.00 USDC
+  const testUSDC = BigInt(1000000); // 1.00 USDC
   let bestRoute: AerodromeRoute[] | undefined;
   let priceUSD: number | undefined;
 
@@ -258,7 +258,7 @@ export async function discoverTokenMetadata(
       args: [testUSDC, directRoute]
     }) as bigint[];
 
-    if (out && out.length > 1 && out[1] > 0n) {
+    if (out && out.length > 1 && out[1] > BigInt(0)) {
       bestRoute = directRoute;
       const tokensPerUSDC = parseFloat(formatUnits(out[1], decimals));
       if (tokensPerUSDC > 0) {
@@ -292,7 +292,7 @@ export async function discoverTokenMetadata(
         args: [testUSDC, multiHopRoute]
       }) as bigint[];
 
-      if (out && out.length > 2 && out[2] > 0n) {
+      if (out && out.length > 2 && out[2] > BigInt(0)) {
         bestRoute = multiHopRoute;
         const tokensPerUSDC = parseFloat(formatUnits(out[2], decimals));
         if (tokensPerUSDC > 0) {
@@ -417,7 +417,7 @@ export async function executeBuyTokenOnAerodrome(
 
   const expectedOutRaw = amountsOut[amountsOut.length - 1];
   // Calculate minimum out with slippage tolerance
-  const minOutRaw = (expectedOutRaw * BigInt(Math.floor((100 - slippage) * 100))) / 10000n;
+  const minOutRaw = (expectedOutRaw * BigInt(Math.floor((100 - slippage) * 100))) / BigInt(10000);
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800); // 30 minutes deadline
 
   // 3. Execute real DEX swap on Base Mainnet
@@ -521,7 +521,7 @@ export async function executeSellTokenOnAerodrome(
   }) as bigint[];
 
   const expectedUSDC = amountsOut[amountsOut.length - 1];
-  const minUSDC = (expectedUSDC * BigInt(Math.floor((100 - slippage) * 100))) / 10000n;
+  const minUSDC = (expectedUSDC * BigInt(Math.floor((100 - slippage) * 100))) / BigInt(10000);
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800);
 
   // 3. Execute sell swap on Base Mainnet
