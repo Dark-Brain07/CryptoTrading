@@ -42,18 +42,17 @@ async function startServer() {
     console.log(`=================================================\n`);
   });
 
-  // Initialize AI Agent Executor and Telegram Bot in background
-  try {
-    await initializeAgent();
-  } catch (e) {
-    console.warn('Agent initialization non-fatal error:', e);
-  }
-
+  // Initialize Telegram Bot immediately so it is online instantly
   try {
     initializeTelegramBot();
   } catch (e) {
     console.warn('Telegram initialization non-fatal error:', e);
   }
+
+  // Initialize AI Agent Executor in background
+  initializeAgent().catch((e) => {
+    console.warn('Agent initialization non-fatal error:', e);
+  });
 }
 
 startServer().catch((err) => {

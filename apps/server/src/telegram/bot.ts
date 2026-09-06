@@ -4,7 +4,12 @@ import { portfolioStore } from '../services/portfolioStore';
 import { formatPortfolioTelegram, formatExecutionTelegram } from './formatters';
 import { processNaturalLanguageIntent } from '../agent/agent';
 import { telegramWalletStore } from './userWalletStore';
-import { BASE_EXPLORER_URL } from '@baseindex/shared';
+import { BASE_EXPLORER_URL, BASE_USDC, ERC20_ABI } from '@baseindex/shared';
+import { executeServerBuyOnAerodrome } from '../services/aerodromeExecution';
+import { createWalletClient, http, parseUnits } from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
+import { base } from 'viem/chains';
+import { publicClient } from '../services/blockchain';
 
 let bot: Telegraf | null = null;
 
@@ -20,24 +25,26 @@ export function initializeTelegramBot(): Telegraf | null {
     // /start command
     bot.start(async (ctx) => {
       const welcome = `🤖 *Welcome to BaseIndex Agent!*\n\n` +
-        `Your autonomous Chat-to-Trade Stock Index & Portfolio Builder on *Base Mainnet* (Chain ID 8453).\n\n` +
+        `Your autonomous Chat-to-Trade Crypto & Stock Portfolio Builder on *Base Mainnet* (Chain ID 8453).\n\n` +
         `💼 *Agentic Smart Wallet:*\n` +
         `• /wallet - View your Base deposit address & live balances\n` +
         `• /createwallet - Generate a 1-click autonomous Base wallet\n` +
-        `• /import <key> - Import an existing private key or keystore\n` +
+        `• /import <key> - Import existing funded wallet (e.g. from Web App)\n` +
         `• /backup - Securely reveal private key & export JSON file\n` +
         `• /withdraw <amount> <address> - Withdraw funds to your main wallet\n\n` +
         `📊 *Trading & Portfolio:*\n` +
-        `• /portfolio - View your current stock index allocation\n` +
+        `• /portfolio - View your current token allocations\n` +
         `• /help - Usage guide and supported assets\n\n` +
-        `*Or chat naturally to trade:*\n` +
-        `_"Allocate $250 across 60% NVDA and 40% TSLA"_`;
+        `*Trade naturally on Aerodrome DEX:*\n` +
+        `_"Buy $0.10 of AERO"_\n` +
+        `_"Buy 0.10 of VIRTUAL"_\n` +
+        `_"Allocate $10 across 60% AERO and 40% WETH"_`;
 
       await ctx.replyWithMarkdown(
         welcome,
         Markup.inlineKeyboard([
           [Markup.button.callback('💳 My Wallet', 'btn_wallet'), Markup.button.callback('📊 My Portfolio', 'btn_portfolio')],
-          [Markup.button.url('🌐 Open Web App', config.FRONTEND_URL || 'http://localhost:3000')]
+          [Markup.button.url('🌐 Open Web App', config.FRONTEND_URL || 'https://baseindex-agent.vercel.app')]
         ])
       );
     });
@@ -50,9 +57,9 @@ export function initializeTelegramBot(): Telegraf | null {
       if (!wallet) {
         await ctx.replyWithMarkdown(
           `⚡ *No Agentic Wallet Linked Yet*\n\n` +
-          `You can generate a new 1-click autonomous wallet or import your existing private key.\n\n` +
+          `You can generate a new 1-click autonomous wallet or import your existing funded key from the Web App.\n\n` +
           `• Click */createwallet* to generate a fresh Base wallet\n` +
-          `• Or send */import <your_private_key>* to import an existing key`,
+          `• Or send */import <your_private_key>* to link your funded wallet`,
           Markup.inlineKeyboard([
             [Markup.button.callback('✨ Create Wallet Now', 'btn_create_wallet')]
           ])
@@ -65,13 +72,13 @@ export function initializeTelegramBot(): Telegraf | null {
       const explorerLink = `${BASE_EXPLORER_URL}/address/${wallet.address}`;
 
       const walletMsg = `💼 *Your BaseIndex Agentic Wallet*\n\n` +
-        `• *Network:* Base Mainnet (8453)\n` +
+        `• *Network:* Base Mainnet (Chain ID 8453)\n` +
         `• *Deposit Address:*\n\`${wallet.address}\`\n\n` +
         `💰 *Live Balances:*\n` +
         `• *USDC (Trading):* \`$${balances.usdc.toFixed(2)} USDC\`\n` +
-        `• *ETH (Gas):* \`${balances.eth.toFixed(4)} ETH\` (~$0.002/tx)\n\n` +
+        `• *ETH (Gas):* \`${balances.eth.toFixed(4)} ETH\` (~$0.001/tx)\n\n` +
         `🔍 [View on BaseScan](${explorerLink})\n\n` +
-        `_Fund your address with USDC on Base to start trading tokenized stocks!_`;
+        `_Deposit Base USDC & ETH to this address to execute 100% real on-chain swaps!_`;
 
       await ctx.replyWithMarkdown(
         walletMsg,
@@ -91,10 +98,11 @@ export function initializeTelegramBot(): Telegraf | null {
         `✨ *Agentic Trading Wallet Generated!*\n\n` +
         `• *Base Deposit Address:*\n\`${wallet.address}\`\n\n` +
         `⚠️ *SECURITY NOTICE:*\n` +
-        `Your wallet is 100% self-custodial. Type */backup* right now to download your Keystore backup JSON and store your private key securely.`,
+        `Your wallet is 100% self-custodial. Type */backup* right now to download your Keystore backup JSON and store your private key securely.\n\n` +
+        `To start trading, deposit a small amount of Base USDC and ETH (e.g. $1-$5 USDC + 0.0005 ETH).`,
         Markup.inlineKeyboard([
           [Markup.button.callback('🛡️ Backup Key Now', 'btn_backup')],
-          [Markup.button.callback('💳 Check Wallet', 'btn_wallet')]
+          [Markup.button.callback('💳 Check Balances', 'btn_wallet')]
         ])
       );
     });
@@ -109,7 +117,7 @@ export function initializeTelegramBot(): Telegraf | null {
       try {
         await ctx.deleteMessage();
       } catch (e) {
-        // Can fail if bot lacks delete permissions in group
+        // ignore
       }
 
       if (parts.length < 2) {
@@ -117,7 +125,7 @@ export function initializeTelegramBot(): Telegraf | null {
           `🔑 *How to Import Your Private Key:*\n\n` +
           `Send: \`/import <your_64_character_private_key>\`\n` +
           `Or send: \`/import <pasted_json_keystore>\`\n\n` +
-          `🛡️ *Privacy Protection:* The bot will instantly delete your message from Telegram chat so your key is never stored in chat logs.`
+          `🛡️ *Privacy Protection:* The bot instantly deletes your message from Telegram chat so your key is never stored in chat logs.`
         );
         return;
       }
@@ -125,11 +133,16 @@ export function initializeTelegramBot(): Telegraf | null {
       const rawKey = parts.slice(1).join(' ');
       try {
         const wallet = telegramWalletStore.importWallet(userId, rawKey);
+        const balances = await telegramWalletStore.getBalances(wallet.address);
+
         await ctx.replyWithMarkdown(
           `✅ *Agentic Wallet Imported Successfully!*\n\n` +
           `• *Address:* \`${wallet.address}\`\n` +
+          `• *USDC Balance:* \`$${balances.usdc.toFixed(2)} USDC\`\n` +
+          `• *ETH Balance:* \`${balances.eth.toFixed(4)} ETH\`\n` +
           `• *Network:* Base Mainnet (8453)\n\n` +
-          `Your wallet is now active. All trade commands and balance checks will use this address.`,
+          `Your wallet is ready! You can now execute live swaps by saying:\n` +
+          `_"Buy $0.10 of AERO"_`,
           Markup.inlineKeyboard([
             [Markup.button.callback('💳 View Wallet & Balances', 'btn_wallet')]
           ])
@@ -139,19 +152,16 @@ export function initializeTelegramBot(): Telegraf | null {
       }
     });
 
-    // Support direct JSON file upload / drop into Telegram chat
+    // Support direct JSON file upload
     bot.on('document', async (ctx) => {
       const doc = ctx.message.document;
       if (!doc || !doc.file_name?.toLowerCase().endsWith('.json')) {
         return;
       }
 
-      // Immediately delete uploaded document message from chat history for sensitivity
       try {
         await ctx.deleteMessage();
-      } catch (e) {
-        // Can fail if bot lacks delete permissions
-      }
+      } catch (e) {}
 
       try {
         await ctx.sendChatAction('typing');
@@ -160,18 +170,20 @@ export function initializeTelegramBot(): Telegraf | null {
         const text = await res.text();
         const userId = `tg_${ctx.from.id}`;
         const wallet = telegramWalletStore.importWallet(userId, text);
+        const balances = await telegramWalletStore.getBalances(wallet.address);
 
         await ctx.replyWithMarkdown(
           `✅ *Agentic Keystore JSON Imported Successfully!*\n\n` +
           `• *Address:* \`${wallet.address}\`\n` +
-          `• *Network:* Base Mainnet (8453)\n\n` +
-          `🛡️ *Security Notice:* Your uploaded backup file was parsed and deleted from chat logs immediately.`,
+          `• *USDC Balance:* \`$${balances.usdc.toFixed(2)} USDC\`\n` +
+          `• *ETH Balance:* \`${balances.eth.toFixed(4)} ETH\`\n\n` +
+          `🛡️ *Security Notice:* Uploaded file parsed and removed from chat logs.`,
           Markup.inlineKeyboard([
             [Markup.button.callback('💳 View Wallet & Balances', 'btn_wallet')]
           ])
         );
       } catch (err: any) {
-        await ctx.reply(`❌ Could not import JSON file: ${err?.message || 'Invalid format. Expected BaseIndex Keystore JSON.'}`);
+        await ctx.reply(`❌ Could not import JSON file: ${err?.message || 'Invalid format.'}`);
       }
     });
 
@@ -181,23 +193,21 @@ export function initializeTelegramBot(): Telegraf | null {
       const wallet = telegramWalletStore.getWallet(userId);
 
       if (!wallet) {
-        await ctx.reply('No wallet found. Use /createwallet first.');
+        await ctx.reply('No wallet found. Use /createwallet or /import first.');
         return;
       }
 
-      // 1. Send warning & private key
       const keyWarning = `🔐 *SENSITIVE: Agentic Wallet Private Key*\n\n` +
         `\`${wallet.privateKey}\`\n\n` +
         `• *Public Address:* \`${wallet.address}\`\n` +
         `• *Network:* Base Mainnet (Chain ID 8453)\n\n` +
         `⚠️ *SECURITY NOTICE:*\n` +
-        `1. Copy this private key and save it in a password manager (1Password, Bitwarden).\n` +
+        `1. Copy this private key and save it securely in a password manager.\n` +
         `2. You can import this key into MetaMask or Coinbase Wallet anytime.\n` +
         `3. *Delete this message once saved.* Never share this key with anyone!`;
 
       await ctx.replyWithMarkdown(keyWarning);
 
-      // 2. Send downloadable Keystore JSON file
       try {
         const jsonContent = telegramWalletStore.generateBackupJson(wallet);
         const buffer = Buffer.from(jsonContent, 'utf-8');
@@ -228,9 +238,9 @@ export function initializeTelegramBot(): Telegraf | null {
       if (parts.length < 3) {
         await ctx.replyWithMarkdown(
           `📤 *How to Withdraw Funds:*\n\n` +
-          `Format: \`/withdraw <amount> <destination_address>\`\n\n` +
+          `Format: \`/withdraw <amount_usdc> <destination_address>\`\n\n` +
           `*Example:*\n` +
-          `\`/withdraw 50 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045\`\n\n` +
+          `\`/withdraw 5 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045\`\n\n` +
           `Funds will be transferred from your Agentic Wallet to your personal wallet on Base Mainnet.`
         );
         return;
@@ -250,17 +260,36 @@ export function initializeTelegramBot(): Telegraf | null {
       }
 
       await ctx.sendChatAction('typing');
-      const randomHex = Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-      const txHash = `0x${randomHex}`;
-      const explorerUrl = `https://basescan.org/tx/${txHash}`;
 
-      await ctx.replyWithMarkdown(
-        `📤 *Withdrawal Confirmed on Base Mainnet!*\n\n` +
-        `• *Amount:* $${amount.toFixed(2)} USDC\n` +
-        `• *Destination:* \`${toAddress}\`\n` +
-        `• *Status:* Confirmed ✅\n` +
-        `• *Explorer:* [View on BaseScan](${explorerUrl})`
-      );
+      try {
+        const account = privateKeyToAccount(wallet.privateKey);
+        const walletClient = createWalletClient({
+          account,
+          chain: base,
+          transport: http(config.BASE_RPC_URL || 'https://mainnet.base.org')
+        });
+
+        const amountRaw = parseUnits(amount.toFixed(6), BASE_USDC.decimals);
+        const txHash = await walletClient.writeContract({
+          address: BASE_USDC.contractAddress as `0x${string}`,
+          abi: ERC20_ABI,
+          functionName: 'transfer',
+          args: [toAddress as `0x${string}`, amountRaw]
+        });
+
+        await publicClient.waitForTransactionReceipt({ hash: txHash });
+        const explorerUrl = `https://basescan.org/tx/${txHash}`;
+
+        await ctx.replyWithMarkdown(
+          `📤 *Withdrawal Confirmed on Base Mainnet!*\n\n` +
+          `• *Amount:* $${amount.toFixed(2)} USDC\n` +
+          `• *Destination:* \`${toAddress}\`\n` +
+          `• *Status:* Confirmed ✅\n` +
+          `• *Explorer:* [View on BaseScan](${explorerUrl})`
+        );
+      } catch (err: any) {
+        await ctx.reply(`❌ Withdrawal failed: ${err?.message || 'Transaction error'}`);
+      }
     });
 
     // /deposit command
@@ -284,7 +313,7 @@ export function initializeTelegramBot(): Telegraf | null {
       );
     });
 
-    // Callback Query Handlers (Inline Buttons)
+    // Inline button callbacks
     bot.action('btn_wallet', async (ctx) => {
       await ctx.answerCbQuery();
       const userId = `tg_${ctx.from.id}`;
@@ -298,7 +327,8 @@ export function initializeTelegramBot(): Telegraf | null {
         `💼 *Wallet Status:*\n` +
         `• *Address:* \`${wallet.address}\`\n` +
         `• *USDC:* \`$${balances.usdc.toFixed(2)}\`\n` +
-        `• *ETH:* \`${balances.eth.toFixed(4)}\``
+        `• *ETH:* \`${balances.eth.toFixed(4)}\`\n` +
+        `[View on BaseScan](https://basescan.org/address/${wallet.address})`
       );
     });
 
@@ -359,36 +389,149 @@ export function initializeTelegramBot(): Telegraf | null {
         `• /backup - Reveal private key & download JSON backup\n` +
         `• /withdraw <amount> <address> - Withdraw funds to personal wallet\n` +
         `• /deposit - View deposit address & instructions\n\n` +
-        `*Trading Commands:*\n` +
-        `• /portfolio - View your current stock index holdings\n` +
-        `• Send any allocation: _"Allocate $100 across 50% TSLA and 50% NVDA"_\n\n` +
-        `*Supported Stocks (Base Mainnet):*\n` +
-        `TSLA, NVDA, AAPL, MSFT, SPY, COIN, AMZN, GOOGL`;
+        `*Real On-Chain DEX Trading Commands:*\n` +
+        `• /portfolio - View your current holdings\n` +
+        `• \`Buy $0.10 of AERO\`\n` +
+        `• \`Buy 0.10 of VIRTUAL\`\n` +
+        `• \`Buy $0.50 of 0x940181a94A35A4569E4529A3CDfB74e38FD98631\`\n` +
+        `• \`Allocate $10 across 50% AERO and 50% WETH\`\n\n` +
+        `*Supported Base Tokens:*\n` +
+        `AERO, WETH, cbBTC, VIRTUAL, DEGEN, USDC & any custom ERC-20 contract with Aerodrome liquidity!`;
       await ctx.replyWithMarkdown(help);
     });
 
-    // Handle Natural Language Messages
+    // Natural language trading and conversational processing
     bot.on('text', async (ctx) => {
-      const text = ctx.message.text;
+      const text = ctx.message.text.trim();
       if (text.startsWith('/')) return;
 
       const userId = `tg_${ctx.from.id}`;
       await ctx.sendChatAction('typing');
 
       const userWallet = telegramWalletStore.getWallet(userId);
-      const walletMeta = userWallet ? { address: userWallet.address } : undefined;
+      const textLower = text.toLowerCase();
+
+      // Check if this is a buy/trade intent
+      const isTradeIntent =
+        textLower.includes('buy') ||
+        textLower.includes('trade') ||
+        textLower.includes('swap') ||
+        textLower.includes('allocate') ||
+        textLower.includes('invest') ||
+        text.includes('$');
+
+      if (isTradeIntent) {
+        if (!userWallet) {
+          await ctx.replyWithMarkdown(
+            `⚡ *No Active Agentic Wallet Linked Yet*\n\n` +
+            `To execute 100% REAL trades on Base Mainnet, you need an Agentic Wallet with USDC & ETH.\n\n` +
+            `1️⃣ **Use your existing funded wallet from the Web App:**\n` +
+            `Send: \`/import <your_private_key>\`\n` +
+            `_(Your message is instantly deleted from chat for security!)_\n\n` +
+            `2️⃣ **Or generate a fresh wallet:**\n` +
+            `Click /createwallet and send USDC + ETH to your new address.`,
+            Markup.inlineKeyboard([
+              [Markup.button.callback('✨ Create Wallet Now', 'btn_create_wallet')]
+            ])
+          );
+          return;
+        }
+
+        // Fetch live balances
+        const balances = await telegramWalletStore.getBalances(userWallet.address);
+
+        // Parse USD amount
+        const amountMatch = text.match(/(?:\$|\b)(\d+(?:\.\d+)?|\.\d+)/);
+        const amountUSD = amountMatch ? parseFloat(amountMatch[1]) : 0.10;
+
+        // Parse target token
+        const supportedTokens = ['AERO', 'WETH', 'CBBTC', 'VIRTUAL', 'DEGEN', 'NVDA', 'TSLA', 'SPY'];
+        let targetToken = 'AERO';
+
+        // Check for 0x contract address
+        const contractMatch = text.match(/0x[a-fA-F0-9]{40}/);
+        if (contractMatch && contractMatch[0].toLowerCase() !== userWallet.address.toLowerCase()) {
+          targetToken = contractMatch[0];
+        } else {
+          for (const tok of supportedTokens) {
+            const re = new RegExp(`\\b${tok}\\b|\\$${tok}`, 'i');
+            if (re.test(text)) {
+              targetToken = tok;
+              break;
+            }
+          }
+        }
+
+        // Validate balances
+        if (balances.usdc < amountUSD) {
+          await ctx.replyWithMarkdown(
+            `❌ *Insufficient USDC Balance on Base Mainnet*\n\n` +
+            `• *Your Wallet:* \`${userWallet.address}\`\n` +
+            `• *Required:* \`$${amountUSD.toFixed(2)} USDC\`\n` +
+            `• *Available:* \`$${balances.usdc.toFixed(2)} USDC\`\n\n` +
+            `💰 *Deposit USDC:* Send Base USDC to your address above to execute real swaps.`,
+            Markup.inlineKeyboard([
+              [Markup.button.callback('🔄 Refresh Balance', 'btn_wallet')]
+            ])
+          );
+          return;
+        }
+
+        if (balances.eth < 0.00003) {
+          await ctx.replyWithMarkdown(
+            `❌ *Insufficient ETH for Gas on Base Mainnet*\n\n` +
+            `• *Your Wallet:* \`${userWallet.address}\`\n` +
+            `• *ETH Balance:* \`${balances.eth.toFixed(5)} ETH\`\n` +
+            `• *Required:* \`~0.0001 ETH\` (~$0.001 USD)\n\n` +
+            `⛽ *Deposit ETH:* Send a small fraction of Base ETH for transaction gas.`
+          );
+          return;
+        }
+
+        // Execute REAL On-Chain DEX Swap
+        const statusMsg = await ctx.replyWithMarkdown(
+          `⏳ *Executing 100% Real Swap on Base Mainnet (Aerodrome DEX)...*\n\n` +
+          `• *Swapping:* \`$${amountUSD.toFixed(2)} USDC\` &rarr; \`${targetToken}\`\n` +
+          `• *Signing with Wallet:* \`${userWallet.address}\`\n` +
+          `• *Router:* Aerodrome Router (\`0xcF77...4E43\`)`
+        );
+
+        try {
+          const result = await executeServerBuyOnAerodrome({
+            privateKey: userWallet.privateKey,
+            targetTokenOrSymbol: targetToken,
+            amountUSD,
+            userId
+          });
+
+          const successCard =
+            `⚡ *Base Mainnet DEX Swap Confirmed On-Chain!*\n\n` +
+            `✅ *Delivered:* \`${result.amountOutTokens.toFixed(6)} ${result.symbol}\`\n` +
+            `💰 *Swapped:* \`$${result.amountInUSD.toFixed(2)} USDC\`\n` +
+            `⛽ *Gas Incurred:* \`~$${result.gasUsedUSD.toFixed(4)} USD\`\n\n` +
+            `🔍 *BaseScan Explorer:*\n[View On-Chain Receipt](${result.explorerUrl})\n\n` +
+            `_Tokens are now in your wallet address! Use /portfolio to see your updated holdings._`;
+
+          await ctx.replyWithMarkdown(successCard, { link_preview_options: { is_disabled: false } });
+          return;
+        } catch (swapErr: any) {
+          console.error('Server Aerodrome swap error:', swapErr);
+          await ctx.replyWithMarkdown(`❌ *On-Chain Execution Failed:*\n${swapErr?.message || 'Transaction error on Base node'}`);
+          return;
+        }
+      }
+
+      // Fallback to conversational natural language assistant
+      const balances = userWallet ? await telegramWalletStore.getBalances(userWallet.address) : { usdc: 0, eth: 0 };
+      const walletMeta = userWallet
+        ? { address: userWallet.address, usdcBalance: balances.usdc, ethBalance: balances.eth }
+        : undefined;
 
       try {
         const result = await processNaturalLanguageIntent(text, userWallet?.address || userId, walletMeta);
-
-        if (result.executionResult) {
-          const card = formatExecutionTelegram(result.executionResult);
-          await ctx.replyWithMarkdown(card, { link_preview_options: { is_disabled: true } });
-        } else {
-          await ctx.replyWithMarkdown(result.reply, { link_preview_options: { is_disabled: true } });
-        }
+        await ctx.replyWithMarkdown(result.reply, { link_preview_options: { is_disabled: true } });
       } catch (err: any) {
-        await ctx.reply(`❌ Execution error: ${err?.message || 'Unknown error'}`);
+        await ctx.reply(`❌ Processing error: ${err?.message || 'Unknown error'}`);
       }
     });
 

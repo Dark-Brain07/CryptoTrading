@@ -1,0 +1,306 @@
+import {
+  createPublicClient,
+  createWalletClient,
+  http,
+  parseUnits,
+  formatUnits,
+  maxUint256,
+  PublicClient
+} from 'viem';
+import { privateKeyToAccount } from 'viem/accounts';
+import { base } from 'viem/chains';
+import { config } from '../config';
+import {
+  BASE_USDC,
+  BASE_WETH_ADDRESS,
+  AERODROME_ROUTER_ADDRESS,
+  AERODROME_FACTORY_ADDRESS,
+  AERODROME_SWAP_ROUTES,
+  AERODROME_ROUTER_ABI,
+  ERC20_ABI,
+  VERIFIED_BASE_TOKENIZED_STOCKS,
+  AerodromeRoute
+} from '@baseindex/shared';
+import { publicClient, getOnChainTokenBalance } from './blockchain';
+import { portfolioStore } from './portfolioStore';
+
+export interface ServerSwapResult {
+  success: boolean;
+  txHash: `0x${string}`;
+  explorerUrl: string;
+  amountInUSD: number;
+  amountOutTokens: number;
+  symbol: string;
+  tokenAddress: `0x${string}`;
+  gasUsedUSD: number;
+  timestamp: number;
+}
+
+const KNOWN_BASE_TOKENS_BY_SYMBOL: Record<string, `0x${string}`> = {
+  AERO: '0x940181a94A35A4569E4529A3CDfB74e38FD98631',
+  WETH: BASE_WETH_ADDRESS,
+  CBBTC: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+  VIRTUAL: '0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b',
+  DEGEN: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed',
+  USDC: BASE_USDC.contractAddress as `0x${string}`
+};
+
+export async function ensureTokenAllowanceServer(
+  walletClient: any,
+  tokenAddress: `0x${string}`,
+  spenderAddress: `0x${string}`,
+  requiredAmount: bigint
+): Promise<void> {
+  const account = walletClient.account;
+  const currentAllowance = await publicClient.readContract({
+    address: tokenAddress,
+    abi: ERC20_ABI,
+    functionName: 'allowance',
+    args: [account.address, spenderAddress]
+  }) as bigint;
+
+  if (currentAllowance < requiredAmount) {
+    console.log(`Approving ${spenderAddress} to spend tokens on behalf of ${account.address}...`);
+    const approveTx = await walletClient.writeContract({
+      address: tokenAddress,
+      abi: ERC20_ABI,
+      functionName: 'approve',
+      args: [spenderAddress, maxUint256]
+    });
+    console.log(`Approval tx broadcasted: ${approveTx}. Waiting for confirmation...`);
+    await publicClient.waitForTransactionReceipt({ hash: approveTx });
+    console.log(`Approval confirmed on Base Mainnet.`);
+  }
+}
+
+export async function discoverTokenMetadataServer(
+  target: string
+): Promise<{
+  address: `0x${string}`;
+  symbol: string;
+  decimals: number;
+  route?: AerodromeRoute[];
+  hasLiquidity: boolean;
+}> {
+  const upper = target.toUpperCase().replace(/^[$]/, '');
+  let resolvedAddress: `0x${string}` | null = null;
+
+  if (KNOWN_BASE_TOKENS_BY_SYMBOL[upper]) {
+    resolvedAddress = KNOWN_BASE_TOKENS_BY_SYMBOL[upper];
+  } else if (target.startsWith('0x') && target.length === 42) {
+    resolvedAddress = target as `0x${string}`;
+  }
+
+  if (!resolvedAddress) {
+    throw new Error(`Token ${target} is not recognized and is not a valid Base 0x address.`);
+  }
+
+  let symbol = upper;
+  let decimals = 18;
+
+  try {
+    const [sym, dec] = await Promise.all([
+      publicClient.readContract({
+        address: resolvedAddress,
+        abi: ERC20_ABI,
+        functionName: 'symbol'
+      }) as Promise<string>,
+      publicClient.readContract({
+        address: resolvedAddress,
+        abi: ERC20_ABI,
+        functionName: 'decimals'
+      }) as Promise<number>
+    ]);
+    symbol = sym;
+    decimals = Number(dec);
+  } catch (e) {
+    // Keep defaults if reading fails
+  }
+
+  const cleanSym = symbol.toUpperCase();
+  if (AERODROME_SWAP_ROUTES[cleanSym]) {
+    return {
+      address: resolvedAddress,
+      symbol: cleanSym,
+      decimals,
+      route: AERODROME_SWAP_ROUTES[cleanSym],
+      hasLiquidity: true
+    };
+  }
+
+  // Attempt direct USDC -> Token route
+  const directRoute: AerodromeRoute[] = [
+    {
+      from: BASE_USDC.contractAddress as `0x${string}`,
+      to: resolvedAddress,
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    }
+  ];
+
+  try {
+    const testAmount = parseUnits('0.1', BASE_USDC.decimals);
+    const out = await publicClient.readContract({
+      address: AERODROME_ROUTER_ADDRESS,
+      abi: AERODROME_ROUTER_ABI,
+      functionName: 'getAmountsOut',
+      args: [testAmount, directRoute]
+    }) as bigint[];
+
+    if (out && out.length > 0 && out[out.length - 1] > 0n) {
+      return {
+        address: resolvedAddress,
+        symbol: cleanSym,
+        decimals,
+        route: directRoute,
+        hasLiquidity: true
+      };
+    }
+  } catch (e) {
+    // Try via WETH
+  }
+
+  const wethRoute: AerodromeRoute[] = [
+    {
+      from: BASE_USDC.contractAddress as `0x${string}`,
+      to: BASE_WETH_ADDRESS,
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    },
+    {
+      from: BASE_WETH_ADDRESS,
+      to: resolvedAddress,
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    }
+  ];
+
+  try {
+    const testAmount = parseUnits('0.1', BASE_USDC.decimals);
+    const out = await publicClient.readContract({
+      address: AERODROME_ROUTER_ADDRESS,
+      abi: AERODROME_ROUTER_ABI,
+      functionName: 'getAmountsOut',
+      args: [testAmount, wethRoute]
+    }) as bigint[];
+
+    if (out && out.length > 0 && out[out.length - 1] > 0n) {
+      return {
+        address: resolvedAddress,
+        symbol: cleanSym,
+        decimals,
+        route: wethRoute,
+        hasLiquidity: true
+      };
+    }
+  } catch (e) {
+    // No liquidity via WETH
+  }
+
+  return {
+    address: resolvedAddress,
+    symbol: cleanSym,
+    decimals,
+    hasLiquidity: false
+  };
+}
+
+export async function executeServerBuyOnAerodrome(params: {
+  privateKey: `0x${string}`;
+  targetTokenOrSymbol: string;
+  amountUSD: number;
+  userId?: string;
+  slippagePercent?: number;
+}): Promise<ServerSwapResult> {
+  const { privateKey, targetTokenOrSymbol, amountUSD, userId } = params;
+  const slippage = params.slippagePercent || 2.0;
+
+  const account = privateKeyToAccount(privateKey);
+  const walletClient = createWalletClient({
+    account,
+    chain: base,
+    transport: http(config.BASE_RPC_URL || 'https://mainnet.base.org')
+  });
+
+  // 1. Balance Checks
+  const [ethBalanceRaw, usdcBalance] = await Promise.all([
+    publicClient.getBalance({ address: account.address }),
+    getOnChainTokenBalance(BASE_USDC.contractAddress as `0x${string}`, account.address, BASE_USDC.decimals)
+  ]);
+
+  if (usdcBalance < amountUSD) {
+    throw new Error(
+      `Insufficient USDC balance on Base Mainnet. You have $${usdcBalance.toFixed(2)} USDC, but this trade requires $${amountUSD.toFixed(2)} USDC.`
+    );
+  }
+
+  const ethBalance = parseFloat(formatUnits(ethBalanceRaw, 18));
+  if (ethBalance < 0.00003) {
+    throw new Error(
+      `Insufficient ETH for gas on Base Mainnet. You have ${ethBalance.toFixed(5)} ETH. Base requires at least ~0.0001 ETH (~$0.001) to pay transaction gas.`
+    );
+  }
+
+  // 2. Discover token metadata and route
+  const discovery = await discoverTokenMetadataServer(targetTokenOrSymbol);
+  if (!discovery.hasLiquidity || !discovery.route) {
+    throw new Error(`Token ${discovery.symbol} (${discovery.address}) does not have an active liquidity pool on Aerodrome.`);
+  }
+
+  const amountInUSDC = parseUnits(amountUSD.toFixed(6), BASE_USDC.decimals);
+
+  // 3. Ensure USDC Allowance
+  await ensureTokenAllowanceServer(
+    walletClient,
+    BASE_USDC.contractAddress as `0x${string}`,
+    AERODROME_ROUTER_ADDRESS,
+    amountInUSDC
+  );
+
+  // 4. Query live quote
+  const amountsOut = await publicClient.readContract({
+    address: AERODROME_ROUTER_ADDRESS,
+    abi: AERODROME_ROUTER_ABI,
+    functionName: 'getAmountsOut',
+    args: [amountInUSDC, discovery.route]
+  }) as bigint[];
+
+  const expectedOutRaw = amountsOut[amountsOut.length - 1];
+  const minOutRaw = (expectedOutRaw * BigInt(Math.floor((100 - slippage) * 100))) / BigInt(10000);
+  const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800); // 30 mins
+
+  // 5. Broadcast real transaction to Base Mainnet
+  console.log(`[Telegram DEX Trade] Broadcasting ${amountUSD} USDC -> ${discovery.symbol} for ${account.address}...`);
+  const txHash = await walletClient.writeContract({
+    address: AERODROME_ROUTER_ADDRESS,
+    abi: AERODROME_ROUTER_ABI,
+    functionName: 'swapExactTokensForTokens',
+    args: [amountInUSDC, minOutRaw, discovery.route, account.address, deadline]
+  });
+
+  console.log(`[Telegram DEX Trade] Broadcasted! TX: ${txHash}. Awaiting confirmation...`);
+  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+
+  if (receipt.status !== 'success') {
+    throw new Error(`Transaction reverted on Base Mainnet: https://basescan.org/tx/${txHash}`);
+  }
+
+  const receivedTokens = parseFloat(formatUnits(expectedOutRaw, discovery.decimals));
+  const gasUsedUSD = Number((parseFloat(formatUnits(receipt.gasUsed * (receipt.effectiveGasPrice || 1000000n), 18)) * 2500).toFixed(4));
+
+  if (userId) {
+    portfolioStore.recordTrade(userId, discovery.symbol, receivedTokens, amountUSD, txHash);
+  }
+
+  return {
+    success: true,
+    txHash,
+    explorerUrl: `https://basescan.org/tx/${txHash}`,
+    amountInUSD: amountUSD,
+    amountOutTokens: receivedTokens,
+    symbol: discovery.symbol,
+    tokenAddress: discovery.address,
+    gasUsedUSD: gasUsedUSD || 0.001,
+    timestamp: Date.now()
+  };
+}

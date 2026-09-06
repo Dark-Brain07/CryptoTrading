@@ -40,19 +40,17 @@ async function startServer() {
         console.log(`⚡ Health Check: http://localhost:${port}/health`);
         console.log(`=================================================\n`);
     });
-    // Initialize AI Agent Executor and Telegram Bot in background
-    try {
-        await (0, agent_1.initializeAgent)();
-    }
-    catch (e) {
-        console.warn('Agent initialization non-fatal error:', e);
-    }
+    // Initialize Telegram Bot immediately so it is online instantly
     try {
         (0, bot_1.initializeTelegramBot)();
     }
     catch (e) {
         console.warn('Telegram initialization non-fatal error:', e);
     }
+    // Initialize AI Agent Executor in background
+    (0, agent_1.initializeAgent)().catch((e) => {
+        console.warn('Agent initialization non-fatal error:', e);
+    });
 }
 startServer().catch((err) => {
     console.error('Fatal startup error in BaseIndex Agent Server:', err);

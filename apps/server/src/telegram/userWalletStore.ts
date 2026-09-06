@@ -2,6 +2,8 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { formatEther } from 'viem';
 import { publicClient, getOnChainTokenBalance } from '../services/blockchain';
 import { BASE_USDC } from '@baseindex/shared';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export interface TelegramUserWallet {
   address: `0x${string}`;
@@ -11,6 +13,48 @@ export interface TelegramUserWallet {
 
 class TelegramUserWalletStore {
   private wallets: Map<string, TelegramUserWallet> = new Map();
+  private storagePath: string;
+
+  constructor() {
+    // Persistent file store in data/wallets.json
+    const dataDir = path.resolve(process.cwd(), 'data');
+    if (!fs.existsSync(dataDir)) {
+      try {
+        fs.mkdirSync(dataDir, { recursive: true });
+      } catch (e) {
+        // ignore
+      }
+    }
+    this.storagePath = path.join(dataDir, 'wallets.json');
+    this.loadFromDisk();
+  }
+
+  private loadFromDisk() {
+    try {
+      if (fs.existsSync(this.storagePath)) {
+        const data = fs.readFileSync(this.storagePath, 'utf8');
+        const parsed = JSON.parse(data);
+        for (const [k, v] of Object.entries(parsed)) {
+          this.wallets.set(k, v as TelegramUserWallet);
+        }
+        console.log(`Loaded ${this.wallets.size} Telegram agentic wallets from disk.`);
+      }
+    } catch (e) {
+      console.warn('Could not load Telegram wallets from disk:', e);
+    }
+  }
+
+  private saveToDisk() {
+    try {
+      const obj: Record<string, TelegramUserWallet> = {};
+      for (const [k, v] of this.wallets.entries()) {
+        obj[k] = v;
+      }
+      fs.writeFileSync(this.storagePath, JSON.stringify(obj, null, 2), 'utf8');
+    } catch (e) {
+      console.warn('Could not persist Telegram wallets to disk:', e);
+    }
+  }
 
   getWallet(userId: string): TelegramUserWallet | null {
     return this.wallets.get(userId) || null;
@@ -25,6 +69,7 @@ class TelegramUserWalletStore {
       createdAt: Date.now()
     };
     this.wallets.set(userId, wallet);
+    this.saveToDisk();
     return wallet;
   }
 
@@ -58,6 +103,7 @@ class TelegramUserWalletStore {
       createdAt: Date.now()
     };
     this.wallets.set(userId, wallet);
+    this.saveToDisk();
     return wallet;
   }
 
