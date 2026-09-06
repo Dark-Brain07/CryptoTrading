@@ -41,7 +41,7 @@ export interface SwapExecutionResult {
  * Inspects any ERC-20 contract address on Base Mainnet and verifies DEX liquidity on Aerodrome
  */
 export async function discoverTokenMetadata(
-  publicClient: PublicClient,
+  publicClient: any,
   tokenAddress: `0x${string}`
 ): Promise<TokenDiscoveryResult> {
   const code = await publicClient.getBytecode({ address: tokenAddress });
@@ -163,8 +163,8 @@ export async function discoverTokenMetadata(
  * Ensures ERC-20 allowance for Aerodrome Router, sending approve() if required
  */
 export async function ensureTokenAllowance(
-  walletClient: WalletClient,
-  publicClient: PublicClient,
+  walletClient: any,
+  publicClient: any,
   tokenAddress: `0x${string}`,
   spender: `0x${string}`,
   requiredAmount: bigint
@@ -196,8 +196,8 @@ export async function ensureTokenAllowance(
  * Execute 100% Real On-Chain Buy on Aerodrome Router (USDC -> Token)
  */
 export async function executeBuyTokenOnAerodrome(
-  walletClient: WalletClient,
-  publicClient: PublicClient,
+  walletClient: any,
+  publicClient: any,
   params: {
     targetTokenOrSymbol: string;
     amountUSD: number;
@@ -296,8 +296,8 @@ export async function executeBuyTokenOnAerodrome(
  * Execute 100% Real On-Chain Sell on Aerodrome Router (Token -> USDC)
  */
 export async function executeSellTokenOnAerodrome(
-  walletClient: WalletClient,
-  publicClient: PublicClient,
+  walletClient: any,
+  publicClient: any,
   params: {
     tokenAddress: `0x${string}`;
     tokenSymbol: string;
