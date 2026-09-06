@@ -88,8 +88,8 @@ export async function processNaturalLanguageIntent(
   executionResult?: any;
 }> {
   const promptLower = userPrompt.toLowerCase();
-  // Match budget
-  const amountMatch = userPrompt.match(/\$?(\d+(\.\d+)?)/);
+  // Match budget (supports $0.10, $.10, $500, etc.)
+  const amountMatch = userPrompt.match(/(?:\$|\b)(\d+(?:\.\d+)?|\.\d+)/);
   const totalUSD = amountMatch ? parseFloat(amountMatch[1]) : 100;
   const steps: any[] = [];
   const currentAddr = walletMeta?.address && walletMeta.address.startsWith('0x') ? walletMeta.address : (walletKey.startsWith('0x') ? walletKey : null);
