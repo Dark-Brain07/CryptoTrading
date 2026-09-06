@@ -3,6 +3,7 @@ node_modules/
 .next/
 out/
 dist/
+!packages/shared/dist/**
 build/
 .turbo/
 *.tgz
@@ -24,3 +25,5 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 
+
+.vercel
