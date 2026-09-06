@@ -30,20 +30,20 @@ interface ChatTerminalProps {
 }
 
 const QUICK_PROMPTS = [
-  'Buy $0.10 of NVDA',
-  'Sell 0.10 of NVDA to USDC',
-  'Sell all my TSLA to USDC',
+  'Buy $0.10 of AERO',
+  'Buy $0.10 of VIRTUAL',
+  'Swap $1 USDC for WETH',
+  'Buy $0.10 of cbBTC',
+  'Sell all my AERO to USDC',
   'Check My Wallet Balance',
-  'Allocate $100 across 60% NVDA and 40% TSLA',
-  'Withdraw Funds to Main Wallet',
-  'Build a $250 Tech Basket: AAPL, MSFT, and AMZN'
+  'Withdraw Funds to Main Wallet'
 ];
 
 const INITIAL_MESSAGES: AgentMessage[] = [
   {
     id: 'welcome-1',
     role: 'assistant',
-    content: 'Welcome to BaseIndex Agent. I am your autonomous portfolio architect on Base Mainnet.\n\nTell me how you would like to buy or sell tokenized stocks (NVDA, TSLA, AAPL, MSFT, SPY, COIN, AMZN, GOOGL), liquidate positions to USDC, or check your wallet balances.',
+    content: 'Welcome to BaseIndex Agent. I am your autonomous trading agent on Base Mainnet powered by Aerodrome DEX.\n\nTell me which tokens you would like to trade (AERO, WETH, cbBTC, VIRTUAL, DEGEN, or paste any ERC-20 contract address), liquidate to USDC, or check your wallet balances.',
     timestamp: Date.now()
   }
 ];
@@ -147,7 +147,50 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
 
       const data = await res.json();
 
-      // If user has live funds (ETH gas and USDC), broadcast directly to Base blockchain node!
+      // 1. If SELL intent and user has funds, broadcast real on-chain Aerodrome sell!
+      if (
+        data.executionResult &&
+        data.executionResult.action === 'SELL' &&
+        data.executionResult.allocations &&
+        data.executionResult.allocations.length > 0 &&
+        address &&
+        ethBalance > 0.00003
+      ) {
+        try {
+          const sellTrade = data.executionResult.allocations[0];
+          const liveTx = await executeSellOnChain(sellTrade.ticker, sellTrade.amountUSD, sellTrade.shares);
+
+          data.message = `📉 **Confirmed Aerodrome Sell on Base Mainnet (Chain ID 8453)**\n\n` +
+            `• **Asset Sold:** ${liveTx.sharesSold} ${sellTrade.ticker}\n` +
+            `• **USDC Proceeds:** +$${liveTx.amountUSD.toFixed(2)} USDC\n` +
+            `• **Signer:** \`${address}\`\n` +
+            `• **DEX Router:** Aerodrome Router (\`0xcF77...4E43\`)\n` +
+            `• **Status:** Successfully Swapped & Mined On-Chain ✅\n` +
+            `• **BaseScan Link:** [View Verified Transaction](${liveTx.explorerUrl})\n\n` +
+            `Transaction has been confirmed by Base blockchain validators. Your real on-chain USDC balance has been updated.`;
+
+          data.steps = [
+            { id: '1', title: 'Intent Parsed', status: 'completed' as const, detail: `Liquidating ${sellTrade.ticker}` },
+            { id: '2', title: 'Signed by Agentic Wallet', status: 'completed' as const, detail: `Key: ${address.substring(0, 10)}...` },
+            { id: '3', title: 'Aerodrome Swap Confirmed', status: 'completed' as const, detail: `TX: ${liveTx.txHash.substring(0, 12)}...` }
+          ];
+
+          data.executionResult = {
+            ...data.executionResult,
+            overallTxHash: liveTx.txHash,
+            allocations: [{
+              ...sellTrade,
+              txHash: liveTx.txHash,
+              explorerUrl: liveTx.explorerUrl
+            }]
+          };
+        } catch (sellErr: any) {
+          console.warn('Real on-chain sell notice:', sellErr);
+          data.message += `\n\n⚠️ *Notice: ${sellErr?.message || sellErr}*`;
+        }
+      }
+
+      // 2. If BUY intent and user has live funds (ETH gas and USDC), broadcast real Aerodrome DEX swap!
       if (
         data.executionResult &&
         data.executionResult.action !== 'SELL' &&
@@ -161,17 +204,17 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           const firstTrade = data.executionResult.allocations[0];
           const liveTx = await executeBuyOnChain(firstTrade.amountUSD, firstTrade.ticker);
 
-          data.message = `⚡ **Confirmed on Base Blockchain Node (Chain ID 8453)**\n\n` +
-            `• **Asset:** ${firstTrade.shares} ${firstTrade.ticker}\n` +
-            `• **Amount:** $${firstTrade.amountUSD.toFixed(2)} USDC\n` +
+          data.message = `⚡ **Confirmed Aerodrome DEX Swap on Base Mainnet (Chain ID 8453)**\n\n` +
+            `• **Asset Received:** ${liveTx.shares} ${liveTx.symbol}\n` +
+            `• **USDC Swapped:** $${firstTrade.amountUSD.toFixed(2)} USDC\n` +
             `• **Signer:** \`${address}\`\n` +
-            `• **Node:** \`https://mainnet.base.org\`\n` +
+            `• **DEX Router:** Aerodrome Router (\`0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43\`)\n` +
             `• **Status:** Successfully Mined On-Chain ✅\n` +
-            `• **BaseScan Link:** [View Live Transaction](${liveTx.explorerUrl})\n\n` +
-            `Transaction has been confirmed by Base blockchain validators. Your real on-chain USDC balance has been updated.`;
+            `• **BaseScan Link:** [View Live Verified Transaction](${liveTx.explorerUrl})\n\n` +
+            `Transaction has been confirmed by Base blockchain validators. Your real on-chain ${liveTx.symbol} balance has been credited.`;
 
           data.steps = [
-            { id: '1', title: 'Intent Parsed', status: 'completed' as const, detail: `Quoting ${firstTrade.ticker}` },
+            { id: '1', title: 'Intent Parsed', status: 'completed' as const, detail: `Quoted ${firstTrade.ticker} via Aerodrome` },
             { id: '2', title: 'Signed by Agentic Wallet', status: 'completed' as const, detail: `Key: ${address.substring(0, 10)}...` },
             { id: '3', title: 'Broadcasted to Base Node', status: 'completed' as const, detail: `TX: ${liveTx.txHash.substring(0, 12)}...` }
           ];
@@ -187,6 +230,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           };
         } catch (liveBroadcastErr: any) {
           console.warn('Real on-chain broadcast notice:', liveBroadcastErr);
+          data.message += `\n\n⚠️ *Notice: ${liveBroadcastErr?.message || liveBroadcastErr}*`;
         }
       }
 

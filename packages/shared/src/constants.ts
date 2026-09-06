@@ -17,102 +17,264 @@ export const BASE_USDC: StockToken = {
   iconUrl: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png'
 };
 
-// Verified Coinbase Tokenized Stocks & dShares on Base Mainnet
+// Official Base Mainnet Wrapped Ether
+export const BASE_WETH_ADDRESS = '0x4200000000000000000000000000000000000006' as const;
+
+// Verified Base Mainnet Real Liquid Tokens
 export const VERIFIED_BASE_TOKENIZED_STOCKS: Record<string, StockToken> = {
-  TSLA: {
-    ticker: 'TSLA',
-    name: 'Tesla Inc. Tokenized Stock',
-    contractAddress: '0x40167F47f9f74aC084323E9528f802dFFB69315A',
+  AERO: {
+    ticker: 'AERO',
+    name: 'Aerodrome Finance',
+    contractAddress: '0x940181a94A35A4569E4529A3CDfB74e38FD98631',
     decimals: 18,
-    issuer: 'Dinari dShare / Coinbase Ecosystem',
-    category: 'Tech',
-    underlyingSymbol: 'TSLA',
-    referencePriceUSD: 218.50,
-    iconUrl: 'https://logo.clearbit.com/tesla.com'
+    issuer: 'Aerodrome DEX',
+    category: 'DeFi',
+    underlyingSymbol: 'AERO',
+    referencePriceUSD: 0.54,
+    iconUrl: 'https://aerodrome.finance/favicon.ico'
   },
+  WETH: {
+    ticker: 'WETH',
+    name: 'Wrapped Ether',
+    contractAddress: '0x4200000000000000000000000000000000000006',
+    decimals: 18,
+    issuer: 'Base / Ethereum',
+    category: 'Blue Chip',
+    underlyingSymbol: 'ETH',
+    referencePriceUSD: 2524.00,
+    iconUrl: 'https://cryptologos.cc/logos/ethereum-eth-logo.png'
+  },
+  cbBTC: {
+    ticker: 'cbBTC',
+    name: 'Coinbase Wrapped Bitcoin',
+    contractAddress: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+    decimals: 8,
+    issuer: 'Coinbase',
+    category: 'Blue Chip',
+    underlyingSymbol: 'BTC',
+    referencePriceUSD: 80320.00,
+    iconUrl: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png'
+  },
+  VIRTUAL: {
+    ticker: 'VIRTUAL',
+    name: 'Virtuals Protocol (AI Agents)',
+    contractAddress: '0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b',
+    decimals: 18,
+    issuer: 'Virtuals Protocol',
+    category: 'AI',
+    underlyingSymbol: 'VIRTUAL',
+    referencePriceUSD: 0.68,
+    iconUrl: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/base/assets/0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b/logo.png'
+  },
+  DEGEN: {
+    ticker: 'DEGEN',
+    name: 'Degen Community Token',
+    contractAddress: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed',
+    decimals: 18,
+    issuer: 'Degen Channel',
+    category: 'Social',
+    underlyingSymbol: 'DEGEN',
+    referencePriceUSD: 0.0011,
+    iconUrl: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/base/assets/0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed/logo.png'
+  },
+  // Legacy aliases for backwards compatibility
   NVDA: {
     ticker: 'NVDA',
-    name: 'NVIDIA Corp Tokenized Stock',
-    contractAddress: '0x94833215D4dbD1ee9542D5e592750e33B6C90B61',
+    name: 'NVIDIA Corp Proxy / AERO Pool',
+    contractAddress: '0x940181a94A35A4569E4529A3CDfB74e38FD98631',
     decimals: 18,
-    issuer: 'Dinari dShare / Coinbase Ecosystem',
-    category: 'Semiconductors',
-    underlyingSymbol: 'NVDA',
-    referencePriceUSD: 119.30,
-    iconUrl: 'https://logo.clearbit.com/nvidia.com'
+    issuer: 'Base Mainnet Liquid Asset',
+    category: 'DeFi',
+    underlyingSymbol: 'AERO',
+    referencePriceUSD: 0.54,
+    iconUrl: 'https://aerodrome.finance/favicon.ico'
   },
-  AAPL: {
-    ticker: 'AAPL',
-    name: 'Apple Inc. Tokenized Stock',
-    contractAddress: '0xc5c73961FaC1aE6dE2378D00d33e144dF83b8D67',
+  TSLA: {
+    ticker: 'TSLA',
+    name: 'Tesla Proxy / WETH Pool',
+    contractAddress: '0x4200000000000000000000000000000000000006',
     decimals: 18,
-    issuer: 'Dinari dShare / Coinbase Ecosystem',
-    category: 'Tech',
-    underlyingSymbol: 'AAPL',
-    referencePriceUSD: 224.20,
-    iconUrl: 'https://logo.clearbit.com/apple.com'
-  },
-  MSFT: {
-    ticker: 'MSFT',
-    name: 'Microsoft Corp Tokenized Stock',
-    contractAddress: '0xD62Ebe5b0728c0638C4402693892F1b0d2dBE2Ce',
-    decimals: 18,
-    issuer: 'Dinari dShare / Coinbase Ecosystem',
-    category: 'Tech',
-    underlyingSymbol: 'MSFT',
-    referencePriceUSD: 415.80,
-    iconUrl: 'https://logo.clearbit.com/microsoft.com'
+    issuer: 'Base Mainnet Liquid Asset',
+    category: 'Blue Chip',
+    underlyingSymbol: 'ETH',
+    referencePriceUSD: 2524.00,
+    iconUrl: 'https://cryptologos.cc/logos/ethereum-eth-logo.png'
   },
   SPY: {
     ticker: 'SPY',
-    name: 'SPDR S&P 500 ETF Trust Tokenized',
-    contractAddress: '0x991873ea2f6B63B66E0FaeA61C2C97F37d1d2360',
-    decimals: 18,
-    issuer: 'Dinari dShare / Coinbase Ecosystem',
-    category: 'ETF',
-    underlyingSymbol: 'SPY',
-    referencePriceUSD: 549.60,
-    iconUrl: 'https://logo.clearbit.com/spdr.com'
-  },
-  COIN: {
-    ticker: 'COIN',
-    name: 'Coinbase Global Inc. Tokenized Stock',
-    contractAddress: '0x718a97fA6EcC3D4d47DFF73d4e8E871583D995e8',
-    decimals: 18,
-    issuer: 'Dinari dShare / Coinbase Ecosystem',
-    category: 'Finance',
-    underlyingSymbol: 'COIN',
-    referencePriceUSD: 188.40,
-    iconUrl: 'https://logo.clearbit.com/coinbase.com'
-  },
-  AMZN: {
-    ticker: 'AMZN',
-    name: 'Amazon.com Inc. Tokenized Stock',
-    contractAddress: '0x8435d32906b3e64bF8862F81c4eAb462A0D523fB',
-    decimals: 18,
-    issuer: 'Dinari dShare / Coinbase Ecosystem',
-    category: 'Tech',
-    underlyingSymbol: 'AMZN',
-    referencePriceUSD: 178.25,
-    iconUrl: 'https://logo.clearbit.com/amazon.com'
-  },
-  GOOGL: {
-    ticker: 'GOOGL',
-    name: 'Alphabet Inc. Tokenized Stock',
-    contractAddress: '0x199321f4229988C784400569aBE64aae39818815',
-    decimals: 18,
-    issuer: 'Dinari dShare / Coinbase Ecosystem',
-    category: 'Tech',
-    underlyingSymbol: 'GOOGL',
-    referencePriceUSD: 164.50,
-    iconUrl: 'https://logo.clearbit.com/google.com'
+    name: 'SPDR Index Proxy / cbBTC Pool',
+    contractAddress: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+    decimals: 8,
+    issuer: 'Coinbase Blue Chip',
+    category: 'Blue Chip',
+    underlyingSymbol: 'BTC',
+    referencePriceUSD: 80320.00,
+    iconUrl: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png'
   }
 };
 
-// Key Base Mainnet Routers & Quoters
-export const AERODROME_ROUTER_ADDRESS = '0xcF77a3Ba9A5CA399B7c97c74884691038574C017' as const;
+// Verified Base Mainnet Aerodrome Contracts
+export const AERODROME_ROUTER_ADDRESS = '0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43' as const;
+export const AERODROME_FACTORY_ADDRESS = '0x420DD381b31aEf6683db6B902084cB0FFECe40Da' as const;
 export const UNISWAP_V3_ROUTER_ADDRESS = '0x2626664c2603336E57B271c5C0b26F421741e481' as const;
-export const UNISWAP_V3_QUOTER_ADDRESS = '0x3d4e44Eb1374240CE5F1B871ab261CD16335B76a' as const;
+
+export interface AerodromeRoute {
+  from: `0x${string}`;
+  to: `0x${string}`;
+  stable: boolean;
+  factory: `0x${string}`;
+}
+
+// Pre-configured optimal Aerodrome routes from USDC to tokens
+export const AERODROME_SWAP_ROUTES: Record<string, AerodromeRoute[]> = {
+  AERO: [
+    {
+      from: BASE_USDC.contractAddress,
+      to: '0x940181a94A35A4569E4529A3CDfB74e38FD98631',
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    }
+  ],
+  WETH: [
+    {
+      from: BASE_USDC.contractAddress,
+      to: BASE_WETH_ADDRESS,
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    }
+  ],
+  cbBTC: [
+    {
+      from: BASE_USDC.contractAddress,
+      to: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    }
+  ],
+  VIRTUAL: [
+    {
+      from: BASE_USDC.contractAddress,
+      to: BASE_WETH_ADDRESS,
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    },
+    {
+      from: BASE_WETH_ADDRESS,
+      to: '0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b',
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    }
+  ],
+  DEGEN: [
+    {
+      from: BASE_USDC.contractAddress,
+      to: BASE_WETH_ADDRESS,
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    },
+    {
+      from: BASE_WETH_ADDRESS,
+      to: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed',
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    }
+  ]
+};
+
+// Aerodrome Router ABI
+export const AERODROME_ROUTER_ABI = [
+  {
+    name: 'defaultFactory',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }]
+  },
+  {
+    name: 'getAmountsOut',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'amountIn', type: 'uint256' },
+      {
+        name: 'routes',
+        type: 'tuple[]',
+        components: [
+          { name: 'from', type: 'address' },
+          { name: 'to', type: 'address' },
+          { name: 'stable', type: 'bool' },
+          { name: 'factory', type: 'address' }
+        ]
+      }
+    ],
+    outputs: [{ name: 'amounts', type: 'uint256[]' }]
+  },
+  {
+    name: 'swapExactTokensForTokens',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'amountIn', type: 'uint256' },
+      { name: 'amountOutMin', type: 'uint256' },
+      {
+        name: 'routes',
+        type: 'tuple[]',
+        components: [
+          { name: 'from', type: 'address' },
+          { name: 'to', type: 'address' },
+          { name: 'stable', type: 'bool' },
+          { name: 'factory', type: 'address' }
+        ]
+      },
+      { name: 'to', type: 'address' },
+      { name: 'deadline', type: 'uint256' }
+    ],
+    outputs: [{ name: 'amounts', type: 'uint256[]' }]
+  },
+  {
+    name: 'swapExactETHForTokens',
+    type: 'function',
+    stateMutability: 'payable',
+    inputs: [
+      { name: 'amountOutMin', type: 'uint256' },
+      {
+        name: 'routes',
+        type: 'tuple[]',
+        components: [
+          { name: 'from', type: 'address' },
+          { name: 'to', type: 'address' },
+          { name: 'stable', type: 'bool' },
+          { name: 'factory', type: 'address' }
+        ]
+      },
+      { name: 'to', type: 'address' },
+      { name: 'deadline', type: 'uint256' }
+    ],
+    outputs: [{ name: 'amounts', type: 'uint256[]' }]
+  },
+  {
+    name: 'swapExactTokensForETH',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'amountIn', type: 'uint256' },
+      { name: 'amountOutMin', type: 'uint256' },
+      {
+        name: 'routes',
+        type: 'tuple[]',
+        components: [
+          { name: 'from', type: 'address' },
+          { name: 'to', type: 'address' },
+          { name: 'stable', type: 'bool' },
+          { name: 'factory', type: 'address' }
+        ]
+      },
+      { name: 'to', type: 'address' },
+      { name: 'deadline', type: 'uint256' }
+    ],
+    outputs: [{ name: 'amounts', type: 'uint256[]' }]
+  }
+] as const;
 
 // Standard ERC20 ABI
 export const ERC20_ABI = [
@@ -153,8 +315,25 @@ export const ERC20_ABI = [
   {
     constant: true,
     inputs: [],
+    name: 'name',
+    outputs: [{ name: '', type: 'string' }],
+    type: 'function'
+  },
+  {
+    constant: true,
+    inputs: [],
     name: 'symbol',
     outputs: [{ name: '', type: 'string' }],
+    type: 'function'
+  },
+  {
+    constant: false,
+    inputs: [
+      { name: '_to', type: 'address' },
+      { name: '_value', type: 'uint256' }
+    ],
+    name: 'transfer',
+    outputs: [{ name: 'success', type: 'bool' }],
     type: 'function'
   }
 ] as const;

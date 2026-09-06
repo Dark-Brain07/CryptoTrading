@@ -11,40 +11,52 @@ class PortfolioStore {
   private seedDefaultPortfolio(walletKey: string) {
     const defaultMap = new Map<string, PortfolioHolding>();
 
-    defaultMap.set('NVDA', {
-      ticker: 'NVDA',
-      name: VERIFIED_BASE_TOKENIZED_STOCKS.NVDA.name,
-      balance: 12.5,
-      balanceUSD: Number((12.5 * VERIFIED_BASE_TOKENIZED_STOCKS.NVDA.referencePriceUSD).toFixed(2)),
-      currentPrice: VERIFIED_BASE_TOKENIZED_STOCKS.NVDA.referencePriceUSD,
-      change24h: 3.42,
-      allocationPercentage: 35.2,
-      contractAddress: VERIFIED_BASE_TOKENIZED_STOCKS.NVDA.contractAddress,
-      explorerUrl: `${BASE_EXPLORER_URL}/token/${VERIFIED_BASE_TOKENIZED_STOCKS.NVDA.contractAddress}`
+    defaultMap.set('AERO', {
+      ticker: 'AERO',
+      name: VERIFIED_BASE_TOKENIZED_STOCKS.AERO.name,
+      balance: 145.2,
+      balanceUSD: Number((145.2 * VERIFIED_BASE_TOKENIZED_STOCKS.AERO.referencePriceUSD).toFixed(2)),
+      currentPrice: VERIFIED_BASE_TOKENIZED_STOCKS.AERO.referencePriceUSD,
+      change24h: 4.82,
+      allocationPercentage: 35.0,
+      contractAddress: VERIFIED_BASE_TOKENIZED_STOCKS.AERO.contractAddress,
+      explorerUrl: `${BASE_EXPLORER_URL}/token/${VERIFIED_BASE_TOKENIZED_STOCKS.AERO.contractAddress}`
     });
 
-    defaultMap.set('TSLA', {
-      ticker: 'TSLA',
-      name: VERIFIED_BASE_TOKENIZED_STOCKS.TSLA.name,
-      balance: 5.2,
-      balanceUSD: Number((5.2 * VERIFIED_BASE_TOKENIZED_STOCKS.TSLA.referencePriceUSD).toFixed(2)),
-      currentPrice: VERIFIED_BASE_TOKENIZED_STOCKS.TSLA.referencePriceUSD,
-      change24h: -1.18,
-      allocationPercentage: 26.8,
-      contractAddress: VERIFIED_BASE_TOKENIZED_STOCKS.TSLA.contractAddress,
-      explorerUrl: `${BASE_EXPLORER_URL}/token/${VERIFIED_BASE_TOKENIZED_STOCKS.TSLA.contractAddress}`
+    defaultMap.set('WETH', {
+      ticker: 'WETH',
+      name: VERIFIED_BASE_TOKENIZED_STOCKS.WETH.name,
+      balance: 0.045,
+      balanceUSD: Number((0.045 * VERIFIED_BASE_TOKENIZED_STOCKS.WETH.referencePriceUSD).toFixed(2)),
+      currentPrice: VERIFIED_BASE_TOKENIZED_STOCKS.WETH.referencePriceUSD,
+      change24h: 1.65,
+      allocationPercentage: 30.0,
+      contractAddress: VERIFIED_BASE_TOKENIZED_STOCKS.WETH.contractAddress,
+      explorerUrl: `${BASE_EXPLORER_URL}/token/${VERIFIED_BASE_TOKENIZED_STOCKS.WETH.contractAddress}`
     });
 
-    defaultMap.set('SPY', {
-      ticker: 'SPY',
-      name: VERIFIED_BASE_TOKENIZED_STOCKS.SPY.name,
-      balance: 2.8,
-      balanceUSD: Number((2.8 * VERIFIED_BASE_TOKENIZED_STOCKS.SPY.referencePriceUSD).toFixed(2)),
-      currentPrice: VERIFIED_BASE_TOKENIZED_STOCKS.SPY.referencePriceUSD,
-      change24h: 0.65,
-      allocationPercentage: 38.0,
-      contractAddress: VERIFIED_BASE_TOKENIZED_STOCKS.SPY.contractAddress,
-      explorerUrl: `${BASE_EXPLORER_URL}/token/${VERIFIED_BASE_TOKENIZED_STOCKS.SPY.contractAddress}`
+    defaultMap.set('VIRTUAL', {
+      ticker: 'VIRTUAL',
+      name: VERIFIED_BASE_TOKENIZED_STOCKS.VIRTUAL.name,
+      balance: 85.0,
+      balanceUSD: Number((85.0 * VERIFIED_BASE_TOKENIZED_STOCKS.VIRTUAL.referencePriceUSD).toFixed(2)),
+      currentPrice: VERIFIED_BASE_TOKENIZED_STOCKS.VIRTUAL.referencePriceUSD,
+      change24h: 8.42,
+      allocationPercentage: 20.0,
+      contractAddress: VERIFIED_BASE_TOKENIZED_STOCKS.VIRTUAL.contractAddress,
+      explorerUrl: `${BASE_EXPLORER_URL}/token/${VERIFIED_BASE_TOKENIZED_STOCKS.VIRTUAL.contractAddress}`
+    });
+
+    defaultMap.set('cbBTC', {
+      ticker: 'cbBTC',
+      name: VERIFIED_BASE_TOKENIZED_STOCKS.cbBTC.name,
+      balance: 0.00065,
+      balanceUSD: Number((0.00065 * VERIFIED_BASE_TOKENIZED_STOCKS.cbBTC.referencePriceUSD).toFixed(2)),
+      currentPrice: VERIFIED_BASE_TOKENIZED_STOCKS.cbBTC.referencePriceUSD,
+      change24h: -0.45,
+      allocationPercentage: 15.0,
+      contractAddress: VERIFIED_BASE_TOKENIZED_STOCKS.cbBTC.contractAddress,
+      explorerUrl: `${BASE_EXPLORER_URL}/token/${VERIFIED_BASE_TOKENIZED_STOCKS.cbBTC.contractAddress}`
     });
 
     this.holdings.set(walletKey, defaultMap);
@@ -60,7 +72,6 @@ class PortfolioStore {
     const items = Array.from(map.values());
     const totalUSD = items.reduce((acc, item) => acc + item.balanceUSD, 0);
 
-    // Recompute percentage distribution
     return items.map((item) => ({
       ...item,
       allocationPercentage: totalUSD > 0 ? Number(((item.balanceUSD / totalUSD) * 100).toFixed(1)) : 0
@@ -81,29 +92,33 @@ class PortfolioStore {
       map = this.holdings.get(key)!;
     }
 
-    const stock = VERIFIED_BASE_TOKENIZED_STOCKS[ticker];
-    if (!stock) return;
+    const symbol = ticker.toUpperCase().replace(/^[$]/, '');
+    const stock = VERIFIED_BASE_TOKENIZED_STOCKS[symbol];
+    const refPrice = stock ? stock.referencePriceUSD : (sharesPurchased > 0 ? amountUSD / sharesPurchased : 1.0);
+    const contractAddress = stock ? stock.contractAddress : (ticker.startsWith('0x') ? ticker as `0x${string}` : '0x0000000000000000000000000000000000000000');
+    const name = stock ? stock.name : `${symbol} Token`;
 
-    const existing = map.get(ticker);
+    const existing = map.get(symbol);
     if (existing) {
-      const newBalance = Number((existing.balance + sharesPurchased).toFixed(4));
-      const newBalanceUSD = Number((newBalance * stock.referencePriceUSD).toFixed(2));
-      map.set(ticker, {
+      const newBalance = Number((existing.balance + sharesPurchased).toFixed(6));
+      const newBalanceUSD = Number((newBalance * refPrice).toFixed(2));
+      map.set(symbol, {
         ...existing,
         balance: newBalance,
-        balanceUSD: newBalanceUSD
+        balanceUSD: newBalanceUSD,
+        explorerUrl: `${BASE_EXPLORER_URL}/tx/${txHash}`
       });
     } else {
-      map.set(ticker, {
-        ticker: stock.ticker,
-        name: stock.name,
-        balance: Number(sharesPurchased.toFixed(4)),
+      map.set(symbol, {
+        ticker: symbol,
+        name,
+        balance: Number(sharesPurchased.toFixed(6)),
         balanceUSD: Number(amountUSD.toFixed(2)),
-        currentPrice: stock.referencePriceUSD,
-        change24h: 1.5,
+        currentPrice: refPrice,
+        change24h: 2.1,
         allocationPercentage: 0,
-        contractAddress: stock.contractAddress,
-        explorerUrl: `${BASE_EXPLORER_URL}/token/${stock.contractAddress}`
+        contractAddress,
+        explorerUrl: `${BASE_EXPLORER_URL}/tx/${txHash}`
       });
     }
   }
@@ -122,42 +137,39 @@ class PortfolioStore {
       map = this.holdings.get(key)!;
     }
 
-    const stock = VERIFIED_BASE_TOKENIZED_STOCKS[ticker];
-    if (!stock) {
-      throw new Error(`Asset ${ticker} not supported on Base Mainnet.`);
-    }
+    const symbol = ticker.toUpperCase().replace(/^[$]/, '');
+    const stock = VERIFIED_BASE_TOKENIZED_STOCKS[symbol];
+    const refPrice = stock ? stock.referencePriceUSD : 1.0;
 
-    const existing = map.get(ticker);
+    const existing = map.get(symbol);
     if (!existing || existing.balance <= 0) {
-      throw new Error(`You do not have any ${ticker} holdings in your wallet to sell.`);
+      throw new Error(`You do not have any ${symbol} holdings in your wallet to sell.`);
     }
 
     let calculatedShares = sharesSold;
     let calculatedUSD = amountUSD;
 
     if (calculatedShares !== undefined && calculatedShares > 0) {
-      calculatedUSD = Number((calculatedShares * stock.referencePriceUSD).toFixed(4));
+      calculatedUSD = Number((calculatedShares * refPrice).toFixed(4));
     } else if (calculatedUSD !== undefined && calculatedUSD > 0) {
-      calculatedShares = Number((calculatedUSD / stock.referencePriceUSD).toFixed(6));
+      calculatedShares = Number((calculatedUSD / refPrice).toFixed(6));
     } else {
-      // Default to selling entire position if neither specified
       calculatedShares = existing.balance;
       calculatedUSD = existing.balanceUSD;
     }
 
-    // Clamp to available balance
     if (calculatedShares > existing.balance) {
       calculatedShares = existing.balance;
-      calculatedUSD = Number((calculatedShares * stock.referencePriceUSD).toFixed(4));
+      calculatedUSD = Number((calculatedShares * refPrice).toFixed(4));
     }
 
     const remainingShares = Math.max(0, Number((existing.balance - calculatedShares).toFixed(6)));
-    const remainingUSD = Math.max(0, Number((remainingShares * stock.referencePriceUSD).toFixed(2)));
+    const remainingUSD = Math.max(0, Number((remainingShares * refPrice).toFixed(2)));
 
     if (remainingShares <= 0.000001) {
-      map.delete(ticker);
+      map.delete(symbol);
     } else {
-      map.set(ticker, {
+      map.set(symbol, {
         ...existing,
         balance: remainingShares,
         balanceUSD: remainingUSD

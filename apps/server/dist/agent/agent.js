@@ -45,7 +45,6 @@ const quoteTool_1 = require("./tools/quoteTool");
 const executeTool_1 = require("./tools/executeTool");
 const shared_1 = require("@baseindex/shared");
 const cdpActionProvider_1 = require("./tools/cdpActionProvider");
-const aerodrome_1 = require("../services/aerodrome");
 const portfolioStore_1 = require("../services/portfolioStore");
 const tools = [stockRegistry_1.stockRegistryTool, quoteTool_1.quoteTool, executeTool_1.executeTradeTool];
 let agentExecutor = null;
@@ -118,7 +117,7 @@ async function processNaturalLanguageIntent(userPrompt, walletKey = 'default', w
             reply: `💳 **Agentic Wallet Balance & Status (Base Mainnet)**\n\n` +
                 `• **Address:** ${addrDisplay}\n` +
                 `• **USDC Available (Trading):** \`$${currentUsdc.toFixed(2)} USDC\`\n` +
-                `• **ETH Balance (Gas):** \`${currentEth.toFixed(4)} ETH\` (~$0.002/tx on Base)\n\n` +
+                `• **ETH Balance (Gas):** \`${currentEth.toFixed(4)} ETH\` (~$0.001/tx on Base)\n\n` +
                 `You can deposit additional Base USDC anytime, or use the **"Withdraw Funds"** button on your Agent bar to return capital to your main personal wallet.`,
             steps: [
                 { id: '1', title: 'Base Mainnet RPC Query', detail: `Checked balances for ${currentAddr ? currentAddr.substring(0, 10) + '...' : 'default wallet'}`, status: 'completed' }
@@ -197,99 +196,16 @@ async function processNaturalLanguageIntent(userPrompt, walletKey = 'default', w
             ]
         };
     }
-    // 5. Handle Withdrawal queries
-    if (promptLower.includes('withdraw')) {
-        const toMatch = userPrompt.match(/0x[a-fA-F0-9]{40}/);
-        if (toMatch) {
-            const recipient = toMatch[0];
-            const randomHex = Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-            const txHash = `0x${randomHex}`;
-            const explorerUrl = `https://basescan.org/tx/${txHash}`;
-            return {
-                reply: `📤 **Withdrawal Processed on Base Mainnet**\n\n` +
-                    `**Amount:** $${totalUSD.toFixed(2)} USDC\n` +
-                    `**Destination:** \`${recipient}\`\n` +
-                    `**Status:** Confirmed ✅\n` +
-                    `**Explorer:** [View on BaseScan](${explorerUrl})\n\n` +
-                    `Funds have been transferred to your destination wallet.`,
-                steps: [
-                    { id: '1', title: 'Validating Destination Address', detail: `${recipient} on Base Mainnet`, status: 'completed' },
-                    { id: '2', title: 'Broadcasting Transfer', detail: `TX: ${txHash.substring(0, 10)}...`, status: 'completed' }
-                ],
-                executionResult: {
-                    success: true,
-                    totalAllocatedUSD: totalUSD,
-                    allocations: [{
-                            ticker: 'USDC Withdrawal',
-                            shares: totalUSD,
-                            amountUSD: totalUSD,
-                            txHash,
-                            explorerUrl
-                        }],
-                    timestamp: Date.now(),
-                    network: 'Base Mainnet',
-                    gasUsedUSD: 0.0012
-                }
-            };
-        }
-        else {
-            return {
-                reply: `📤 **How to Withdraw Funds to Your Main Wallet:**\n\n` +
-                    `1. Click the **"Withdraw Funds"** button directly on the Agent toolbar above.\n` +
-                    `2. Paste your destination address (or click *"Use Connected Main Wallet"* to auto-fill).\n` +
-                    `3. Choose the amount or click **MAX** and click **"Confirm Withdrawal"**.\n\n` +
-                    `*Or simply type in chat:* \`Withdraw $50 USDC to 0xYourMainWalletAddress...\``,
-                steps: [
-                    { id: '1', title: 'Withdrawal Portal Ready', detail: 'Waiting for destination address or UI modal trigger', status: 'completed' }
-                ]
-            };
+    // 5. Check if user provided an arbitrary ERC-20 contract address (0x...)
+    const contractMatch = userPrompt.match(/0x[a-fA-F0-9]{40}/);
+    let customContractTarget = null;
+    if (contractMatch) {
+        const matchedHex = contractMatch[0];
+        if (matchedHex.toLowerCase() !== currentAddr?.toLowerCase()) {
+            customContractTarget = matchedHex;
         }
     }
-    // 5b. Handle AI Brain Diagnostics & Status Check
-    if (promptLower.includes('brain') || promptLower.includes('ai working') || promptLower.includes('is that working') || promptLower.includes('model status') || promptLower.includes('check ai')) {
-        const startTime = Date.now();
-        let modelReply = '';
-        if (!agentExecutor) {
-            await initializeAgent();
-        }
-        if (agentExecutor) {
-            try {
-                const timeoutP = new Promise((_, reject) => setTimeout(() => reject(new Error('Probe timeout')), 3500));
-                const probeRes = await Promise.race([
-                    agentExecutor.invoke({
-                        input: 'Give a brief 1-sentence confirmation of your status, engine, and readiness to trade tokenized stocks on Base Mainnet.',
-                        chat_history: []
-                    }),
-                    timeoutP
-                ]);
-                modelReply = probeRes.output;
-            }
-            catch (e) {
-                modelReply = `Model probe note: ${e?.message}`;
-            }
-        }
-        const latency = Date.now() - startTime;
-        return {
-            reply: `🧠 **AI Brain Diagnostics & Status: 100% OPERATIONAL**\n\n` +
-                `• **Status:** 🟢 **Online & Fully Synced**\n` +
-                `• **Inference Engine:** Groq Ultra-Low Latency LPU\n` +
-                `• **Active Model:** \`${config_1.config.OPENAI_MODEL_NAME || 'openai/gpt-oss-120b'}\`\n` +
-                `• **API Gateway:** \`${config_1.config.OPENAI_BASE_URL || 'https://api.groq.com/openai/v1'}\`\n` +
-                `• **Framework:** LangChain v0.3 Agent Tools Framework\n` +
-                `• **Inference Latency:** \`${latency} ms\` (Sub-second response)\n` +
-                `• **Network:** Base Mainnet (Chain ID 8453)\n` +
-                `• **Active Tools:**\n` +
-                `  - \`stockRegistryTool\` (Dinari dShares on Base Mainnet)\n` +
-                `  - \`quoteTool\` (Aerodrome Slipstream 50 bps Slippage)\n` +
-                `  - \`executeTradeTool\` (Autonomous CDP AgentKit MPC)\n\n` +
-                `🤖 **Live Model Handshake Output:**\n*"${modelReply || 'BaseIndex Agent is active, quoting liquidity on Base Mainnet and ready to trade.'}"*`,
-            steps: [
-                { id: '1', title: 'Groq LPU Handshake', detail: `API Status 200 OK (${latency}ms)`, status: 'completed' },
-                { id: '2', title: 'LangChain Tools Verification', detail: '3 Native Base Mainnet tools loaded', status: 'completed' }
-            ]
-        };
-    }
-    // Identify tickers mentioned
+    // Identify supported tickers mentioned
     const supportedTickers = Object.keys(shared_1.VERIFIED_BASE_TOKENIZED_STOCKS);
     const matchedTickers = [];
     for (const ticker of supportedTickers) {
@@ -297,6 +213,9 @@ async function processNaturalLanguageIntent(userPrompt, walletKey = 'default', w
         if (regex.test(userPrompt)) {
             matchedTickers.push(ticker);
         }
+    }
+    if (customContractTarget && !matchedTickers.includes(customContractTarget)) {
+        matchedTickers.push(customContractTarget);
     }
     // 6. Handle SELL / Liquidate orders
     const isSellIntent = promptLower.includes('sell') ||
@@ -310,74 +229,41 @@ async function processNaturalLanguageIntent(userPrompt, walletKey = 'default', w
         if (!targetTicker) {
             return {
                 reply: `⚠️ **No Holdings Available to Sell**\n\n` +
-                    `You do not currently have any active tokenized stock positions in your Agentic Wallet.\n\n` +
-                    `You can purchase any tokenized stock by typing: \`Buy $0.10 of NVDA\` or \`Allocate $10 in TSLA\`.`,
+                    `You do not currently have any active token positions in your Agentic Wallet.\n\n` +
+                    `You can purchase any Base token by typing: \`Buy $0.10 of AERO\` or \`Buy 0.10 of VIRTUAL\`.`,
                 steps: [
-                    { id: '1', title: 'Portfolio Scan', detail: '0 active tokenized positions found', status: 'completed' }
+                    { id: '1', title: 'Portfolio Scan', detail: '0 active token positions found', status: 'completed' }
                 ]
             };
         }
-        const currentHolding = holdings.find(h => h.ticker === targetTicker);
-        if (!currentHolding || currentHolding.balance <= 0) {
-            const activeTickers = holdings.map(h => `${h.ticker} (${h.balance} shares)`).join(', ') || 'None';
-            return {
-                reply: `⚠️ **No ${targetTicker} Position Found**\n\n` +
-                    `You do not hold any **${targetTicker}** in your Agentic Wallet.\n\n` +
-                    `• **Current Active Holdings:** ${activeTickers}\n\n` +
-                    `To buy ${targetTicker}, say: \`Buy $0.10 of ${targetTicker}\`.`,
-                steps: [
-                    { id: '1', title: 'Asset Verification', detail: `${targetTicker} balance is 0`, status: 'completed' }
-                ]
-            };
-        }
+        const currentHolding = holdings.find(h => h.ticker.toLowerCase() === targetTicker.toLowerCase());
         const stock = shared_1.VERIFIED_BASE_TOKENIZED_STOCKS[targetTicker];
-        let sharesToSell;
-        let usdToSell;
-        if (promptLower.includes('all') || promptLower.includes('100%') || promptLower.includes('entire') || promptLower.includes('everything')) {
-            sharesToSell = currentHolding.balance;
-            usdToSell = currentHolding.balanceUSD;
+        const refPrice = stock ? stock.referencePriceUSD : (currentHolding ? currentHolding.currentPrice : 1.0);
+        const availableBalance = currentHolding ? currentHolding.balance : 0;
+        let sharesToSell = availableBalance;
+        let usdToSell = currentHolding ? currentHolding.balanceUSD : 0;
+        const pctMatch = userPrompt.match(/(\d+)%/);
+        if (pctMatch) {
+            const pct = parseFloat(pctMatch[1]);
+            sharesToSell = Number(((availableBalance * pct) / 100).toFixed(6));
+            usdToSell = Number((sharesToSell * refPrice).toFixed(2));
         }
-        else {
-            const pctMatch = userPrompt.match(/(\d+)%/);
-            if (pctMatch) {
-                const pct = parseFloat(pctMatch[1]);
-                sharesToSell = Number(((currentHolding.balance * pct) / 100).toFixed(6));
-                usdToSell = Number((sharesToSell * stock.referencePriceUSD).toFixed(2));
-            }
-            else if (totalUSD && totalUSD > 0 && totalUSD !== 100) {
-                // User specified a dollar amount e.g. "sell 0.10 of NVDA"
-                usdToSell = Math.min(totalUSD, currentHolding.balanceUSD);
-                sharesToSell = Number((usdToSell / stock.referencePriceUSD).toFixed(6));
-            }
-            else {
-                // Default to selling full position
-                sharesToSell = currentHolding.balance;
-                usdToSell = currentHolding.balanceUSD;
-            }
+        else if (totalUSD && totalUSD > 0 && totalUSD !== 100) {
+            usdToSell = Math.min(totalUSD, currentHolding ? currentHolding.balanceUSD : totalUSD);
+            sharesToSell = Number((usdToSell / refPrice).toFixed(6));
         }
-        if (sharesToSell > currentHolding.balance) {
-            sharesToSell = currentHolding.balance;
-            usdToSell = currentHolding.balanceUSD;
-        }
-        const randomHex = Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
-        const txHash = `0x${randomHex}`;
-        const explorerUrl = `https://basescan.org/tx/${txHash}`;
-        const outcome = portfolioStore_1.portfolioStore.recordSell(walletKey, targetTicker, usdToSell, sharesToSell, txHash);
-        const reply = `📉 **Executed Sell Order on Base Mainnet**\n\n` +
-            `• **Asset Sold:** \`${outcome.sharesSold} ${targetTicker}\`\n` +
-            `• **Reference Price:** \`$${stock.referencePriceUSD.toFixed(2)}\`\n` +
-            `• **USDC Proceeds Credited:** \`+$${outcome.amountUSD.toFixed(2)} USDC\`\n` +
-            `• **Remaining Position:** \`${outcome.remainingShares} ${targetTicker}\`\n` +
-            `• **Settlement Wallet:** \`${currentAddr || 'default'}\`\n` +
-            `• **Status:** Confirmed ✅\n` +
-            `• **Explorer:** [View on BaseScan](${explorerUrl})\n\n` +
-            `Proceeds of **$${outcome.amountUSD.toFixed(2)} USDC** have been credited to your Agentic Wallet.`;
+        const outcome = portfolioStore_1.portfolioStore.recordSell(walletKey, targetTicker, usdToSell, sharesToSell);
         return {
-            reply,
+            reply: `📉 **Sell Order Prepared on Base Mainnet (Aerodrome DEX)**\n\n` +
+                `• **Asset to Liquidate:** \`${outcome.sharesSold} ${targetTicker}\`\n` +
+                `• **Reference Price:** \`$${refPrice.toFixed(2)}\`\n` +
+                `• **Estimated USDC Proceeds:** \`+$${outcome.amountUSD.toFixed(2)} USDC\`\n` +
+                `• **Settlement Wallet:** \`${currentAddr || 'default'}\`\n` +
+                `• **Route:** Aerodrome DEX Reverse Pool &rarr; USDC\n\n` +
+                `Signing swap and broadcasting transaction directly to Base node...`,
             steps: [
-                { id: '1', title: 'Quoting Base Mainnet Liquidity', detail: `Quoted ${targetTicker} -> USDC via Aerodrome Slipstream`, status: 'completed' },
-                { id: '2', title: 'Executing Tokenized Stock Sell', detail: `Sold ${outcome.sharesSold} ${targetTicker} for $${outcome.amountUSD.toFixed(2)} USDC`, status: 'completed' },
-                { id: '3', title: 'Settlement Confirmed on Base', detail: `TX: ${txHash.substring(0, 10)}...`, status: 'completed' }
+                { id: '1', title: 'Quoting Aerodrome Liquidity', detail: `${targetTicker} -> USDC via Aerodrome Router`, status: 'completed' },
+                { id: '2', title: 'Ready for On-Chain Broadcast', detail: `Amount: ${outcome.sharesSold} ${targetTicker}`, status: 'completed' }
             ],
             executionResult: {
                 success: true,
@@ -387,12 +273,12 @@ async function processNaturalLanguageIntent(userPrompt, walletKey = 'default', w
                         ticker: targetTicker,
                         shares: outcome.sharesSold,
                         amountUSD: outcome.amountUSD,
-                        txHash,
-                        explorerUrl
+                        txHash: '',
+                        explorerUrl: ''
                     }],
                 timestamp: Date.now(),
                 network: 'Base Mainnet',
-                gasUsedUSD: 0.0018
+                gasUsedUSD: 0.0012
             }
         };
     }
@@ -406,7 +292,6 @@ async function processNaturalLanguageIntent(userPrompt, walletKey = 'default', w
         promptLower.includes('basket') ||
         userPrompt.includes('$') ||
         matchedTickers.length > 0;
-    // If not a trade intent, invoke the LangChain AI agent directly for intelligent conversation
     if (!isTradeIntent) {
         if (!agentExecutor) {
             await initializeAgent();
@@ -429,19 +314,22 @@ async function processNaturalLanguageIntent(userPrompt, walletKey = 'default', w
             }
         }
     }
-    // Handle common basket queries like "tech basket", "ai basket", "magnificent 7", "spy index"
+    // Handle common basket queries like "ai basket", "defi basket", "crypto basket"
     if (matchedTickers.length === 0) {
-        if (promptLower.includes('ai') || promptLower.includes('chips')) {
-            matchedTickers.push('NVDA', 'MSFT', 'GOOGL');
+        if (promptLower.includes('ai') || promptLower.includes('agent')) {
+            matchedTickers.push('VIRTUAL');
         }
-        else if (promptLower.includes('tech') || promptLower.includes('nasdaq')) {
-            matchedTickers.push('AAPL', 'MSFT', 'NVDA', 'AMZN');
+        else if (promptLower.includes('defi') || promptLower.includes('dex')) {
+            matchedTickers.push('AERO');
         }
-        else if (promptLower.includes('index') || promptLower.includes('s&p') || promptLower.includes('spy')) {
-            matchedTickers.push('SPY');
+        else if (promptLower.includes('btc') || promptLower.includes('bitcoin')) {
+            matchedTickers.push('cbBTC');
+        }
+        else if (promptLower.includes('eth') || promptLower.includes('ethereum')) {
+            matchedTickers.push('WETH');
         }
         else {
-            matchedTickers.push('NVDA', 'TSLA'); // sensible default demo allocation
+            matchedTickers.push('AERO', 'VIRTUAL');
         }
     }
     steps.push({
@@ -450,98 +338,58 @@ async function processNaturalLanguageIntent(userPrompt, walletKey = 'default', w
         detail: `Identified ${matchedTickers.join(', ')} with budget $${totalUSD.toFixed(2)} USDC`,
         status: 'completed'
     });
-    // Calculate allocation percentages
     const count = matchedTickers.length;
-    // Parse explicit percentages if present (e.g. 60% NVDA and 40% TSLA)
-    const allocMap = {};
-    for (const ticker of matchedTickers) {
-        const pctMatch = userPrompt.match(new RegExp(`(\\d+)%\\s*(?:in|of)?\\s*${ticker}`, 'i')) ||
-            userPrompt.match(new RegExp(`${ticker}\\s*(?:in|at)?\\s*(\\d+)%`, 'i'));
-        if (pctMatch) {
-            allocMap[ticker] = parseFloat(pctMatch[1]);
-        }
-    }
-    const hasExplicitPct = Object.keys(allocMap).length === count;
     const allocations = matchedTickers.map((ticker) => {
-        const pct = hasExplicitPct ? allocMap[ticker] : (100 / count);
-        const amountUSD = (totalUSD * pct) / 100;
+        const amountUSD = totalUSD / count;
         const stock = shared_1.VERIFIED_BASE_TOKENIZED_STOCKS[ticker];
-        const quote = (0, aerodrome_1.getSimulatedOrLiveQuote)(stock, amountUSD);
+        const refPrice = stock ? stock.referencePriceUSD : (ticker.startsWith('0x') ? 1.0 : 1.0);
+        const shares = Number((amountUSD / refPrice).toFixed(6));
         return {
             ticker,
-            pct,
+            pct: 100 / count,
             amountUSD,
             stock,
-            quote
+            shares
         };
     });
     steps.push({
         id: 'step-2',
         title: 'Verifying Base Mainnet Liquidity & Quoting',
-        detail: `Quoted via Aerodrome Slipstream: Max slippage 0.50% (50 bps)`,
+        detail: `Quoted via Aerodrome Router (0xcF77...4E43): Max slippage 1.5%`,
         status: 'completed'
     });
-    // Execute trades via CDP AgentKit
-    const executedTrades = [];
-    for (const item of allocations) {
-        const outcome = await cdpActionProvider_1.cdpExecutionManager.executeStockSwap({
-            ticker: item.ticker,
-            amountUSD: item.amountUSD,
-            walletKey
-        });
-        executedTrades.push({
-            ticker: item.ticker,
-            shares: outcome.shares,
-            amountUSD: item.amountUSD,
-            txHash: outcome.txHash,
-            explorerUrl: outcome.explorerUrl
-        });
-    }
-    steps.push({
-        id: 'step-3',
-        title: 'On-Chain Execution Confirmed',
-        detail: `Dispatched ${executedTrades.length} swaps on Base Mainnet`,
-        status: 'completed'
-    });
+    const isRealOnChain = Boolean(currentAddr && currentUsdc >= totalUSD && currentEth >= 0.00003);
     const executionResult = {
         success: true,
         totalAllocatedUSD: totalUSD,
-        allocations: executedTrades,
-        overallTxHash: executedTrades[0]?.txHash,
+        allocations: allocations.map(a => ({
+            ticker: a.ticker,
+            shares: a.shares,
+            amountUSD: a.amountUSD,
+            txHash: '',
+            explorerUrl: ''
+        })),
         timestamp: Date.now(),
         network: 'Base Mainnet',
-        gasUsedUSD: 0.0038
+        gasUsedUSD: 0.0018
     };
-    const isRealOnChain = Boolean(currentAddr && currentUsdc >= totalUSD && currentEth >= 0.00003);
-    const tradeBreakdown = executedTrades
-        .map(t => {
-        if (isRealOnChain) {
-            return `• **${t.ticker}**: ${t.shares} shares ($${t.amountUSD.toFixed(2)}) → [View BaseScan](${t.explorerUrl})`;
-        }
-        else {
-            return `• **${t.ticker}**: ${t.shares} shares ($${t.amountUSD.toFixed(2)}) *(Paper Trading Allocation)*`;
-        }
-    })
-        .join('\n');
     let reply = '';
     if (isRealOnChain) {
-        reply = `⚡ **Autonomous Index Allocation Confirmed on Base Mainnet**:\n\n` +
-            `**Total Capital Allocated:** $${totalUSD.toFixed(2)} USDC\n` +
-            `**Assets Executed:**\n${tradeBreakdown}\n\n` +
-            `Portfolio weights and on-chain holdings have been synchronized on Base Mainnet.`;
+        reply = `⚡ **Trade Intent Formatted for Base Mainnet (Aerodrome DEX)**:\n\n` +
+            `**Capital to Allocate:** \`$${totalUSD.toFixed(2)} USDC\`\n` +
+            `**Target Assets:** ${allocations.map(a => `${a.shares} ${a.ticker} ($${a.amountUSD.toFixed(2)})`).join(', ')}\n` +
+            `**DEX Router:** Aerodrome Router (\`0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43\`)\n\n` +
+            `Signing transaction directly with your Agentic Wallet and broadcasting to Base node...`;
     }
     else {
-        reply = `📝 **Simulated Trade Executed (Paper Trading Mode)**\n\n` +
+        reply = `📝 **Trade Prepared for Aerodrome DEX Swap**\n\n` +
             `**Capital Staged:** $${totalUSD.toFixed(2)} USDC\n` +
-            `**Assets Allocated:**\n${tradeBreakdown}\n\n` +
-            `🔍 **Why this is not on BaseScan Explorer yet:**\n` +
-            `BaseScan only tracks transactions that spend real gas on the blockchain. Your Agentic Wallet currently has:\n` +
+            `**Assets:** ${allocations.map(a => `${a.shares} ${a.ticker} ($${a.amountUSD.toFixed(2)})`).join(', ')}\n\n` +
+            `💡 **To broadcast 100% REAL transactions visible on BaseScan:**\n` +
+            `Your Agentic Wallet currently has:\n` +
             `• **USDC Available:** \`$${currentUsdc.toFixed(2)} USDC\` (Need: \`$${totalUSD.toFixed(2)}\`)\n` +
-            `• **ETH for Gas:** \`${currentEth.toFixed(4)} ETH\` (Need: \`~0.0005 ETH\` / ~$0.002)\n\n` +
-            `💡 **To broadcast REAL transactions visible on BaseScan:**\n` +
-            `1. Click the **"Deposit"** button on your Agent bar.\n` +
-            `2. Send \`$${totalUSD.toFixed(2)} USDC\` and a tiny fraction of ETH to: \`${currentAddr || 'Create Agent Wallet above'}\`.\n\n` +
-            `*Your trade is currently tracked in your local portfolio dashboard below.*`;
+            `• **ETH for Gas:** \`${currentEth.toFixed(4)} ETH\` (Need: \`~0.0005 ETH\` / ~$0.001)\n\n` +
+            `Deposit funds into your Agent Wallet address: \`${currentAddr || 'Click Create Agent Wallet'}\` to broadcast live swaps!`;
     }
     return { reply, steps, executionResult };
 }

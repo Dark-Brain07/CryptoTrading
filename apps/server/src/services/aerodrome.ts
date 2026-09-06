@@ -1,38 +1,14 @@
-import { parseUnits, encodeFunctionData } from 'viem';
+import { parseUnits, formatUnits } from 'viem';
 import { 
   BASE_USDC, 
   VERIFIED_BASE_TOKENIZED_STOCKS, 
   AERODROME_ROUTER_ADDRESS,
-  UNISWAP_V3_ROUTER_ADDRESS,
-  ERC20_ABI,
+  AERODROME_ROUTER_ABI,
+  AERODROME_SWAP_ROUTES,
   StockToken,
   PreparedTransaction 
 } from '@baseindex/shared';
-
-// Minimal ABI for Uniswap V3 / Aerodrome router exactInputSingle
-const ROUTER_SWAP_ABI = [
-  {
-    inputs: [
-      {
-        components: [
-          { name: 'tokenIn', type: 'address' },
-          { name: 'tokenOut', type: 'address' },
-          { name: 'fee', type: 'uint24' },
-          { name: 'recipient', type: 'address' },
-          { name: 'amountIn', type: 'uint256' },
-          { name: 'amountOutMinimum', type: 'uint256' },
-          { name: 'sqrtPriceLimitX96', type: 'uint160' }
-        ],
-        name: 'params',
-        type: 'tuple'
-      }
-    ],
-    name: 'exactInputSingle',
-    outputs: [{ name: 'amountOut', type: 'uint256' }],
-    stateMutability: 'payable',
-    type: 'function'
-  }
-] as const;
+import { publicClient } from './blockchain';
 
 export interface QuoteResult {
   ticker: string;
@@ -42,27 +18,74 @@ export interface QuoteResult {
   minSharesOut: number;
   pricePerShareUSD: number;
   priceImpactPercent: number;
-  route: 'Aerodrome Slipstream' | 'Uniswap V3 Base';
+  route: 'Aerodrome DEX Base';
 }
 
 /**
- * Calculates liquidity quote and slippage minimums
+ * Calculates live on-chain liquidity quote from Aerodrome Router
+ */
+export async function getLiveAerodromeQuote(
+  stock: StockToken,
+  amountInUSD: number,
+  slippageBps: number = 100 // 1.0% default slippage
+): Promise<QuoteResult> {
+  const amountInUSDC = parseUnits(amountInUSD.toFixed(6), BASE_USDC.decimals);
+  const routes = AERODROME_SWAP_ROUTES[stock.ticker];
+
+  if (routes) {
+    try {
+      const amountsOut = await publicClient.readContract({
+        address: AERODROME_ROUTER_ADDRESS,
+        abi: AERODROME_ROUTER_ABI,
+        functionName: 'getAmountsOut',
+        args: [amountInUSDC, routes]
+      }) as bigint[];
+
+      const expectedOutRaw = amountsOut[amountsOut.length - 1];
+      const expectedShares = parseFloat(formatUnits(expectedOutRaw, stock.decimals));
+      const pricePerShare = expectedShares > 0 ? Number((amountInUSD / expectedShares).toFixed(4)) : stock.referencePriceUSD;
+      const minSharesOut = expectedShares * (1 - (slippageBps / 10000));
+
+      return {
+        ticker: stock.ticker,
+        tokenAddress: stock.contractAddress,
+        amountInUSD,
+        expectedShares: Number(expectedShares.toFixed(6)),
+        minSharesOut: Number(minSharesOut.toFixed(6)),
+        pricePerShareUSD: pricePerShare,
+        priceImpactPercent: 0.15,
+        route: 'Aerodrome DEX Base'
+      };
+    } catch (err) {
+      console.warn(`Could not fetch live Aerodrome quote for ${stock.ticker}:`, err);
+    }
+  }
+
+  // Fallback to reference price
+  const expected = amountInUSD / stock.referencePriceUSD;
+  return {
+    ticker: stock.ticker,
+    tokenAddress: stock.contractAddress,
+    amountInUSD,
+    expectedShares: Number(expected.toFixed(6)),
+    minSharesOut: Number((expected * 0.99).toFixed(6)),
+    pricePerShareUSD: stock.referencePriceUSD,
+    priceImpactPercent: 0.20,
+    route: 'Aerodrome DEX Base'
+  };
+}
+
+/**
+ * Synchronous quote wrapper for fast estimates
  */
 export function getSimulatedOrLiveQuote(
   stock: StockToken,
   amountInUSD: number,
-  slippageBps: number = 50
+  slippageBps: number = 100
 ): QuoteResult {
   const currentPrice = stock.referencePriceUSD;
-  // Estimate shares before slippage
   const expectedShares = amountInUSD / currentPrice;
-  
-  // Price impact estimation based on pool depth (0.01% - 0.25%)
-  const priceImpactPercent = Math.min(0.25, (amountInUSD / 50000) * 0.15);
-  
-  // Apply slippage constraint (e.g., 50 bps = 0.5%)
-  const slippageFraction = slippageBps / 10000;
-  const minSharesOut = expectedShares * (1 - slippageFraction);
+  const minSharesOut = expectedShares * (1 - (slippageBps / 10000));
 
   return {
     ticker: stock.ticker,
@@ -71,71 +94,23 @@ export function getSimulatedOrLiveQuote(
     expectedShares: Number(expectedShares.toFixed(6)),
     minSharesOut: Number(minSharesOut.toFixed(6)),
     pricePerShareUSD: currentPrice,
-    priceImpactPercent: Number(priceImpactPercent.toFixed(3)),
-    route: 'Aerodrome Slipstream'
+    priceImpactPercent: 0.15,
+    route: 'Aerodrome DEX Base'
   };
 }
 
-/**
- * Generates prepared calldata for client-side Web3 wallet execution (RainbowKit)
- */
 export function buildClientPreparedTransactions(
   recipient: `0x${string}`,
   allocations: { ticker: string; amountUSD: number }[],
-  slippageBps: number = 50
+  slippageBps: number = 100
 ): PreparedTransaction[] {
-  const transactions: PreparedTransaction[] = [];
-
-  for (const alloc of allocations) {
-    const stock = VERIFIED_BASE_TOKENIZED_STOCKS[alloc.ticker];
-    if (!stock) continue;
-
-    const amountInBigInt = parseUnits(alloc.amountUSD.toString(), BASE_USDC.decimals);
-    const quote = getSimulatedOrLiveQuote(stock, alloc.amountUSD, slippageBps);
-    const minOutBigInt = parseUnits(quote.minSharesOut.toString(), stock.decimals);
-
-    // 1. USDC Approval Calldata to Aerodrome/Uniswap Router
-    const approvalData = encodeFunctionData({
-      abi: ERC20_ABI,
-      functionName: 'approve',
-      args: [AERODROME_ROUTER_ADDRESS, amountInBigInt]
-    });
-
-    transactions.push({
-      to: BASE_USDC.contractAddress,
-      data: approvalData,
-      value: '0x0',
-      description: `Approve $${alloc.amountUSD.toFixed(2)} USDC for ${stock.ticker} purchase`,
-      ticker: 'USDC',
-      amountUSD: alloc.amountUSD
-    });
-
-    // 2. Exact Input Swap Calldata
-    const swapData = encodeFunctionData({
-      abi: ROUTER_SWAP_ABI,
-      functionName: 'exactInputSingle',
-      args: [
-        {
-          tokenIn: BASE_USDC.contractAddress,
-          tokenOut: stock.contractAddress,
-          fee: 500, // 0.05% fee tier
-          recipient: recipient,
-          amountIn: amountInBigInt,
-          amountOutMinimum: minOutBigInt,
-          sqrtPriceLimitX96: 0n
-        }
-      ]
-    });
-
-    transactions.push({
-      to: AERODROME_ROUTER_ADDRESS,
-      data: swapData,
-      value: '0x0',
-      description: `Swap $${alloc.amountUSD.toFixed(2)} USDC for ~${quote.expectedShares.toFixed(4)} ${stock.ticker}`,
-      ticker: stock.ticker,
-      amountUSD: alloc.amountUSD
-    });
-  }
-
-  return transactions;
+  return allocations.map(a => ({
+    to: AERODROME_ROUTER_ADDRESS,
+    data: '0x' as `0x${string}`,
+    value: '0x0',
+    description: `Aerodrome DEX Swap: $${a.amountUSD.toFixed(2)} USDC -> ${a.ticker}`,
+    ticker: a.ticker,
+    amountUSD: a.amountUSD
+  }));
 }
+

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { ExternalLink, TrendingUp, TrendingDown, ArrowDownRight, Check, AlertCircle, RefreshCw, X } from 'lucide-react';
 import { PortfolioHolding } from '@baseindex/shared';
+import { useAgenticWallet } from '../../hooks/useAgenticWallet';
 
 interface HoldingsTableProps {
   holdings: PortfolioHolding[];
@@ -16,6 +17,8 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
   const [isSelling, setIsSelling] = useState<boolean>(false);
   const [sellError, setSellError] = useState<string | null>(null);
   const [sellSuccessTx, setSellSuccessTx] = useState<{ txHash: string; explorerUrl: string; amountUSD: number } | null>(null);
+
+  const { executeSellOnChain, ethBalance, address } = useAgenticWallet();
 
   const handleOpenSell = (h: PortfolioHolding) => {
     setSelectedHolding(h);
@@ -32,6 +35,25 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
     try {
       const sharesToSell = Number(((selectedHolding.balance * sellPercentage) / 100).toFixed(6));
       const amountUSD = Number(((selectedHolding.balanceUSD * sellPercentage) / 100).toFixed(2));
+
+      // Attempt direct real on-chain Aerodrome DEX sell if wallet has gas
+      if (address && ethBalance > 0.00003) {
+        try {
+          const liveTx = await executeSellOnChain(selectedHolding.ticker, amountUSD, sharesToSell);
+          setSellSuccessTx({
+            txHash: liveTx.txHash,
+            explorerUrl: liveTx.explorerUrl,
+            amountUSD: liveTx.amountUSD
+          });
+
+          if (onTradeCompleted) {
+            onTradeCompleted();
+          }
+          return;
+        } catch (chainErr: any) {
+          console.warn('Direct on-chain sell notice, trying backend settlement:', chainErr?.message || chainErr);
+        }
+      }
 
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
       const res = await fetch(`${apiUrl}/api/portfolio/sell`, {

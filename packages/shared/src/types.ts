@@ -4,7 +4,7 @@ export interface StockToken {
   contractAddress: `0x${string}`;
   decimals: number;
   issuer: string; // e.g. "Dinari / Backed"
-  category: 'Tech' | 'ETF' | 'Finance' | 'Semiconductors';
+  category: 'DeFi' | 'Blue Chip' | 'AI' | 'Social' | 'Finance' | 'Tech' | 'ETF' | 'Semiconductors' | 'Custom';
   underlyingSymbol: string;
   referencePriceUSD: number;
   poolAddress?: `0x${string}`;

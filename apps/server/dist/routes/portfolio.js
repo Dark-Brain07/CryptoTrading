@@ -71,23 +71,20 @@ exports.portfolioRouter.post('/withdraw', async (req, res) => {
 // Record confirmed on-chain buy of tokenized asset
 exports.portfolioRouter.post('/buy', async (req, res) => {
     try {
-        const { wallet, ticker, amountUSD, txHash: providedTxHash } = req.body;
+        const { wallet, ticker, amountUSD, shares: providedShares, txHash: providedTxHash } = req.body;
         if (!ticker) {
-            res.status(400).json({ success: false, error: 'Ticker symbol is required' });
+            res.status(400).json({ success: false, error: 'Ticker symbol or contract address is required' });
             return;
         }
-        const symbol = ticker.toUpperCase().replace(/^[$]/, '');
+        const symbol = ticker.startsWith('0x') ? ticker : ticker.toUpperCase().replace(/^[$]/, '');
         const stock = shared_1.VERIFIED_BASE_TOKENIZED_STOCKS[symbol];
-        if (!stock) {
-            res.status(400).json({ success: false, error: `Asset ${ticker} not recognized on Base Mainnet` });
-            return;
-        }
+        const refPrice = stock ? stock.referencePriceUSD : 1.0;
         const parsedUSD = parseFloat(amountUSD);
         if (!parsedUSD || parsedUSD <= 0) {
             res.status(400).json({ success: false, error: 'Trade amount must be greater than 0' });
             return;
         }
-        const expectedShares = Number((parsedUSD / stock.referencePriceUSD).toFixed(6));
+        const expectedShares = providedShares || Number((parsedUSD / refPrice).toFixed(6));
         const effectiveWallet = wallet || 'default';
         const txHash = providedTxHash || `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
         const explorerUrl = `https://basescan.org/tx/${txHash}`;
@@ -117,12 +114,7 @@ exports.portfolioRouter.post('/sell', async (req, res) => {
             res.status(400).json({ success: false, error: 'Ticker symbol is required' });
             return;
         }
-        const symbol = ticker.toUpperCase().replace(/^[$]/, '');
-        const stock = shared_1.VERIFIED_BASE_TOKENIZED_STOCKS[symbol];
-        if (!stock) {
-            res.status(400).json({ success: false, error: `Asset ${ticker} not recognized on Base Mainnet` });
-            return;
-        }
+        const symbol = ticker.startsWith('0x') ? ticker : ticker.toUpperCase().replace(/^[$]/, '');
         const effectiveWallet = wallet || toAddress || 'default';
         const txHash = providedTxHash || `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
         const explorerUrl = `https://basescan.org/tx/${txHash}`;
