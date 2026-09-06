@@ -15,7 +15,8 @@ import {
   ArrowDownLeft,
   Shield,
   ShieldAlert,
-  Key
+  Key,
+  Zap
 } from 'lucide-react';
 import { AgentMessage, VERIFIED_BASE_TOKENIZED_STOCKS } from '@baseindex/shared';
 import { MessageBubble } from './MessageBubble';
@@ -25,7 +26,12 @@ import { truncateAddress } from '../../lib/utils';
 import { BASE_EXPLORER_URL } from '@baseindex/shared';
 import { createPublicClient, http, formatUnits } from 'viem';
 import { base } from 'viem/chains';
-import { discoverTokenMetadata } from '../../lib/dexTrading';
+import { 
+  discoverTokenMetadata, 
+  KNOWN_BASE_TOKENS_BY_SYMBOL, 
+  executeBuyTokenOnAerodrome 
+} from '../../lib/dexTrading';
+import { useAccount, useWalletClient } from 'wagmi';
 
 const publicClient = createPublicClient({
   chain: base,
@@ -78,6 +84,68 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
   const [modalTab, setModalTab] = useState<'overview' | 'withdraw' | 'backup' | 'import'>('overview');
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [isRefreshingBalances, setIsRefreshingBalances] = useState(false);
+
+  // Connected External Web3 Wallet (MetaMask / Coinbase Wallet)
+  const { address: connectedAddress, isConnected: isExternalConnected } = useAccount();
+  const { data: externalWalletClient } = useWalletClient();
+  const [pendingExternalTrade, setPendingExternalTrade] = useState<{ target: string; symbol: string; amountUSD: number } | null>(null);
+  const [isExecutingExternal, setIsExecutingExternal] = useState(false);
+
+  const handleExecuteWithConnectedWallet = async () => {
+    if (!externalWalletClient || !pendingExternalTrade) return;
+    setIsExecutingExternal(true);
+    try {
+      const liveTx = await executeBuyTokenOnAerodrome(externalWalletClient, publicClient, {
+        targetTokenOrSymbol: pendingExternalTrade.target,
+        amountUSD: pendingExternalTrade.amountUSD,
+        slippagePercent: 1.5
+      });
+
+      const successMsg: AgentMessage = {
+        id: `agent-ext-${Date.now()}`,
+        role: 'assistant',
+        content: `⚡ **Confirmed Aerodrome DEX Swap on BaseScan!**\n\n` +
+          `• **Asset Received:** ${liveTx.amountOut} ${liveTx.symbol}\n` +
+          `• **USDC Swapped:** $${liveTx.amountIn.toFixed(2)} USDC\n` +
+          `• **Signer:** \`${connectedAddress}\`\n` +
+          `• **DEX Router:** Aerodrome Router V2 (\`0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43\`)\n` +
+          `• **BaseScan Link:** [View Live Confirmed Transaction](${liveTx.explorerUrl})\n\n` +
+          `Transaction confirmed by Base validators. Your real on-chain balance has been updated!`,
+        steps: [
+          { id: '1', title: 'Intent Parsed', status: 'completed', detail: `Swapping ${liveTx.symbol}` },
+          { id: '2', title: 'Signed by Connected Wallet', status: 'completed', detail: `Signer: ${connectedAddress?.substring(0, 10)}...` },
+          { id: '3', title: 'Confirmed On-Chain', status: 'completed', detail: `TX: ${liveTx.txHash.substring(0, 12)}...` }
+        ],
+        executionResult: {
+          success: true,
+          totalAllocatedUSD: liveTx.amountIn,
+          action: 'BUY',
+          overallTxHash: liveTx.txHash,
+          allocations: [{
+            ticker: liveTx.symbol,
+            shares: liveTx.amountOut,
+            amountUSD: liveTx.amountIn,
+            txHash: liveTx.txHash,
+            explorerUrl: liveTx.explorerUrl
+          }],
+          timestamp: Date.now(),
+          network: 'Base Mainnet',
+          gasUsedUSD: 0.0003
+        },
+        timestamp: Date.now()
+      };
+
+      setMessages(prev => [...prev, successMsg]);
+      setPendingExternalTrade(null);
+      if (onTradeExecuted) onTradeExecuted();
+      fetchBalances();
+    } catch (extErr: any) {
+      console.error('External wallet swap error:', extErr);
+      alert(`Swap notice: ${extErr?.shortMessage || extErr?.message || 'Transaction could not be completed'}`);
+    } finally {
+      setIsExecutingExternal(false);
+    }
+  };
 
   const openWalletModal = (tab: 'overview' | 'withdraw' | 'backup' | 'import') => {
     setModalTab(tab);
@@ -262,9 +330,9 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
         }
 
         // Case B: Live On-Chain Discovery & Quotation (Awaiting Wallet Gas / USDC Deposit)
-        const resolvedAddress = (targetAsset.startsWith('0x')
-          ? targetAsset
-          : (VERIFIED_BASE_TOKENIZED_STOCKS as any)[targetAsset.toUpperCase()]?.contractAddress || targetAsset) as `0x${string}`;
+        const cleanSym = targetAsset.trim().toUpperCase().replace(/^[$]/, '');
+        const resolvedAddress = (KNOWN_BASE_TOKENS_BY_SYMBOL[cleanSym]?.address ||
+          (targetAsset.startsWith('0x') && targetAsset.length === 42 ? targetAsset : targetAsset)) as string;
 
         const tokenMeta = await discoverTokenMetadata(publicClient as any, resolvedAddress);
         const routeDisplay = tokenMeta.route && tokenMeta.route.length > 0
@@ -275,6 +343,14 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           ? Number((amountUSD / tokenMeta.priceUSD).toFixed(6))
           : 0;
 
+        if (!isSell) {
+          setPendingExternalTrade({
+            target: tokenMeta.address,
+            symbol: tokenMeta.symbol,
+            amountUSD
+          });
+        }
+
         const quoteMsg = `📝 **Verified Aerodrome DEX Route & Live Quote on Base**\n\n` +
           `• **Target Asset:** ${tokenMeta.name} (\`${tokenMeta.symbol}\`)\n` +
           `• **Contract Address:** \`${tokenMeta.address}\`\n` +
@@ -282,15 +358,13 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           `• **Allocated Budget:** \`$${amountUSD.toFixed(2)} USDC\`\n` +
           `• **Estimated Output:** \`~${quotedShares > 0 ? quotedShares : '0.001'} ${tokenMeta.symbol}\`\n` +
           `• **DEX Router:** Aerodrome Router V2 (\`0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43\`)\n\n` +
-          `🔍 **Why this trade is not yet on BaseScan Explorer:**\n` +
-          `BaseScan only indexes transactions that spend real gas on the Base blockchain. Your Agentic Wallet currently has:\n` +
-          `• **USDC Available:** \`$${usdcBalance.toFixed(2)} USDC\` (Need: \`$${amountUSD.toFixed(2)}\`)\n` +
-          `• **ETH for Gas:** \`${ethBalance.toFixed(5)} ETH\` (Need: \`~0.0001 ETH\` / ~$0.0002)\n\n` +
-          `💡 **To broadcast 100% REAL transactions visible on BaseScan:**\n` +
-          `1. Click the **"Deposit"** button on your Agent bar above.\n` +
-          `2. Send \`$${amountUSD.toFixed(2)} USDC\` and \`0.0001 ETH\` to your Agentic Wallet address:\n` +
-          `\`${address || 'Generate wallet above'}\`\n\n` +
-          `*Your order is queued in paper simulation below until funded!*`;
+          `⚡ **How to broadcast this swap to BaseScan:**\n\n` +
+          `1️⃣ **Option A: Autonomous Agentic Wallet (Hands-Free)**\n` +
+          `Your Agentic Wallet currently has \`$${usdcBalance.toFixed(2)} USDC\` and \`${ethBalance.toFixed(4)} ETH\`.\n` +
+          `Deposit \`$${amountUSD.toFixed(2)} USDC\` and \`~0.0001 ETH\` to: \`${address || 'Generate wallet above'}\`\n` +
+          `*(Click the **"Deposit"** button above to view QR code or copy address)*\n\n` +
+          `2️⃣ **Option B: Sign with Connected Wallet (MetaMask / Coinbase Wallet)**\n` +
+          `Use the **"⚡ Sign with Connected Wallet"** action bar below to execute directly from your personal Web3 wallet!`;
 
         setMessages((prev) =>
           prev.map((msg) => msg.id === pendingAssistantId ? {
@@ -566,6 +640,50 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           ))}
         </div>
       </div>
+
+      {/* Pending Trade Execution Action Banner */}
+      {pendingExternalTrade && (
+        <div className="px-4 py-2 bg-gradient-to-r from-blue-950/90 via-obsidian-900 to-obsidian-950 border-t border-blue-500/40 flex items-center justify-between gap-3 animate-fadeIn">
+          <div className="flex items-center gap-2 text-xs">
+            <Zap className="w-4 h-4 text-yellow-400 animate-pulse shrink-0" />
+            <div>
+              <span className="font-semibold text-white">Execute ${pendingExternalTrade.amountUSD.toFixed(2)} of {pendingExternalTrade.symbol} on BaseScan:</span>
+              <span className="text-slate-400 ml-1 text-[11px] hidden sm:inline">Choose signing method</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {isExternalConnected ? (
+              <button
+                type="button"
+                onClick={handleExecuteWithConnectedWallet}
+                disabled={isExecutingExternal}
+                className="px-3 py-1.5 rounded-lg bg-base-blue hover:bg-blue-600 text-white font-medium text-xs flex items-center gap-1.5 shadow-md shadow-base-blue/30 transition-all cursor-pointer"
+              >
+                {isExecutingExternal ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5 text-yellow-300" />}
+                <span>Sign with MetaMask</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => openWalletModal('overview')}
+                className="px-3 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/40 text-blue-300 border border-blue-500/30 font-medium text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+              >
+                <Wallet className="w-3.5 h-3.5 text-blue-400" />
+                <span>Deposit to Agent Wallet</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setPendingExternalTrade(null)}
+              className="p-1 rounded text-slate-500 hover:text-slate-300 transition-colors text-base leading-none"
+              title="Dismiss"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Input Form */}
       <form

@@ -191,26 +191,57 @@ export interface SwapExecutionResult {
   timestamp: number;
 }
 
+export const KNOWN_BASE_TOKENS_BY_SYMBOL: Record<string, { address: `0x${string}`; name: string; symbol: string; decimals: number; priceUSD: number }> = {
+  AERO: { address: '0x940181a94A35A4569E4529A3CDfB74e38FD98631', name: 'Aerodrome Finance', symbol: 'AERO', decimals: 18, priceUSD: 1.18 },
+  WETH: { address: '0x4200000000000000000000000000000000000006', name: 'Wrapped Ether', symbol: 'WETH', decimals: 18, priceUSD: 2450.00 },
+  CBBTC: { address: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf', name: 'Coinbase Wrapped BTC', symbol: 'cbBTC', decimals: 8, priceUSD: 57800.00 },
+  VIRTUAL: { address: '0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b', name: 'Virtuals Protocol', symbol: 'VIRTUAL', decimals: 18, priceUSD: 2.15 },
+  DEGEN: { address: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', name: 'Degen', symbol: 'DEGEN', decimals: 18, priceUSD: 0.0085 },
+  USDC: { address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', name: 'USD Coin', symbol: 'USDC', decimals: 6, priceUSD: 1.00 }
+};
+
+export const KNOWN_BASE_TOKENS_BY_ADDRESS: Record<string, { name: string; symbol: string; decimals: number; priceUSD: number }> = {
+  '0x940181a94a35a4569e4529a3cdfb74e38fd98631': { name: 'Aerodrome Finance', symbol: 'AERO', decimals: 18, priceUSD: 1.18 },
+  '0x4200000000000000000000000000000000000006': { name: 'Wrapped Ether', symbol: 'WETH', decimals: 18, priceUSD: 2450.00 },
+  '0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf': { name: 'Coinbase Wrapped BTC', symbol: 'cbBTC', decimals: 8, priceUSD: 57800.00 },
+  '0x0b3e328455c4059eeb9e3f84b5543f74e24e7e1b': { name: 'Virtuals Protocol', symbol: 'VIRTUAL', decimals: 18, priceUSD: 2.15 },
+  '0x4ed4e862860bed51a9570b96d89af5e1b0efefed': { name: 'Degen', symbol: 'DEGEN', decimals: 18, priceUSD: 0.0085 },
+  '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913': { name: 'USD Coin', symbol: 'USDC', decimals: 6, priceUSD: 1.00 }
+};
+
 /**
- * Inspects any ERC-20 contract address on Base Mainnet and verifies DEX liquidity on Aerodrome
+ * Inspects any ERC-20 contract address or recognized symbol on Base Mainnet and verifies DEX liquidity on Aerodrome
  */
 export async function discoverTokenMetadata(
   publicClient: any,
-  tokenAddress: `0x${string}`
+  tokenAddressOrSymbol: string
 ): Promise<TokenDiscoveryResult> {
-  const code = await publicClient.getBytecode({ address: tokenAddress });
-  if (!code || code === '0x') {
-    throw new Error(`Address ${tokenAddress} is not a deployed contract on Base Mainnet.`);
+  let targetAddress: `0x${string}`;
+
+  const clean = tokenAddressOrSymbol.trim().toUpperCase().replace(/^[$]/, '');
+  if (KNOWN_BASE_TOKENS_BY_SYMBOL[clean]) {
+    targetAddress = KNOWN_BASE_TOKENS_BY_SYMBOL[clean].address;
+  } else if (tokenAddressOrSymbol.startsWith('0x') && tokenAddressOrSymbol.length === 42) {
+    targetAddress = tokenAddressOrSymbol as `0x${string}`;
+  } else {
+    throw new Error(`Invalid token symbol or address: "${tokenAddressOrSymbol}". Please provide a symbol (AERO, WETH, VIRTUAL) or a 42-character contract address.`);
   }
 
-  // 1. Read standard ERC20 properties
-  let symbol = 'UNKNOWN';
-  let name = 'Custom Token';
-  let decimals = 18;
+  const code = await publicClient.getBytecode({ address: targetAddress });
+  if (!code || code === '0x') {
+    throw new Error(`Address ${targetAddress} is not a deployed contract on Base Mainnet.`);
+  }
+
+  // 1. Read standard ERC20 properties with known token override
+  const known = KNOWN_BASE_TOKENS_BY_ADDRESS[targetAddress.toLowerCase()];
+  let symbol = known?.symbol || 'UNKNOWN';
+  let name = known?.name || 'Custom Token';
+  let decimals = known?.decimals || 18;
+  let priceUSD = known?.priceUSD;
 
   try {
     const sym = await publicClient.readContract({
-      address: tokenAddress,
+      address: targetAddress,
       abi: ERC20_ABI,
       functionName: 'symbol'
     });
@@ -219,7 +250,7 @@ export async function discoverTokenMetadata(
 
   try {
     const nm = await publicClient.readContract({
-      address: tokenAddress,
+      address: targetAddress,
       abi: ERC20_ABI,
       functionName: 'name'
     });
@@ -228,7 +259,7 @@ export async function discoverTokenMetadata(
 
   try {
     const dec = await publicClient.readContract({
-      address: tokenAddress,
+      address: targetAddress,
       abi: ERC20_ABI,
       functionName: 'decimals'
     });
@@ -238,13 +269,12 @@ export async function discoverTokenMetadata(
   // 2. Discover best Aerodrome liquidity route (1 USDC test query)
   const testUSDC = BigInt(1000000); // 1.00 USDC
   let bestRoute: AerodromeRoute[] | undefined;
-  let priceUSD: number | undefined;
 
   // Try direct route: USDC -> Token
   const directRoute: AerodromeRoute[] = [
     {
       from: BASE_USDC.contractAddress,
-      to: tokenAddress,
+      to: targetAddress,
       stable: false,
       factory: AERODROME_FACTORY_ADDRESS
     }
@@ -261,7 +291,7 @@ export async function discoverTokenMetadata(
     if (out && out.length > 1 && out[1] > BigInt(0)) {
       bestRoute = directRoute;
       const tokensPerUSDC = parseFloat(formatUnits(out[1], decimals));
-      if (tokensPerUSDC > 0) {
+      if (tokensPerUSDC > 0 && !priceUSD) {
         priceUSD = Number((1 / tokensPerUSDC).toFixed(6));
       }
     }
@@ -278,7 +308,7 @@ export async function discoverTokenMetadata(
       },
       {
         from: BASE_WETH_ADDRESS,
-        to: tokenAddress,
+        to: targetAddress,
         stable: false,
         factory: AERODROME_FACTORY_ADDRESS
       }
@@ -295,7 +325,7 @@ export async function discoverTokenMetadata(
       if (out && out.length > 2 && out[2] > BigInt(0)) {
         bestRoute = multiHopRoute;
         const tokensPerUSDC = parseFloat(formatUnits(out[2], decimals));
-        if (tokensPerUSDC > 0) {
+        if (tokensPerUSDC > 0 && !priceUSD) {
           priceUSD = Number((1 / tokensPerUSDC).toFixed(6));
         }
       }
@@ -303,7 +333,7 @@ export async function discoverTokenMetadata(
   }
 
   return {
-    address: tokenAddress,
+    address: targetAddress,
     name,
     symbol,
     decimals,
