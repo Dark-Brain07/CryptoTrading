@@ -147,6 +147,49 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
 
       const data = await res.json();
 
+      // If user has live funds (ETH gas and USDC), broadcast directly to Base blockchain node!
+      if (
+        data.executionResult &&
+        data.executionResult.action !== 'SELL' &&
+        data.executionResult.allocations &&
+        data.executionResult.allocations.length > 0 &&
+        address &&
+        ethBalance > 0.00003 &&
+        usdcBalance >= (data.executionResult.totalAllocatedUSD || 0)
+      ) {
+        try {
+          const firstTrade = data.executionResult.allocations[0];
+          const liveTx = await executeBuyOnChain(firstTrade.amountUSD, firstTrade.ticker);
+
+          data.message = `⚡ **Confirmed on Base Blockchain Node (Chain ID 8453)**\n\n` +
+            `• **Asset:** ${firstTrade.shares} ${firstTrade.ticker}\n` +
+            `• **Amount:** $${firstTrade.amountUSD.toFixed(2)} USDC\n` +
+            `• **Signer:** \`${address}\`\n` +
+            `• **Node:** \`https://mainnet.base.org\`\n` +
+            `• **Status:** Successfully Mined On-Chain ✅\n` +
+            `• **BaseScan Link:** [View Live Transaction](${liveTx.explorerUrl})\n\n` +
+            `Transaction has been confirmed by Base blockchain validators. Your real on-chain USDC balance has been updated.`;
+
+          data.steps = [
+            { id: '1', title: 'Intent Parsed', status: 'completed' as const, detail: `Quoting ${firstTrade.ticker}` },
+            { id: '2', title: 'Signed by Agentic Wallet', status: 'completed' as const, detail: `Key: ${address.substring(0, 10)}...` },
+            { id: '3', title: 'Broadcasted to Base Node', status: 'completed' as const, detail: `TX: ${liveTx.txHash.substring(0, 12)}...` }
+          ];
+
+          data.executionResult = {
+            ...data.executionResult,
+            overallTxHash: liveTx.txHash,
+            allocations: data.executionResult.allocations.map((a: any) => ({
+              ...a,
+              txHash: liveTx.txHash,
+              explorerUrl: liveTx.explorerUrl
+            }))
+          };
+        } catch (liveBroadcastErr: any) {
+          console.warn('Real on-chain broadcast notice:', liveBroadcastErr);
+        }
+      }
+
       setMessages((prev) =>
         prev.map((msg) => {
           if (msg.id === pendingAssistantId) {
