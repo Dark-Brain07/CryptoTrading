@@ -1,4 +1,4 @@
-import { createPublicClient, http, formatGwei, formatUnits } from 'viem';
+import { createPublicClient, http, fallback, formatGwei, formatUnits } from 'viem';
 import { base } from 'viem/chains';
 import { config } from '../config';
 import { BASE_USDC, VERIFIED_BASE_TOKENIZED_STOCKS, ERC20_ABI } from '@baseindex/shared';
@@ -6,7 +6,11 @@ import { GasTrackerData } from '@baseindex/shared';
 
 export const publicClient = createPublicClient({
   chain: base,
-  transport: http(config.BASE_RPC_URL)
+  transport: fallback([
+    http('https://base.llamarpc.com'),
+    http('https://1rpc.io/base'),
+    http('https://mainnet.base.org')
+  ])
 });
 
 /**

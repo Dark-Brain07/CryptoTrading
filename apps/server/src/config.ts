@@ -5,8 +5,7 @@ dotenv.config();
 
 const envSchema = z.object({
   PORT: z.string().default('4000'),
-  NODE_ENV: z.string().default('development'),
-  FRONTEND_URL: z.string().default('http://localhost:3000'),
+  FRONTEND_URL: z.string().default('https://baseindex-agent.vercel.app'),
   
   // AI Brain
   OPENAI_API_KEY: z.string().optional(),

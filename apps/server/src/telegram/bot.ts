@@ -40,13 +40,23 @@ export function initializeTelegramBot(): Telegraf | null {
         `_"Buy 0.10 of VIRTUAL"_\n` +
         `_"Allocate $10 across 60% AERO and 40% WETH"_`;
 
-      await ctx.replyWithMarkdown(
-        welcome,
-        Markup.inlineKeyboard([
-          [Markup.button.callback('💳 My Wallet', 'btn_wallet'), Markup.button.callback('📊 My Portfolio', 'btn_portfolio')],
-          [Markup.button.url('🌐 Open Web App', config.FRONTEND_URL || 'https://baseindex-agent.vercel.app')]
-        ])
-      );
+      try {
+        await ctx.replyWithMarkdown(
+          welcome,
+          Markup.inlineKeyboard([
+            [Markup.button.callback('💳 My Wallet', 'btn_wallet'), Markup.button.callback('📊 My Portfolio', 'btn_portfolio')],
+            [Markup.button.url('🌐 Open Web App', 'https://baseindex-agent.vercel.app')]
+          ])
+        );
+      } catch (err: any) {
+        console.error('Error sending /start reply:', err);
+        await ctx.reply(welcome.replace(/[*_`]/g, ''));
+      }
+    });
+
+    // Global bot error handler to keep polling resilient
+    bot.catch((err: any, ctx) => {
+      console.error(`Telegram Bot error on update ${ctx.updateType}:`, err?.message || err);
     });
 
     // /wallet command

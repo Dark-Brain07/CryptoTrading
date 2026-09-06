@@ -2,6 +2,7 @@ import {
   createPublicClient,
   createWalletClient,
   http,
+  fallback,
   parseUnits,
   formatUnits,
   maxUint256,
@@ -219,7 +220,11 @@ export async function executeServerBuyOnAerodrome(params: {
   const walletClient = createWalletClient({
     account,
     chain: base,
-    transport: http(config.BASE_RPC_URL || 'https://mainnet.base.org')
+    transport: fallback([
+      http('https://base.llamarpc.com'),
+      http('https://1rpc.io/base'),
+      http('https://mainnet.base.org')
+    ])
   });
 
   // 1. Balance Checks
