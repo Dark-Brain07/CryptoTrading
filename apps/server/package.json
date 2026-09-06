@@ -1,0 +1,32 @@
+{
+  "name": "base-index-server",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@baseindex/shared": "file:../../packages/shared",
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "zod": "^3.23.8",
+    "telegraf": "^4.16.3",
+    "@coinbase/agentkit": "^0.1.1",
+    "@coinbase/agentkit-langchain": "^0.1.0",
+    "@langchain/core": "^0.2.26",
+    "@langchain/openai": "^0.2.7",
+    "langchain": "^0.2.14",
+    "viem": "^2.19.4"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.14",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4"
+  }
+}

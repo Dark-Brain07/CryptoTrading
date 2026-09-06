@@ -1,0 +1,35 @@
+# Render Blueprint Specification for BaseIndex Agent
+# Deploys the Node.js/Express LangChain Backend + Telegram Bot on Render
+
+services:
+  - type: web
+    name: baseindex-agent-backend
+    runtime: node
+    plan: starter
+    region: oregon
+    rootDir: apps/server
+    buildCommand: npm install --install-links && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: BASE_RPC_URL
+        value: https://mainnet.base.org
+      - key: BASE_CHAIN_ID
+        value: "8453"
+      - key: FRONTEND_URL
+        value: https://baseindex.vercel.app
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: CDP_API_KEY_NAME
+        sync: false
+      - key: CDP_API_KEY_PRIVATE_KEY
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: MAX_SLIPPAGE_BPS
+        value: "50"

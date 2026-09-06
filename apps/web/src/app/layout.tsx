@@ -1,0 +1,30 @@
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import '../styles/globals.css';
+import { Web3Providers } from './providers';
+
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata: Metadata = {
+  title: 'BaseIndex Agent | Autonomous Chat-to-Trade Stock Portfolios on Base',
+  description: 'Institutional-grade autonomous stock index builder on Base Mainnet. Allocate real-world tokenized equities (TSLA, NVDA, AAPL, SPY) via natural language chat with CDP AgentKit.',
+  icons: {
+    icon: '/favicon.ico'
+  }
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" className="dark">
+      <body className={`${inter.className} min-h-screen bg-obsidian-950 text-slate-100 antialiased selection:bg-base-blue selection:text-white`}>
+        <Web3Providers>
+          {children}
+        </Web3Providers>
+      </body>
+    </html>
+  );
+}

@@ -1,0 +1,12 @@
+{
+  "name": "baseindex-agent-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:shared": "npm --prefix packages/shared run build",
+    "dev:server": "npm --prefix apps/server run dev",
+    "build:server": "npm --prefix apps/server run build",
+    "dev:web": "npm --prefix apps/web run dev",
+    "build:web": "npm --prefix apps/web run build"
+  }
+}

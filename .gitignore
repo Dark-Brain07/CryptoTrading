@@ -1,0 +1,26 @@
+# Node & Build artifacts
+node_modules/
+.next/
+out/
+dist/
+build/
+.turbo/
+*.tgz
+
+# Environment files
+.env
+.env.*
+!.env.example
+*.env
+
+# Logs & cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+
+# OS files
+.DS_Store
+Thumbs.db
+
