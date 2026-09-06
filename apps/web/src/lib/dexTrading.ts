@@ -7,15 +7,169 @@ import {
 } from 'viem';
 import {
   BASE_USDC,
-  BASE_WETH_ADDRESS,
-  AERODROME_ROUTER_ADDRESS,
-  AERODROME_FACTORY_ADDRESS,
-  AERODROME_ROUTER_ABI,
-  AERODROME_SWAP_ROUTES,
-  AerodromeRoute,
   ERC20_ABI,
   VERIFIED_BASE_TOKENIZED_STOCKS
 } from '@baseindex/shared';
+
+export const BASE_WETH_ADDRESS = '0x4200000000000000000000000000000000000006' as const;
+export const AERODROME_ROUTER_ADDRESS = '0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43' as const;
+export const AERODROME_FACTORY_ADDRESS = '0x420DD381b31aEf6683db6B902084cB0FFECe40Da' as const;
+
+export interface AerodromeRoute {
+  from: `0x${string}`;
+  to: `0x${string}`;
+  stable: boolean;
+  factory: `0x${string}`;
+}
+
+export const AERODROME_SWAP_ROUTES: Record<string, AerodromeRoute[]> = {
+  AERO: [
+    {
+      from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+      to: '0x940181a94A35A4569E4529A3CDfB74e38FD98631',
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    }
+  ],
+  WETH: [
+    {
+      from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+      to: BASE_WETH_ADDRESS,
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    }
+  ],
+  cbBTC: [
+    {
+      from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+      to: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    }
+  ],
+  VIRTUAL: [
+    {
+      from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+      to: BASE_WETH_ADDRESS,
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    },
+    {
+      from: BASE_WETH_ADDRESS,
+      to: '0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b',
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    }
+  ],
+  DEGEN: [
+    {
+      from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+      to: BASE_WETH_ADDRESS,
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    },
+    {
+      from: BASE_WETH_ADDRESS,
+      to: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed',
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    }
+  ]
+};
+
+export const AERODROME_ROUTER_ABI = [
+  {
+    name: 'defaultFactory',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'address' }]
+  },
+  {
+    name: 'getAmountsOut',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'amountIn', type: 'uint256' },
+      {
+        name: 'routes',
+        type: 'tuple[]',
+        components: [
+          { name: 'from', type: 'address' },
+          { name: 'to', type: 'address' },
+          { name: 'stable', type: 'bool' },
+          { name: 'factory', type: 'address' }
+        ]
+      }
+    ],
+    outputs: [{ name: 'amounts', type: 'uint256[]' }]
+  },
+  {
+    name: 'swapExactTokensForTokens',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'amountIn', type: 'uint256' },
+      { name: 'amountOutMin', type: 'uint256' },
+      {
+        name: 'routes',
+        type: 'tuple[]',
+        components: [
+          { name: 'from', type: 'address' },
+          { name: 'to', type: 'address' },
+          { name: 'stable', type: 'bool' },
+          { name: 'factory', type: 'address' }
+        ]
+      },
+      { name: 'to', type: 'address' },
+      { name: 'deadline', type: 'uint256' }
+    ],
+    outputs: [{ name: 'amounts', type: 'uint256[]' }]
+  },
+  {
+    name: 'swapExactETHForTokens',
+    type: 'function',
+    stateMutability: 'payable',
+    inputs: [
+      { name: 'amountOutMin', type: 'uint256' },
+      {
+        name: 'routes',
+        type: 'tuple[]',
+        components: [
+          { name: 'from', type: 'address' },
+          { name: 'to', type: 'address' },
+          { name: 'stable', type: 'bool' },
+          { name: 'factory', type: 'address' }
+        ]
+      },
+      { name: 'to', type: 'address' },
+      { name: 'deadline', type: 'uint256' }
+    ],
+    outputs: [{ name: 'amounts', type: 'uint256[]' }]
+  },
+  {
+    name: 'swapExactTokensForETH',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'amountIn', type: 'uint256' },
+      { name: 'amountOutMin', type: 'uint256' },
+      {
+        name: 'routes',
+        type: 'tuple[]',
+        components: [
+          { name: 'from', type: 'address' },
+          { name: 'to', type: 'address' },
+          { name: 'stable', type: 'bool' },
+          { name: 'factory', type: 'address' }
+        ]
+      },
+      { name: 'to', type: 'address' },
+      { name: 'deadline', type: 'uint256' }
+    ],
+    outputs: [{ name: 'amounts', type: 'uint256[]' }]
+  }
+] as const;
 
 export interface TokenDiscoveryResult {
   address: `0x${string}`;
