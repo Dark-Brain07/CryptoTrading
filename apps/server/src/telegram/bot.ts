@@ -6,10 +6,10 @@ import { processNaturalLanguageIntent } from '../agent/agent';
 import { BASE_EXPLORER_URL, BASE_USDC, ERC20_ABI } from '@baseindex/shared';
 import { telegramWalletStore } from './userWalletStore';
 import { executeServerBuyOnAerodrome, executeServerSellOrSwapOnAerodrome } from '../services/aerodromeExecution';
-import { createWalletClient, http, parseUnits } from 'viem';
+import { createWalletClient, http, fallback, parseUnits, formatUnits } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { base } from 'viem/chains';
-import { publicClient } from '../services/blockchain';
+import { publicClient, getOnChainTokenBalance } from '../services/blockchain';
 
 let bot: Telegraf | null = null;
 
@@ -243,31 +243,39 @@ export function initializeTelegramBot(): Telegraf | null {
       }
 
       const text = ctx.message.text.trim();
-      const parts = text.split(/\s+/);
+      const parts = text.split(/\s+/).filter(Boolean);
 
       if (parts.length < 3) {
         await ctx.replyWithMarkdown(
           `📤 *How to Withdraw Funds:*\n\n` +
-          `Format: \`/withdraw <amount_usdc> <destination_address>\`\n\n` +
-          `*Example:*\n` +
-          `\`/withdraw 5 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045\`\n\n` +
-          `Funds will be transferred from your Agentic Wallet to your personal wallet on Base Mainnet.`
+          `• *Withdraw ETH:*\n` +
+          `\`/withdraw <amount> ETH <destination_address>\`\n` +
+          `*Example:* \`/withdraw 0.001 ETH 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045\`\n` +
+          `*Withdraw All ETH:* \`/withdraw all ETH 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045\`\n\n` +
+          `• *Withdraw USDC:*\n` +
+          `\`/withdraw <amount> USDC <destination_address>\`\n` +
+          `*Example:* \`/withdraw 5 USDC 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045\`\n\n` +
+          `_Funds will be broadcasted directly from your wallet on Base Mainnet._`
         );
         return;
       }
 
-      const amount = parseFloat(parts[1]);
-      const toAddress = parts[2];
-
-      if (isNaN(amount) || amount <= 0) {
-        await ctx.reply('Please enter a valid withdrawal amount.');
+      // Find 0x address
+      const toAddress = parts.find(p => p.startsWith('0x') && p.length === 42);
+      if (!toAddress) {
+        await ctx.reply('Please provide a valid 42-character Base destination address (0x...).');
         return;
       }
 
-      if (!toAddress.startsWith('0x') || toAddress.length !== 42) {
-        await ctx.reply('Please enter a valid 42-character Base address (0x...).');
-        return;
-      }
+      // Detect asset: ETH or USDC (default to ETH if 'eth' or fractional < 0.05, else USDC)
+      const isExplicitETH = parts.some(p => p.toUpperCase() === 'ETH' || p.toUpperCase() === 'WETH');
+      const isExplicitUSDC = parts.some(p => p.toUpperCase() === 'USDC' || p.toUpperCase() === 'USD');
+      const isAll = parts.some(p => p.toLowerCase() === 'all' || p.toLowerCase() === 'max' || p.toLowerCase() === 'everything');
+      
+      const numPart = parts.find(p => !p.startsWith('0x') && !['ETH', 'USDC', 'WETH', 'USD', 'ALL', 'MAX'].includes(p.toUpperCase()) && !isNaN(parseFloat(p)));
+      const parsedAmount = numPart ? parseFloat(numPart) : 0;
+
+      const isETH = isExplicitETH || (!isExplicitUSDC && parsedAmount > 0 && parsedAmount < 0.05);
 
       await ctx.sendChatAction('typing');
 
@@ -276,27 +284,83 @@ export function initializeTelegramBot(): Telegraf | null {
         const walletClient = createWalletClient({
           account,
           chain: base,
-          transport: http(config.BASE_RPC_URL || 'https://mainnet.base.org')
+          transport: fallback([
+            http('https://base.llamarpc.com'),
+            http('https://1rpc.io/base'),
+            http('https://mainnet.base.org')
+          ])
         });
 
-        const amountRaw = parseUnits(amount.toFixed(6), BASE_USDC.decimals);
-        const txHash = await walletClient.writeContract({
-          address: BASE_USDC.contractAddress as `0x${string}`,
-          abi: ERC20_ABI,
-          functionName: 'transfer',
-          args: [toAddress as `0x${string}`, amountRaw]
-        });
+        if (isETH) {
+          const balanceRaw = await publicClient.getBalance({ address: account.address });
+          const balanceETH = parseFloat(formatUnits(balanceRaw, 18));
 
-        await publicClient.waitForTransactionReceipt({ hash: txHash });
-        const explorerUrl = `https://basescan.org/tx/${txHash}`;
+          if (balanceETH <= 0.00003) {
+            await ctx.reply(`❌ Insufficient ETH balance to withdraw. You currently have ${balanceETH.toFixed(5)} ETH.`);
+            return;
+          }
 
-        await ctx.replyWithMarkdown(
-          `📤 *Withdrawal Confirmed on Base Mainnet!*\n\n` +
-          `• *Amount:* $${amount.toFixed(2)} USDC\n` +
-          `• *Destination:* \`${toAddress}\`\n` +
-          `• *Status:* Confirmed ✅\n` +
-          `• *Explorer:* [View on BaseScan](${explorerUrl})`
-        );
+          let sendValue: bigint;
+          let displayAmount: number;
+
+          if (isAll || parsedAmount <= 0 || parsedAmount >= balanceETH) {
+            const gasPrice = await publicClient.getGasPrice();
+            const estimatedGas = 21000n * gasPrice * 2n;
+            if (balanceRaw <= estimatedGas) {
+              await ctx.reply(`❌ ETH balance (${balanceETH.toFixed(5)} ETH) is too small to cover the gas fee.`);
+              return;
+            }
+            sendValue = balanceRaw - estimatedGas;
+            displayAmount = parseFloat(formatUnits(sendValue, 18));
+          } else {
+            sendValue = parseUnits(parsedAmount.toFixed(6), 18);
+            displayAmount = parsedAmount;
+          }
+
+          const txHash = await walletClient.sendTransaction({
+            to: toAddress as `0x${string}`,
+            value: sendValue
+          });
+
+          await publicClient.waitForTransactionReceipt({ hash: txHash });
+          const explorerUrl = `https://basescan.org/tx/${txHash}`;
+
+          await ctx.replyWithMarkdown(
+            `📤 *ETH Withdrawal Confirmed on Base Mainnet!*\n\n` +
+            `• *Amount Sent:* \`${displayAmount.toFixed(6)} ETH\`\n` +
+            `• *Destination:* \`${toAddress}\`\n` +
+            `• *Status:* Confirmed ✅\n` +
+            `• *BaseScan Explorer:* [View Confirmed Transaction](${explorerUrl})`
+          );
+        } else {
+          // USDC Withdrawal
+          const usdcBalance = await getOnChainTokenBalance(BASE_USDC.contractAddress as `0x${string}`, account.address, BASE_USDC.decimals);
+          if (usdcBalance <= 0) {
+            await ctx.reply(`❌ You have $0.00 USDC in your wallet to withdraw.`);
+            return;
+          }
+
+          const sendAmount = (isAll || parsedAmount <= 0 || parsedAmount >= usdcBalance) ? usdcBalance : parsedAmount;
+          const amountRaw = parseUnits(sendAmount.toFixed(6), BASE_USDC.decimals);
+
+          const txHash = await walletClient.writeContract({
+            address: BASE_USDC.contractAddress as `0x${string}`,
+            abi: ERC20_ABI,
+            functionName: 'transfer',
+            args: [toAddress as `0x${string}`, amountRaw]
+          });
+
+          await publicClient.waitForTransactionReceipt({ hash: txHash });
+          const explorerUrl = `https://basescan.org/tx/${txHash}`;
+
+          await ctx.replyWithMarkdown(
+            `📤 *USDC Withdrawal Confirmed on Base Mainnet!*\n\n` +
+            `• *Amount Sent:* \`$${sendAmount.toFixed(2)} USDC\`\n` +
+            `• *Destination:* \`${toAddress}\`\n` +
+            `• *Status:* Confirmed ✅\n` +
+            `• *BaseScan Explorer:* [View Confirmed Transaction](${explorerUrl})`
+          );
+        }
       } catch (err: any) {
         await ctx.reply(`❌ Withdrawal failed: ${err?.message || 'Transaction error'}`);
       }
