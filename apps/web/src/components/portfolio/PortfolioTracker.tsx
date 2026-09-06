@@ -115,7 +115,11 @@ export function PortfolioTracker({ refreshTrigger, walletAddress }: PortfolioTra
             On-Chain Balances & BaseScan Verification
           </div>
           <div className="rounded-xl border border-obsidian-border bg-obsidian-900/40 overflow-hidden">
-            <HoldingsTable holdings={holdings} />
+            <HoldingsTable
+              holdings={holdings}
+              onTradeCompleted={fetchPortfolio}
+              walletAddress={walletAddress}
+            />
           </div>
         </div>
       </div>

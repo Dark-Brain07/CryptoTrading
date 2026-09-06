@@ -30,11 +30,12 @@ interface ChatTerminalProps {
 }
 
 const QUICK_PROMPTS = [
-  'Allocate $100 across 60% NVDA and 40% TSLA',
-  'How to import my private key & login',
+  'Buy $0.10 of NVDA',
+  'Sell 0.10 of NVDA to USDC',
+  'Sell all my TSLA to USDC',
   'Check My Wallet Balance',
+  'Allocate $100 across 60% NVDA and 40% TSLA',
   'Withdraw Funds to Main Wallet',
-  'Backup My Private Key',
   'Build a $250 Tech Basket: AAPL, MSFT, and AMZN'
 ];
 
@@ -42,7 +43,7 @@ const INITIAL_MESSAGES: AgentMessage[] = [
   {
     id: 'welcome-1',
     role: 'assistant',
-    content: 'Welcome to BaseIndex Agent. I am your autonomous portfolio architect on Base Mainnet.\n\nTell me how you would like to allocate your capital across verified tokenized stocks (TSLA, NVDA, AAPL, MSFT, SPY, COIN, AMZN, GOOGL), or ask me to check your wallet balance, withdraw funds, backup your key, or import an existing wallet.',
+    content: 'Welcome to BaseIndex Agent. I am your autonomous portfolio architect on Base Mainnet.\n\nTell me how you would like to buy or sell tokenized stocks (NVDA, TSLA, AAPL, MSFT, SPY, COIN, AMZN, GOOGL), liquidate positions to USDC, or check your wallet balances.',
     timestamp: Date.now()
   }
 ];
@@ -60,7 +61,9 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
     usdcBalance,
     isCreated,
     createWallet,
-    fetchBalances
+    fetchBalances,
+    executeBuyOnChain,
+    executeSellOnChain
   } = useAgenticWallet();
 
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
@@ -160,6 +163,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
 
       if (data.executionResult && onTradeExecuted) {
         onTradeExecuted();
+        fetchBalances();
       }
     } catch (err: any) {
       setMessages((prev) =>

@@ -93,6 +93,58 @@ class PortfolioStore {
             });
         }
     }
+    recordSell(walletKey = 'default', ticker, amountUSD, sharesSold, txHash) {
+        const key = walletKey.toLowerCase();
+        let map = this.holdings.get(key);
+        if (!map) {
+            this.seedDefaultPortfolio(key);
+            map = this.holdings.get(key);
+        }
+        const stock = shared_1.VERIFIED_BASE_TOKENIZED_STOCKS[ticker];
+        if (!stock) {
+            throw new Error(`Asset ${ticker} not supported on Base Mainnet.`);
+        }
+        const existing = map.get(ticker);
+        if (!existing || existing.balance <= 0) {
+            throw new Error(`You do not have any ${ticker} holdings in your wallet to sell.`);
+        }
+        let calculatedShares = sharesSold;
+        let calculatedUSD = amountUSD;
+        if (calculatedShares !== undefined && calculatedShares > 0) {
+            calculatedUSD = Number((calculatedShares * stock.referencePriceUSD).toFixed(4));
+        }
+        else if (calculatedUSD !== undefined && calculatedUSD > 0) {
+            calculatedShares = Number((calculatedUSD / stock.referencePriceUSD).toFixed(6));
+        }
+        else {
+            // Default to selling entire position if neither specified
+            calculatedShares = existing.balance;
+            calculatedUSD = existing.balanceUSD;
+        }
+        // Clamp to available balance
+        if (calculatedShares > existing.balance) {
+            calculatedShares = existing.balance;
+            calculatedUSD = Number((calculatedShares * stock.referencePriceUSD).toFixed(4));
+        }
+        const remainingShares = Math.max(0, Number((existing.balance - calculatedShares).toFixed(6)));
+        const remainingUSD = Math.max(0, Number((remainingShares * stock.referencePriceUSD).toFixed(2)));
+        if (remainingShares <= 0.000001) {
+            map.delete(ticker);
+        }
+        else {
+            map.set(ticker, {
+                ...existing,
+                balance: remainingShares,
+                balanceUSD: remainingUSD
+            });
+        }
+        return {
+            success: true,
+            sharesSold: calculatedShares,
+            amountUSD: calculatedUSD || 0,
+            remainingShares
+        };
+    }
     getTotalValueUSD(walletKey = 'default') {
         const holdings = this.getHoldings(walletKey);
         return Number(holdings.reduce((sum, h) => sum + h.balanceUSD, 0).toFixed(2));
