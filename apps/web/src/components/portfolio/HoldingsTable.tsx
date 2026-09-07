@@ -104,7 +104,7 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
         {holdings.map((h) => {
           const isPositive = h.change24h >= 0;
           const tokenMeta = VERIFIED_BASE_TOKENIZED_STOCKS[h.ticker] || VERIFIED_BASE_TOKENIZED_STOCKS[h.ticker.replace(/c$/, '')];
-          const iconSrc = h.iconUrl || tokenMeta?.iconUrl;
+          const iconSrc = (h as any).iconUrl || tokenMeta?.iconUrl;
 
           return (
             <div key={h.ticker} className="p-3.5 space-y-2.5 hover:bg-obsidian-900/40 transition-colors">
@@ -199,7 +199,7 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
             {holdings.map((h) => {
               const isPositive = h.change24h >= 0;
               const tokenMeta = VERIFIED_BASE_TOKENIZED_STOCKS[h.ticker] || VERIFIED_BASE_TOKENIZED_STOCKS[h.ticker.replace(/c$/, '')];
-              const iconSrc = h.iconUrl || tokenMeta?.iconUrl;
+              const iconSrc = (h as any).iconUrl || tokenMeta?.iconUrl;
 
               return (
                 <tr key={h.ticker} className="hover:bg-obsidian-900/40 transition-colors">
@@ -296,9 +296,9 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
             <div className="flex items-center justify-between border-b border-obsidian-border/80 pb-3">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-base-blue/10 border border-obsidian-border flex items-center justify-center font-bold text-blue-500 dark:text-blue-400 text-xs shrink-0 overflow-hidden p-1 shadow-sm">
-                  {(selectedHolding.iconUrl || VERIFIED_BASE_TOKENIZED_STOCKS[selectedHolding.ticker]?.iconUrl) ? (
+                  {((selectedHolding as any).iconUrl || VERIFIED_BASE_TOKENIZED_STOCKS[selectedHolding.ticker]?.iconUrl) ? (
                     <img
-                      src={selectedHolding.iconUrl || VERIFIED_BASE_TOKENIZED_STOCKS[selectedHolding.ticker]?.iconUrl}
+                      src={(selectedHolding as any).iconUrl || VERIFIED_BASE_TOKENIZED_STOCKS[selectedHolding.ticker]?.iconUrl}
                       alt={selectedHolding.ticker}
                       className="w-full h-full object-contain rounded-md"
                       onError={(e) => {
