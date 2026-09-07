@@ -3,26 +3,26 @@
 @tailwind utilities;
 
 :root {
-  /* Day Mode (Light Theme) Tokens */
-  --bg-app: #F8FAFC;
-  --bg-panel: rgba(255, 255, 255, 0.94);
-  --bg-card: #F1F5F9;
-  --bg-card-hover: #E2E8F0;
-  --bg-input: #FFFFFF;
-  --bg-elevated: #E2E8F0;
-  --border-color: #E2E8F0;
-  --border-subtle: #CBD5E1;
+  /* Day Mode (Ash Light Grey Theme) Tokens */
+  --bg-app: #E2E8F0; /* Soft Ash / Slate-200 Light Grey Background */
+  --bg-panel: rgba(255, 255, 255, 0.96); /* Clean Crisp White Glass Panels */
+  --bg-card: #F1F5F9; /* Slate-100 Soft Ash Card Surfaces */
+  --bg-card-hover: #E2E8F0; /* Slate-200 Hover States */
+  --bg-input: #FFFFFF; /* Pure White Inputs */
+  --bg-elevated: #CBD5E1; /* Slate-300 Ash Elevated Elements */
+  --border-color: #CBD5E1; /* Slate-300 Well-Defined Ash Borders */
+  --border-subtle: #94A3B8; /* Slate-400 Subtle Accent Lines */
 
-  --text-primary: #0F172A;
-  --text-secondary: #334155;
-  --text-muted: #64748B;
-  --text-faint: #94A3B8;
+  --text-primary: #0F172A; /* Slate-900 High Contrast Charcoal */
+  --text-secondary: #334155; /* Slate-700 Deep Slate Body */
+  --text-muted: #64748B; /* Slate-500 Labels & Footers */
+  --text-faint: #94A3B8; /* Slate-400 */
 
-  --panel-glass: rgba(255, 255, 255, 0.90);
-  --panel-border: #E2E8F0;
-  --panel-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
-  --scrollbar-track: #F1F5F9;
-  --scrollbar-thumb: #CBD5E1;
+  --panel-glass: rgba(255, 255, 255, 0.94);
+  --panel-border: #CBD5E1;
+  --panel-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+  --scrollbar-track: #E2E8F0;
+  --scrollbar-thumb: #94A3B8;
 }
 
 .dark {
@@ -64,7 +64,7 @@ body::before {
   left: 0;
   right: 0;
   height: 520px;
-  background: radial-gradient(circle at 50% -20%, rgba(0, 82, 255, 0.08) 0%, rgba(248, 250, 252, 0) 70%);
+  background: radial-gradient(circle at 50% -20%, rgba(0, 82, 255, 0.09) 0%, rgba(226, 232, 240, 0) 70%);
   pointer-events: none;
   z-index: 0;
 }
