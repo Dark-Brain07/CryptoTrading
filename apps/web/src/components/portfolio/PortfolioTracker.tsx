@@ -13,13 +13,35 @@ interface PortfolioTrackerProps {
 
 const DEFAULT_REAL_BASE_HOLDINGS: PortfolioHolding[] = [
   {
+    ticker: 'NVDAc',
+    name: 'NVIDIA (NVDAc)',
+    balance: 0.85,
+    balanceUSD: 109.23,
+    currentPrice: 128.50,
+    change24h: 3.12,
+    allocationPercentage: 20.2,
+    contractAddress: '0xb20000000000000000000078ee7ce2fE4908108C',
+    explorerUrl: 'https://basescan.org/token/0xb20000000000000000000078ee7ce2fE4908108C'
+  },
+  {
+    ticker: 'TSLAc',
+    name: 'Tesla (TSLAc)',
+    balance: 0.42,
+    balanceUSD: 90.30,
+    currentPrice: 215.00,
+    change24h: 3.80,
+    allocationPercentage: 16.7,
+    contractAddress: '0xb2000000000000000000001e800a7f5189430cD0',
+    explorerUrl: 'https://basescan.org/token/0xb2000000000000000000001e800a7f5189430cD0'
+  },
+  {
     ticker: 'AERO',
     name: 'Aerodrome Finance',
-    balance: 145.2,
-    balanceUSD: 171.34,
+    balance: 120.0,
+    balanceUSD: 141.60,
     currentPrice: 1.18,
     change24h: 4.82,
-    allocationPercentage: 35.0,
+    allocationPercentage: 26.1,
     contractAddress: '0x940181a94A35A4569E4529A3CDfB74e38FD98631',
     explorerUrl: 'https://basescan.org/token/0x940181a94A35A4569E4529A3CDfB74e38FD98631'
   },
@@ -30,37 +52,26 @@ const DEFAULT_REAL_BASE_HOLDINGS: PortfolioHolding[] = [
     balanceUSD: 110.25,
     currentPrice: 2450.00,
     change24h: 1.65,
-    allocationPercentage: 30.0,
+    allocationPercentage: 20.4,
     contractAddress: '0x4200000000000000000000000000000000000006',
     explorerUrl: 'https://basescan.org/token/0x4200000000000000000000000000000000000006'
   },
   {
     ticker: 'VIRTUAL',
     name: 'Virtuals Protocol',
-    balance: 85.0,
-    balanceUSD: 182.75,
+    balance: 42.0,
+    balanceUSD: 90.30,
     currentPrice: 2.15,
     change24h: 8.42,
-    allocationPercentage: 20.0,
+    allocationPercentage: 16.6,
     contractAddress: '0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b',
     explorerUrl: 'https://basescan.org/token/0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b'
-  },
-  {
-    ticker: 'cbBTC',
-    name: 'Coinbase Wrapped BTC',
-    balance: 0.00065,
-    balanceUSD: 37.57,
-    currentPrice: 57800.00,
-    change24h: -0.45,
-    allocationPercentage: 15.0,
-    contractAddress: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
-    explorerUrl: 'https://basescan.org/token/0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf'
   }
 ];
 
 export function PortfolioTracker({ refreshTrigger, walletAddress }: PortfolioTrackerProps) {
   const [holdings, setHoldings] = useState<PortfolioHolding[]>(DEFAULT_REAL_BASE_HOLDINGS);
-  const [totalValueUSD, setTotalValueUSD] = useState<number>(501.91);
+  const [totalValueUSD, setTotalValueUSD] = useState<number>(541.68);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
 
@@ -74,8 +85,7 @@ export function PortfolioTracker({ refreshTrigger, walletAddress }: PortfolioTra
       if (res.ok) {
         const data = await res.json();
         let list: PortfolioHolding[] = data.holdings || [];
-        // If server returns legacy tokens or empty list, sanitize to real Base tokens
-        if (list.length === 0 || list.some(h => ['NVDA', 'TSLA', 'SPY', 'AAPL'].includes(h.ticker))) {
+        if (list.length === 0) {
           list = DEFAULT_REAL_BASE_HOLDINGS;
         }
         setHoldings(list);

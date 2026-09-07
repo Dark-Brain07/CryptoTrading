@@ -75,39 +75,227 @@ exports.VERIFIED_BASE_TOKENIZED_STOCKS = {
         referencePriceUSD: 0.0011,
         iconUrl: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/base/assets/0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed/logo.png'
     },
-    // Legacy aliases for backwards compatibility
+    // Official Base Mainnet Tokenized Equities
+    NVDAc: {
+        ticker: 'NVDAc',
+        name: 'NVIDIA',
+        contractAddress: '0xb20000000000000000000078ee7ce2fE4908108C',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'NVDA',
+        referencePriceUSD: 128.50,
+        iconUrl: 'https://cryptologos.cc/logos/nvidia-logo.png'
+    },
+    METAc: {
+        ticker: 'METAc',
+        name: 'Meta',
+        contractAddress: '0xb2000000000000000000008bC8786B856E61707C',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'META',
+        referencePriceUSD: 512.00,
+        iconUrl: 'https://cryptologos.cc/logos/meta-logo.png'
+    },
+    AAPLc: {
+        ticker: 'AAPLc',
+        name: 'Apple',
+        contractAddress: '0xb200000000000000000000C2e324d24d7eEcd1fb',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'AAPL',
+        referencePriceUSD: 228.00,
+        iconUrl: 'https://cryptologos.cc/logos/apple-logo.png'
+    },
+    GOOGLc: {
+        ticker: 'GOOGLc',
+        name: 'Alphabet',
+        contractAddress: '0xb2000000000000000000002D0BA3164cc74f58B7',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'GOOGL',
+        referencePriceUSD: 164.00,
+        iconUrl: 'https://cryptologos.cc/logos/google-logo.png'
+    },
+    AMZNc: {
+        ticker: 'AMZNc',
+        name: 'Amazon',
+        contractAddress: '0xb200000000000000000000d9192b6B456483C2E8',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'AMZN',
+        referencePriceUSD: 186.00,
+        iconUrl: 'https://cryptologos.cc/logos/amazon-logo.png'
+    },
+    MSFTc: {
+        ticker: 'MSFTc',
+        name: 'Microsoft',
+        contractAddress: '0xB200000000000000000000Ab99cFa739E253872B',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'MSFT',
+        referencePriceUSD: 418.00,
+        iconUrl: 'https://cryptologos.cc/logos/microsoft-logo.png'
+    },
+    MSTRc: {
+        ticker: 'MSTRc',
+        name: 'MicroStrategy',
+        contractAddress: '0xb2000000000000000000004884b426556b92883d',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Blue Chip',
+        underlyingSymbol: 'MSTR',
+        referencePriceUSD: 138.00,
+        iconUrl: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png'
+    },
+    SNDKc: {
+        ticker: 'SNDKc',
+        name: 'SanDisk',
+        contractAddress: '0xb200000000000000000000397293Cb8cda9a10c5',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Semiconductors',
+        underlyingSymbol: 'SNDK',
+        referencePriceUSD: 72.00,
+        iconUrl: 'https://cryptologos.cc/logos/sandisk-logo.png'
+    },
+    SPCXc: {
+        ticker: 'SPCXc',
+        name: 'SpaceX',
+        contractAddress: '0xb2000000000000000000007b9fcbd005511aCBd5',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'SPCX',
+        referencePriceUSD: 185.00,
+        iconUrl: 'https://cryptologos.cc/logos/spacex-logo.png'
+    },
+    TSLAc: {
+        ticker: 'TSLAc',
+        name: 'Tesla',
+        contractAddress: '0xb2000000000000000000001e800a7f5189430cD0',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'TSLA',
+        referencePriceUSD: 215.00,
+        iconUrl: 'https://cryptologos.cc/logos/tesla-logo.png'
+    },
+    // Direct aliases without trailing 'c'
     NVDA: {
         ticker: 'NVDA',
-        name: 'NVIDIA Corp Proxy / AERO Pool',
-        contractAddress: '0x940181a94A35A4569E4529A3CDfB74e38FD98631',
+        name: 'NVIDIA (NVDAc)',
+        contractAddress: '0xb20000000000000000000078ee7ce2fE4908108C',
         decimals: 18,
-        issuer: 'Base Mainnet Liquid Asset',
-        category: 'DeFi',
-        underlyingSymbol: 'AERO',
-        referencePriceUSD: 0.54,
-        iconUrl: 'https://aerodrome.finance/favicon.ico'
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'NVDA',
+        referencePriceUSD: 128.50,
+        iconUrl: 'https://cryptologos.cc/logos/nvidia-logo.png'
+    },
+    META: {
+        ticker: 'META',
+        name: 'Meta (METAc)',
+        contractAddress: '0xb2000000000000000000008bC8786B856E61707C',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'META',
+        referencePriceUSD: 512.00,
+        iconUrl: 'https://cryptologos.cc/logos/meta-logo.png'
+    },
+    AAPL: {
+        ticker: 'AAPL',
+        name: 'Apple (AAPLc)',
+        contractAddress: '0xb200000000000000000000C2e324d24d7eEcd1fb',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'AAPL',
+        referencePriceUSD: 228.00,
+        iconUrl: 'https://cryptologos.cc/logos/apple-logo.png'
+    },
+    GOOGL: {
+        ticker: 'GOOGL',
+        name: 'Alphabet (GOOGLc)',
+        contractAddress: '0xb2000000000000000000002D0BA3164cc74f58B7',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'GOOGL',
+        referencePriceUSD: 164.00,
+        iconUrl: 'https://cryptologos.cc/logos/google-logo.png'
+    },
+    AMZN: {
+        ticker: 'AMZN',
+        name: 'Amazon (AMZNc)',
+        contractAddress: '0xb200000000000000000000d9192b6B456483C2E8',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'AMZN',
+        referencePriceUSD: 186.00,
+        iconUrl: 'https://cryptologos.cc/logos/amazon-logo.png'
+    },
+    MSFT: {
+        ticker: 'MSFT',
+        name: 'Microsoft (MSFTc)',
+        contractAddress: '0xB200000000000000000000Ab99cFa739E253872B',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'MSFT',
+        referencePriceUSD: 418.00,
+        iconUrl: 'https://cryptologos.cc/logos/microsoft-logo.png'
+    },
+    MSTR: {
+        ticker: 'MSTR',
+        name: 'MicroStrategy (MSTRc)',
+        contractAddress: '0xb2000000000000000000004884b426556b92883d',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Blue Chip',
+        underlyingSymbol: 'MSTR',
+        referencePriceUSD: 138.00,
+        iconUrl: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png'
+    },
+    SNDK: {
+        ticker: 'SNDK',
+        name: 'SanDisk (SNDKc)',
+        contractAddress: '0xb200000000000000000000397293Cb8cda9a10c5',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Semiconductors',
+        underlyingSymbol: 'SNDK',
+        referencePriceUSD: 72.00,
+        iconUrl: 'https://cryptologos.cc/logos/sandisk-logo.png'
+    },
+    SPCX: {
+        ticker: 'SPCX',
+        name: 'SpaceX (SPCXc)',
+        contractAddress: '0xb2000000000000000000007b9fcbd005511aCBd5',
+        decimals: 18,
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'SPCX',
+        referencePriceUSD: 185.00,
+        iconUrl: 'https://cryptologos.cc/logos/spacex-logo.png'
     },
     TSLA: {
         ticker: 'TSLA',
-        name: 'Tesla Proxy / WETH Pool',
-        contractAddress: '0x4200000000000000000000000000000000000006',
+        name: 'Tesla (TSLAc)',
+        contractAddress: '0xb2000000000000000000001e800a7f5189430cD0',
         decimals: 18,
-        issuer: 'Base Mainnet Liquid Asset',
-        category: 'Blue Chip',
-        underlyingSymbol: 'ETH',
-        referencePriceUSD: 2524.00,
-        iconUrl: 'https://cryptologos.cc/logos/ethereum-eth-logo.png'
-    },
-    SPY: {
-        ticker: 'SPY',
-        name: 'SPDR Index Proxy / cbBTC Pool',
-        contractAddress: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
-        decimals: 8,
-        issuer: 'Coinbase Blue Chip',
-        category: 'Blue Chip',
-        underlyingSymbol: 'BTC',
-        referencePriceUSD: 80320.00,
-        iconUrl: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png'
+        issuer: 'Base Tokenized Equities',
+        category: 'Tech',
+        underlyingSymbol: 'TSLA',
+        referencePriceUSD: 215.00,
+        iconUrl: 'https://cryptologos.cc/logos/tesla-logo.png'
     }
 };
 // Verified Base Mainnet Aerodrome Contracts
@@ -125,6 +313,14 @@ exports.AERODROME_SWAP_ROUTES = {
         }
     ],
     WETH: [
+        {
+            from: exports.BASE_USDC.contractAddress,
+            to: exports.BASE_WETH_ADDRESS,
+            stable: false,
+            factory: exports.AERODROME_FACTORY_ADDRESS
+        }
+    ],
+    ETH: [
         {
             from: exports.BASE_USDC.contractAddress,
             to: exports.BASE_WETH_ADDRESS,
@@ -167,6 +363,87 @@ exports.AERODROME_SWAP_ROUTES = {
             stable: false,
             factory: exports.AERODROME_FACTORY_ADDRESS
         }
+    ],
+    // Base Tokenized Equities Swap Routes (Aerodrome Router)
+    NVDAc: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb20000000000000000000078ee7ce2fE4908108C', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    NVDA: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb20000000000000000000078ee7ce2fE4908108C', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    METAc: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb2000000000000000000008bC8786B856E61707C', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    META: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb2000000000000000000008bC8786B856E61707C', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    AAPLc: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb200000000000000000000C2e324d24d7eEcd1fb', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    AAPL: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb200000000000000000000C2e324d24d7eEcd1fb', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    GOOGLc: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb2000000000000000000002D0BA3164cc74f58B7', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    GOOGL: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb2000000000000000000002D0BA3164cc74f58B7', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    AMZNc: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb200000000000000000000d9192b6B456483C2E8', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    AMZN: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb200000000000000000000d9192b6B456483C2E8', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    MSFTc: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xB200000000000000000000Ab99cFa739E253872B', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    MSFT: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xB200000000000000000000Ab99cFa739E253872B', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    MSTRc: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb2000000000000000000004884b426556b92883d', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    MSTR: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb2000000000000000000004884b426556b92883d', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    SNDKc: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb200000000000000000000397293Cb8cda9a10c5', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    SNDK: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb200000000000000000000397293Cb8cda9a10c5', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    SPCXc: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb2000000000000000000007b9fcbd005511aCBd5', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    SPCX: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb2000000000000000000007b9fcbd005511aCBd5', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    TSLAc: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb2000000000000000000001e800a7f5189430cD0', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
+    ],
+    TSLA: [
+        { from: exports.BASE_USDC.contractAddress, to: exports.BASE_WETH_ADDRESS, stable: false, factory: exports.AERODROME_FACTORY_ADDRESS },
+        { from: exports.BASE_WETH_ADDRESS, to: '0xb2000000000000000000001e800a7f5189430cD0', stable: false, factory: exports.AERODROME_FACTORY_ADDRESS }
     ]
 };
 // Aerodrome Router ABI

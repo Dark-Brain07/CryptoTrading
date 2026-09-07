@@ -143,6 +143,97 @@ async function scanWalletLiveHoldings(address) {
             price: 0.0011,
             change24h: -1.15,
             isNative: false
+        },
+        // Base Tokenized Equities (Stocks)
+        {
+            ticker: 'NVDAc',
+            name: 'NVIDIA',
+            contractAddress: '0xb20000000000000000000078ee7ce2fE4908108C',
+            decimals: 18,
+            price: 128.50,
+            change24h: 3.12,
+            isNative: false
+        },
+        {
+            ticker: 'METAc',
+            name: 'Meta',
+            contractAddress: '0xb2000000000000000000008bC8786B856E61707C',
+            decimals: 18,
+            price: 512.00,
+            change24h: 1.84,
+            isNative: false
+        },
+        {
+            ticker: 'AAPLc',
+            name: 'Apple',
+            contractAddress: '0xb200000000000000000000C2e324d24d7eEcd1fb',
+            decimals: 18,
+            price: 228.00,
+            change24h: 0.95,
+            isNative: false
+        },
+        {
+            ticker: 'GOOGLc',
+            name: 'Alphabet',
+            contractAddress: '0xb2000000000000000000002D0BA3164cc74f58B7',
+            decimals: 18,
+            price: 164.00,
+            change24h: 1.25,
+            isNative: false
+        },
+        {
+            ticker: 'AMZNc',
+            name: 'Amazon',
+            contractAddress: '0xb200000000000000000000d9192b6B456483C2E8',
+            decimals: 18,
+            price: 186.00,
+            change24h: 2.10,
+            isNative: false
+        },
+        {
+            ticker: 'MSFTc',
+            name: 'Microsoft',
+            contractAddress: '0xB200000000000000000000Ab99cFa739E253872B',
+            decimals: 18,
+            price: 418.00,
+            change24h: 1.45,
+            isNative: false
+        },
+        {
+            ticker: 'MSTRc',
+            name: 'MicroStrategy',
+            contractAddress: '0xb2000000000000000000004884b426556b92883d',
+            decimals: 18,
+            price: 138.00,
+            change24h: 5.60,
+            isNative: false
+        },
+        {
+            ticker: 'SNDKc',
+            name: 'SanDisk',
+            contractAddress: '0xb200000000000000000000397293Cb8cda9a10c5',
+            decimals: 18,
+            price: 72.00,
+            change24h: -0.80,
+            isNative: false
+        },
+        {
+            ticker: 'SPCXc',
+            name: 'SpaceX',
+            contractAddress: '0xb2000000000000000000007b9fcbd005511aCBd5',
+            decimals: 18,
+            price: 185.00,
+            change24h: 4.15,
+            isNative: false
+        },
+        {
+            ticker: 'TSLAc',
+            name: 'Tesla',
+            contractAddress: '0xb2000000000000000000001e800a7f5189430cD0',
+            decimals: 18,
+            price: 215.00,
+            change24h: 3.80,
+            isNative: false
         }
     ];
     const results = [];

@@ -74,6 +74,87 @@ export const AERODROME_SWAP_ROUTES: Record<string, AerodromeRoute[]> = {
       stable: false,
       factory: AERODROME_FACTORY_ADDRESS
     }
+  ],
+  // Base Tokenized Equities Swap Routes
+  NVDAc: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb20000000000000000000078ee7ce2fE4908108C', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  NVDA: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb20000000000000000000078ee7ce2fE4908108C', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  METAc: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000008bC8786B856E61707C', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  META: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000008bC8786B856E61707C', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  AAPLc: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb200000000000000000000C2e324d24d7eEcd1fb', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  AAPL: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb200000000000000000000C2e324d24d7eEcd1fb', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  GOOGLc: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000002D0BA3164cc74f58B7', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  GOOGL: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000002D0BA3164cc74f58B7', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  AMZNc: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb200000000000000000000d9192b6B456483C2E8', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  AMZN: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb200000000000000000000d9192b6B456483C2E8', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  MSFTc: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xB200000000000000000000Ab99cFa739E253872B', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  MSFT: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xB200000000000000000000Ab99cFa739E253872B', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  MSTRc: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000004884b426556b92883d', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  MSTR: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000004884b426556b92883d', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  SNDKc: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb200000000000000000000397293Cb8cda9a10c5', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  SNDK: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb200000000000000000000397293Cb8cda9a10c5', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  SPCXc: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000007b9fcbd005511aCBd5', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  SPCX: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000007b9fcbd005511aCBd5', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  TSLAc: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000001e800a7f5189430cD0', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  TSLA: [
+    { from: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
+    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000001e800a7f5189430cD0', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ]
 };
 
@@ -197,7 +278,44 @@ export const KNOWN_BASE_TOKENS_BY_SYMBOL: Record<string, { address: `0x${string}
   CBBTC: { address: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf', name: 'Coinbase Wrapped BTC', symbol: 'cbBTC', decimals: 8, priceUSD: 57800.00 },
   VIRTUAL: { address: '0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b', name: 'Virtuals Protocol', symbol: 'VIRTUAL', decimals: 18, priceUSD: 2.15 },
   DEGEN: { address: '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed', name: 'Degen', symbol: 'DEGEN', decimals: 18, priceUSD: 0.0085 },
-  USDC: { address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', name: 'USD Coin', symbol: 'USDC', decimals: 6, priceUSD: 1.00 }
+  USDC: { address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913', name: 'USD Coin', symbol: 'USDC', decimals: 6, priceUSD: 1.00 },
+
+  // Base Tokenized Equities (Stocks)
+  NVDAC: { address: '0xb20000000000000000000078ee7ce2fE4908108C', name: 'NVIDIA (NVDAc)', symbol: 'NVDAc', decimals: 18, priceUSD: 128.50 },
+  NVDA: { address: '0xb20000000000000000000078ee7ce2fE4908108C', name: 'NVIDIA', symbol: 'NVDAc', decimals: 18, priceUSD: 128.50 },
+  NVIDIA: { address: '0xb20000000000000000000078ee7ce2fE4908108C', name: 'NVIDIA', symbol: 'NVDAc', decimals: 18, priceUSD: 128.50 },
+
+  METAC: { address: '0xb2000000000000000000008bC8786B856E61707C', name: 'Meta Platforms (METAc)', symbol: 'METAc', decimals: 18, priceUSD: 512.00 },
+  META: { address: '0xb2000000000000000000008bC8786B856E61707C', name: 'Meta Platforms', symbol: 'METAc', decimals: 18, priceUSD: 512.00 },
+
+  AAPLC: { address: '0xb200000000000000000000C2e324d24d7eEcd1fb', name: 'Apple (AAPLc)', symbol: 'AAPLc', decimals: 18, priceUSD: 228.00 },
+  AAPL: { address: '0xb200000000000000000000C2e324d24d7eEcd1fb', name: 'Apple', symbol: 'AAPLc', decimals: 18, priceUSD: 228.00 },
+  APPLE: { address: '0xb200000000000000000000C2e324d24d7eEcd1fb', name: 'Apple', symbol: 'AAPLc', decimals: 18, priceUSD: 228.00 },
+
+  GOOGLC: { address: '0xb2000000000000000000002D0BA3164cc74f58B7', name: 'Alphabet (GOOGLc)', symbol: 'GOOGLc', decimals: 18, priceUSD: 164.00 },
+  GOOGL: { address: '0xb2000000000000000000002D0BA3164cc74f58B7', name: 'Alphabet', symbol: 'GOOGLc', decimals: 18, priceUSD: 164.00 },
+  GOOGLE: { address: '0xb2000000000000000000002D0BA3164cc74f58B7', name: 'Alphabet', symbol: 'GOOGLc', decimals: 18, priceUSD: 164.00 },
+
+  AMZNC: { address: '0xb200000000000000000000d9192b6B456483C2E8', name: 'Amazon (AMZNc)', symbol: 'AMZNc', decimals: 18, priceUSD: 186.00 },
+  AMZN: { address: '0xb200000000000000000000d9192b6B456483C2E8', name: 'Amazon', symbol: 'AMZNc', decimals: 18, priceUSD: 186.00 },
+  AMAZON: { address: '0xb200000000000000000000d9192b6B456483C2E8', name: 'Amazon', symbol: 'AMZNc', decimals: 18, priceUSD: 186.00 },
+
+  MSFTC: { address: '0xB200000000000000000000Ab99cFa739E253872B', name: 'Microsoft (MSFTc)', symbol: 'MSFTc', decimals: 18, priceUSD: 418.00 },
+  MSFT: { address: '0xB200000000000000000000Ab99cFa739E253872B', name: 'Microsoft', symbol: 'MSFTc', decimals: 18, priceUSD: 418.00 },
+  MICROSOFT: { address: '0xB200000000000000000000Ab99cFa739E253872B', name: 'Microsoft', symbol: 'MSFTc', decimals: 18, priceUSD: 418.00 },
+
+  MSTRC: { address: '0xb2000000000000000000004884b426556b92883d', name: 'MicroStrategy (MSTRc)', symbol: 'MSTRc', decimals: 18, priceUSD: 138.00 },
+  MSTR: { address: '0xb2000000000000000000004884b426556b92883d', name: 'MicroStrategy', symbol: 'MSTRc', decimals: 18, priceUSD: 138.00 },
+
+  SNDKC: { address: '0xb200000000000000000000397293Cb8cda9a10c5', name: 'SanDisk (SNDKc)', symbol: 'SNDKc', decimals: 18, priceUSD: 72.00 },
+  SNDK: { address: '0xb200000000000000000000397293Cb8cda9a10c5', name: 'SanDisk', symbol: 'SNDKc', decimals: 18, priceUSD: 72.00 },
+
+  SPCXC: { address: '0xb2000000000000000000007b9fcbd005511aCBd5', name: 'SpaceX (SPCXc)', symbol: 'SPCXc', decimals: 18, priceUSD: 185.00 },
+  SPCX: { address: '0xb2000000000000000000007b9fcbd005511aCBd5', name: 'SpaceX', symbol: 'SPCXc', decimals: 18, priceUSD: 185.00 },
+
+  TSLAC: { address: '0xb2000000000000000000001e800a7f5189430cD0', name: 'Tesla (TSLAc)', symbol: 'TSLAc', decimals: 18, priceUSD: 215.00 },
+  TSLA: { address: '0xb2000000000000000000001e800a7f5189430cD0', name: 'Tesla', symbol: 'TSLAc', decimals: 18, priceUSD: 215.00 },
+  TESLA: { address: '0xb2000000000000000000001e800a7f5189430cD0', name: 'Tesla', symbol: 'TSLAc', decimals: 18, priceUSD: 215.00 }
 };
 
 export const KNOWN_BASE_TOKENS_BY_ADDRESS: Record<string, { name: string; symbol: string; decimals: number; priceUSD: number }> = {
@@ -206,7 +324,19 @@ export const KNOWN_BASE_TOKENS_BY_ADDRESS: Record<string, { name: string; symbol
   '0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf': { name: 'Coinbase Wrapped BTC', symbol: 'cbBTC', decimals: 8, priceUSD: 57800.00 },
   '0x0b3e328455c4059eeb9e3f84b5543f74e24e7e1b': { name: 'Virtuals Protocol', symbol: 'VIRTUAL', decimals: 18, priceUSD: 2.15 },
   '0x4ed4e862860bed51a9570b96d89af5e1b0efefed': { name: 'Degen', symbol: 'DEGEN', decimals: 18, priceUSD: 0.0085 },
-  '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913': { name: 'USD Coin', symbol: 'USDC', decimals: 6, priceUSD: 1.00 }
+  '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913': { name: 'USD Coin', symbol: 'USDC', decimals: 6, priceUSD: 1.00 },
+
+  // Base Tokenized Equities (Lowercased Addresses)
+  '0xb20000000000000000000078ee7ce2fe4908108c': { name: 'NVIDIA', symbol: 'NVDAc', decimals: 18, priceUSD: 128.50 },
+  '0xb2000000000000000000008bc8786b856e61707c': { name: 'Meta', symbol: 'METAc', decimals: 18, priceUSD: 512.00 },
+  '0xb200000000000000000000c2e324d24d7eecd1fb': { name: 'Apple', symbol: 'AAPLc', decimals: 18, priceUSD: 228.00 },
+  '0xb2000000000000000000002d0ba3164cc74f58b7': { name: 'Alphabet', symbol: 'GOOGLc', decimals: 18, priceUSD: 164.00 },
+  '0xb200000000000000000000d9192b6b456483c2e8': { name: 'Amazon', symbol: 'AMZNc', decimals: 18, priceUSD: 186.00 },
+  '0xb200000000000000000000ab99cfa739e253872b': { name: 'Microsoft', symbol: 'MSFTc', decimals: 18, priceUSD: 418.00 },
+  '0xb2000000000000000000004884b426556b92883d': { name: 'MicroStrategy', symbol: 'MSTRc', decimals: 18, priceUSD: 138.00 },
+  '0xb200000000000000000000397293cb8cda9a10c5': { name: 'SanDisk', symbol: 'SNDKc', decimals: 18, priceUSD: 72.00 },
+  '0xb2000000000000000000007b9fcbd005511acbd5': { name: 'SpaceX', symbol: 'SPCXc', decimals: 18, priceUSD: 185.00 },
+  '0xb2000000000000000000001e800a7f5189430cd0': { name: 'Tesla', symbol: 'TSLAc', decimals: 18, priceUSD: 215.00 }
 };
 
 /**

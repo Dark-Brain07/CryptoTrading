@@ -44,11 +44,11 @@ interface ChatTerminalProps {
 }
 
 const QUICK_PROMPTS = [
+  'Buy $0.10 of NVDAc',
+  'Buy $0.10 of TSLAc',
+  'Buy $0.10 of AAPLc',
   'Buy $0.10 of AERO',
-  'Buy $0.10 of VIRTUAL',
-  'Swap $1 USDC for WETH',
-  'Buy $0.10 of cbBTC',
-  'Sell all my AERO to USDC',
+  'Sell all my NVDAc to USDC',
   'Check My Wallet Balance',
   'Withdraw Funds to Main Wallet'
 ];
@@ -57,7 +57,7 @@ const INITIAL_MESSAGES: AgentMessage[] = [
   {
     id: 'welcome-1',
     role: 'assistant',
-    content: 'Welcome to BaseIndex Agent. I am your autonomous trading agent on Base Mainnet powered by Aerodrome DEX.\n\nTell me which tokens you would like to trade (AERO, WETH, cbBTC, VIRTUAL, DEGEN, or paste any ERC-20 contract address), liquidate to USDC, or check your wallet balances.',
+    content: 'Welcome to BaseIndex Agent. I am your autonomous trading agent on Base Mainnet powered by Aerodrome DEX.\n\nTrade official Base tokenized stocks (NVDAc, METAc, AAPLc, GOOGLc, AMZNc, MSFTc, MSTRc, SNDKc, SPCXc, TSLAc) or Base ecosystem tokens (AERO, WETH, cbBTC, VIRTUAL, DEGEN), liquidate to USDC/ETH, or check your wallet balances.',
     timestamp: Date.now()
   }
 ];
@@ -695,7 +695,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading}
-            placeholder="e.g., Buy $0.10 of AERO, or trade Base token 0x..."
+            placeholder="e.g., Buy $0.10 of NVDAc, trade Tesla, or paste Base 0x..."
             className="w-full bg-obsidian-950 border border-obsidian-border rounded-xl px-3.5 sm:px-4 py-2.5 text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-base-blue focus:ring-1 focus:ring-base-blue transition-all disabled:opacity-50"
           />
         </div>

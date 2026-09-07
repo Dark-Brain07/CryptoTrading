@@ -271,7 +271,7 @@ export async function processNaturalLanguageIntent(
 
   // Identify supported tickers mentioned
   const supportedTickers = Object.keys(VERIFIED_BASE_TOKENIZED_STOCKS);
-  const matchedTickers: string[] = [];
+  let matchedTickers: string[] = [];
 
   for (const ticker of supportedTickers) {
     const regex = new RegExp(`\\b${ticker}\\b|\\$${ticker}`, 'i');
@@ -279,6 +279,34 @@ export async function processNaturalLanguageIntent(
       matchedTickers.push(ticker);
     }
   }
+
+  const COMPANY_NAME_MAP: Record<string, string> = {
+    nvidia: 'NVDAc',
+    meta: 'METAc',
+    facebook: 'METAc',
+    apple: 'AAPLc',
+    google: 'GOOGLc',
+    alphabet: 'GOOGLc',
+    amazon: 'AMZNc',
+    microsoft: 'MSFTc',
+    microstrategy: 'MSTRc',
+    sandisk: 'SNDKc',
+    spacex: 'SPCXc',
+    tesla: 'TSLAc'
+  };
+
+  for (const [cName, ticker] of Object.entries(COMPANY_NAME_MAP)) {
+    const reg = new RegExp(`\\b${cName}\\b`, 'i');
+    if (reg.test(userPrompt) && !matchedTickers.includes(ticker)) {
+      matchedTickers.push(ticker);
+    }
+  }
+
+  // Deduplicate tickers where both 'c' and non-'c' alias matched (e.g. NVDA and NVDAc)
+  matchedTickers = matchedTickers.filter(t => {
+    if (t.endsWith('c')) return true;
+    return !matchedTickers.includes(`${t}c`);
+  });
 
   if (customContractTarget && !matchedTickers.includes(customContractTarget)) {
     matchedTickers.push(customContractTarget);

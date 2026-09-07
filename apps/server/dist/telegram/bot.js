@@ -35,9 +35,11 @@ function initializeTelegramBot() {
                 `• /portfolio - View your current token allocations\n` +
                 `• /help - Usage guide and supported assets\n\n` +
                 `*Trade naturally on Aerodrome DEX:*\n` +
+                `_"Buy $0.10 of NVDAc" (or NVIDIA)\n` +
+                `_"Buy $0.10 of TSLAc" (or Tesla)\n` +
                 `_"Buy $0.10 of AERO"_\n` +
-                `_"Buy 0.10 of VIRTUAL"_\n` +
-                `_"Allocate $10 across 60% AERO and 40% WETH"_`;
+                `_"Sell all NVDAc to USDC"_\n` +
+                `_"Sell all USDC to ETH"_`;
             try {
                 await ctx.replyWithMarkdown(welcome, telegraf_1.Markup.inlineKeyboard([
                     [telegraf_1.Markup.button.callback('💳 My Wallet', 'btn_wallet'), telegraf_1.Markup.button.callback('📊 My Portfolio', 'btn_portfolio')],
@@ -75,9 +77,11 @@ function initializeTelegramBot() {
                 `• *Total Estimated Value:* ~$${scan.totalUSD.toFixed(2)} USD\n\n` +
                 `💰 *Every Token in Your Wallet (Exact Live Balances):*\n`;
             for (const h of scan.holdings) {
-                const displayBal = h.formattedBalance || (h.balance < 0.0001 ? h.balance.toFixed(8) : h.balance.toFixed(4));
-                const valUSD = (h.balanceUSD || 0).toFixed(2);
-                walletMsg += `• *${h.ticker}:* \`${displayBal} ${h.ticker}\` ($${valUSD})\n`;
+                if (h.ticker === 'USDC' || h.ticker === 'ETH' || (h.balance && h.balance > 0)) {
+                    const displayBal = h.formattedBalance || (h.balance < 0.0001 ? h.balance.toFixed(8) : h.balance.toFixed(4));
+                    const valUSD = (h.balanceUSD || 0).toFixed(2);
+                    walletMsg += `• *${h.ticker}:* \`${displayBal} ${h.ticker}\` ($${valUSD})\n`;
+                }
             }
             walletMsg += `\n🔍 [View on BaseScan](${explorerLink})\n\n` +
                 `_Minimum micro-amounts & dust are fully tracked with up to 8-decimal precision!_`;
@@ -347,8 +351,10 @@ function initializeTelegramBot() {
                 `• *Total Value:* ~$${scan.totalUSD.toFixed(2)} USD\n\n` +
                 `💰 *Token Balances (Exact Precision):*\n`;
             for (const h of scan.holdings) {
-                const displayBal = h.formattedBalance || (h.balance < 0.0001 ? h.balance.toFixed(8) : h.balance.toFixed(4));
-                msg += `• *${h.ticker}:* \`${displayBal} ${h.ticker}\` ($${h.balanceUSD.toFixed(2)})\n`;
+                if (h.ticker === 'USDC' || h.ticker === 'ETH' || (h.balance && h.balance > 0)) {
+                    const displayBal = h.formattedBalance || (h.balance < 0.0001 ? h.balance.toFixed(8) : h.balance.toFixed(4));
+                    msg += `• *${h.ticker}:* \`${displayBal} ${h.ticker}\` ($${(h.balanceUSD || 0).toFixed(2)})\n`;
+                }
             }
             msg += `\n[View on BaseScan](https://basescan.org/address/${wallet.address})`;
             await ctx.replyWithMarkdown(msg);
@@ -416,14 +422,59 @@ function initializeTelegramBot() {
                 `• /deposit - View deposit address & instructions\n\n` +
                 `*Real On-Chain DEX Trading Commands:*\n` +
                 `• /portfolio - View your current holdings\n` +
+                `• \`Buy $0.10 of NVDAc\` (or NVIDIA)\n` +
+                `• \`Buy $0.10 of TSLAc\` (or Tesla)\n` +
+                `• \`Buy $0.10 of AAPLc\` (or Apple)\n` +
                 `• \`Buy $0.10 of AERO\`\n` +
-                `• \`Buy 0.10 of VIRTUAL\`\n` +
-                `• \`Buy $0.50 of 0x940181a94A35A4569E4529A3CDfB74e38FD98631\`\n` +
-                `• \`Allocate $10 across 50% AERO and 50% WETH\`\n\n` +
-                `*Supported Base Tokens:*\n` +
+                `• \`Sell all NVDAc to USDC\`\n` +
+                `• \`Sell all USDC to ETH\`\n\n` +
+                `*Supported Base Tokenized Equities:*\n` +
+                `• NVDAc (NVIDIA): \`0xb200...108C\`\n` +
+                `• METAc (Meta): \`0xb200...707C\`\n` +
+                `• AAPLc (Apple): \`0xb200...d1fb\`\n` +
+                `• GOOGLc (Alphabet): \`0xb200...58B7\`\n` +
+                `• AMZNc (Amazon): \`0xb200...C2E8\`\n` +
+                `• MSFTc (Microsoft): \`0xB200...872B\`\n` +
+                `• MSTRc (MicroStrategy): \`0xb200...883d\`\n` +
+                `• SNDKc (SanDisk): \`0xb200...10c5\`\n` +
+                `• SPCXc (SpaceX): \`0xb200...CBd5\`\n` +
+                `• TSLAc (Tesla): \`0xb200...0cD0\`\n\n` +
+                `*Supported Base Crypto:*\n` +
                 `AERO, WETH, cbBTC, VIRTUAL, DEGEN, USDC & any custom ERC-20 contract with Aerodrome liquidity!`;
             await ctx.replyWithMarkdown(help);
         });
+        const NAME_OR_ALIAS_TO_TICKER = {
+            NVIDIA: 'NVDAc',
+            NVDA: 'NVDAc',
+            NVDAC: 'NVDAc',
+            META: 'METAc',
+            METAC: 'METAc',
+            APPLE: 'AAPLc',
+            AAPL: 'AAPLc',
+            AAPLC: 'AAPLc',
+            ALPHABET: 'GOOGLc',
+            GOOGLE: 'GOOGLc',
+            GOOGL: 'GOOGLc',
+            GOOGLC: 'GOOGLc',
+            AMAZON: 'AMZNc',
+            AMZN: 'AMZNc',
+            AMZNC: 'AMZNc',
+            MICROSOFT: 'MSFTc',
+            MSFT: 'MSFTc',
+            MSFTC: 'MSFTc',
+            MICROSTRATEGY: 'MSTRc',
+            MSTR: 'MSTRc',
+            MSTRC: 'MSTRc',
+            SANDISK: 'SNDKc',
+            SNDK: 'SNDKc',
+            SNDKC: 'SNDKc',
+            SPACEX: 'SPCXc',
+            SPCX: 'SPCXc',
+            SPCXC: 'SPCXc',
+            TESLA: 'TSLAc',
+            TSLA: 'TSLAc',
+            TSLAC: 'TSLAc'
+        };
         // Natural language trading and conversational processing
         bot.on('text', async (ctx) => {
             const text = ctx.message.text.trim();
@@ -454,7 +505,19 @@ function initializeTelegramBot() {
                 else if (textLower.includes('to weth') || textLower.includes('for weth')) {
                     toToken = 'WETH';
                 }
-                const candidateTokens = ['USDC', 'USD', 'ETH', 'WETH', 'AERO', 'CBBTC', 'VIRTUAL', 'DEGEN', 'NVDA', 'TSLA', 'SPY'];
+                const candidateTokens = [
+                    'NVDAC', 'NVDA', 'NVIDIA',
+                    'METAC', 'META',
+                    'AAPLC', 'AAPL', 'APPLE',
+                    'GOOGLC', 'GOOGL', 'GOOGLE', 'ALPHABET',
+                    'AMZNC', 'AMZN', 'AMAZON',
+                    'MSFTC', 'MSFT', 'MICROSOFT',
+                    'MSTRC', 'MSTR', 'MICROSTRATEGY',
+                    'SNDKC', 'SNDK', 'SANDISK',
+                    'SPCXC', 'SPCX', 'SPACEX',
+                    'TSLAC', 'TSLA', 'TESLA',
+                    'AERO', 'WETH', 'ETH', 'CBBTC', 'VIRTUAL', 'DEGEN', 'USDC', 'USD'
+                ];
                 let fromToken = toToken === 'ETH' ? 'USDC' : 'AERO';
                 const contractMatch = text.match(/0x[a-fA-F0-9]{40}/);
                 if (contractMatch && contractMatch[0].toLowerCase() !== userWallet.address.toLowerCase()) {
@@ -465,7 +528,13 @@ function initializeTelegramBot() {
                     for (const tok of candidateTokens) {
                         const re = new RegExp(`\\b${tok}\\b|\\$${tok}`, 'i');
                         if (re.test(beforeTo)) {
-                            fromToken = tok === 'USD' ? 'USDC' : tok;
+                            const upperTok = tok.toUpperCase();
+                            if (NAME_OR_ALIAS_TO_TICKER[upperTok]) {
+                                fromToken = NAME_OR_ALIAS_TO_TICKER[upperTok];
+                            }
+                            else {
+                                fromToken = tok === 'USD' ? 'USDC' : tok;
+                            }
                             break;
                         }
                     }
@@ -527,7 +596,19 @@ function initializeTelegramBot() {
                 const amountMatch = text.match(/(?:\$|\b)(\d+(?:\.\d+)?|\.\d+)/);
                 const amountUSD = amountMatch ? parseFloat(amountMatch[1]) : 0.10;
                 // Parse target token
-                const supportedTokens = ['AERO', 'WETH', 'ETH', 'CBBTC', 'VIRTUAL', 'DEGEN', 'NVDA', 'TSLA', 'SPY'];
+                const supportedTokens = [
+                    'NVDAC', 'NVDA', 'NVIDIA',
+                    'METAC', 'META',
+                    'AAPLC', 'AAPL', 'APPLE',
+                    'GOOGLC', 'GOOGL', 'GOOGLE', 'ALPHABET',
+                    'AMZNC', 'AMZN', 'AMAZON',
+                    'MSFTC', 'MSFT', 'MICROSOFT',
+                    'MSTRC', 'MSTR', 'MICROSTRATEGY',
+                    'SNDKC', 'SNDK', 'SANDISK',
+                    'SPCXC', 'SPCX', 'SPACEX',
+                    'TSLAC', 'TSLA', 'TESLA',
+                    'AERO', 'WETH', 'ETH', 'CBBTC', 'VIRTUAL', 'DEGEN', 'USDC'
+                ];
                 let targetToken = 'AERO';
                 // Check for 0x contract address
                 const contractMatch = text.match(/0x[a-fA-F0-9]{40}/);
@@ -538,7 +619,8 @@ function initializeTelegramBot() {
                     for (const tok of supportedTokens) {
                         const re = new RegExp(`\\b${tok}\\b|\\$${tok}`, 'i');
                         if (re.test(text)) {
-                            targetToken = tok;
+                            const upperTok = tok.toUpperCase();
+                            targetToken = NAME_OR_ALIAS_TO_TICKER[upperTok] || tok;
                             break;
                         }
                     }
