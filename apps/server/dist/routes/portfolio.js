@@ -4,7 +4,7 @@ exports.portfolioRouter = void 0;
 const express_1 = require("express");
 const portfolioStore_1 = require("../services/portfolioStore");
 const blockchain_1 = require("../services/blockchain");
-const shared_1 = require("@baseindex/shared");
+const shared_1 = require("../shared");
 exports.portfolioRouter = (0, express_1.Router)();
 // Get holdings for a wallet
 exports.portfolioRouter.get('/', async (req, res) => {

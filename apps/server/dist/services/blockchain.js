@@ -7,7 +7,7 @@ exports.formatPreciseAmount = formatPreciseAmount;
 exports.scanWalletLiveHoldings = scanWalletLiveHoldings;
 const viem_1 = require("viem");
 const chains_1 = require("viem/chains");
-const shared_1 = require("@baseindex/shared");
+const shared_1 = require("../shared");
 exports.publicClient = (0, viem_1.createPublicClient)({
     chain: chains_1.base,
     transport: (0, viem_1.fallback)([

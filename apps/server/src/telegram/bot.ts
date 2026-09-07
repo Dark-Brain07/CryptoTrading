@@ -3,7 +3,7 @@ import { config, isTelegramConfigured } from '../config';
 import { portfolioStore } from '../services/portfolioStore';
 import { formatPortfolioTelegram, formatExecutionTelegram } from './formatters';
 import { processNaturalLanguageIntent } from '../agent/agent';
-import { BASE_EXPLORER_URL, BASE_USDC, ERC20_ABI } from '@baseindex/shared';
+import { BASE_EXPLORER_URL, BASE_USDC, ERC20_ABI } from '../shared';
 import { telegramWalletStore } from './userWalletStore';
 import { executeServerBuyOnAerodrome, executeServerSellOrSwapOnAerodrome } from '../services/aerodromeExecution';
 import { createWalletClient, http, fallback, parseUnits, formatUnits } from 'viem';

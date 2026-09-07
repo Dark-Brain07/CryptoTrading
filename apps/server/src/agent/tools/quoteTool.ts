@@ -1,6 +1,6 @@
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
-import { VERIFIED_BASE_TOKENIZED_STOCKS } from '@baseindex/shared';
+import { VERIFIED_BASE_TOKENIZED_STOCKS } from '../../shared';
 import { getSimulatedOrLiveQuote } from '../../services/aerodrome';
 
 export const quoteTool = new DynamicStructuredTool({

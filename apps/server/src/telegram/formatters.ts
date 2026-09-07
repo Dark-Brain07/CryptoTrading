@@ -1,4 +1,4 @@
-import { PortfolioHolding } from '@baseindex/shared';
+import { PortfolioHolding } from '../shared';
 
 export function formatPortfolioTelegram(holdings: any[], totalUSD: number, walletAddress?: string): string {
   let text = `💼 *BaseIndex Agent — Live On-Chain Portfolio*\n`;

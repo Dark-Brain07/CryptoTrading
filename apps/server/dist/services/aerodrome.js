@@ -4,7 +4,7 @@ exports.getLiveAerodromeQuote = getLiveAerodromeQuote;
 exports.getSimulatedOrLiveQuote = getSimulatedOrLiveQuote;
 exports.buildClientPreparedTransactions = buildClientPreparedTransactions;
 const viem_1 = require("viem");
-const shared_1 = require("@baseindex/shared");
+const shared_1 = require("../shared");
 const blockchain_1 = require("./blockchain");
 /**
  * Calculates live on-chain liquidity quote from Aerodrome Router

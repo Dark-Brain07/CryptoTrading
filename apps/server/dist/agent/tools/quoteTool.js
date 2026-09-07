@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.quoteTool = void 0;
 const tools_1 = require("@langchain/core/tools");
 const zod_1 = require("zod");
-const shared_1 = require("@baseindex/shared");
+const shared_1 = require("../../shared");
 const aerodrome_1 = require("../../services/aerodrome");
 exports.quoteTool = new tools_1.DynamicStructuredTool({
     name: 'get_stock_quote_and_liquidity',

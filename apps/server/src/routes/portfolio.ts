@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { portfolioStore } from '../services/portfolioStore';
 import { getLiveGasMetrics, scanWalletLiveHoldings } from '../services/blockchain';
-import { VERIFIED_BASE_TOKENIZED_STOCKS } from '@baseindex/shared';
+import { VERIFIED_BASE_TOKENIZED_STOCKS } from '../shared';
 
 export const portfolioRouter = Router();
 

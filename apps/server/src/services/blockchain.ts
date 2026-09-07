@@ -1,8 +1,7 @@
 import { createPublicClient, http, fallback, formatGwei, formatUnits } from 'viem';
 import { base } from 'viem/chains';
 import { config } from '../config';
-import { BASE_USDC, VERIFIED_BASE_TOKENIZED_STOCKS, ERC20_ABI } from '@baseindex/shared';
-import { GasTrackerData } from '@baseindex/shared';
+import { BASE_USDC, VERIFIED_BASE_TOKENIZED_STOCKS, ERC20_ABI, GasTrackerData } from '../shared';
 
 export const publicClient = createPublicClient({
   chain: base,

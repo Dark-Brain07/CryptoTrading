@@ -1,4 +1,4 @@
-import { PortfolioHolding, VERIFIED_BASE_TOKENIZED_STOCKS, BASE_EXPLORER_URL } from '@baseindex/shared';
+import { PortfolioHolding, VERIFIED_BASE_TOKENIZED_STOCKS, BASE_EXPLORER_URL } from '../shared';
 
 // In-memory persistent portfolio store (keyed by wallet address or "default")
 class PortfolioStore {

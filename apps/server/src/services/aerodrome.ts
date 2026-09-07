@@ -7,7 +7,7 @@ import {
   AERODROME_SWAP_ROUTES,
   StockToken,
   PreparedTransaction 
-} from '@baseindex/shared';
+} from '../shared';
 import { publicClient } from './blockchain';
 
 export interface QuoteResult {

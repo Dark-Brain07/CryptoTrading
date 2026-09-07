@@ -1,7 +1,7 @@
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { formatEther } from 'viem';
 import { publicClient, getOnChainTokenBalance } from '../services/blockchain';
-import { BASE_USDC } from '@baseindex/shared';
+import { BASE_USDC } from '../shared';
 import * as fs from 'fs';
 import * as path from 'path';
 

@@ -1,6 +1,6 @@
 import { config, isLiveCDPConfigured } from '../../config';
 import { portfolioStore } from '../../services/portfolioStore';
-import { VERIFIED_BASE_TOKENIZED_STOCKS, BASE_EXPLORER_URL } from '@baseindex/shared';
+import { VERIFIED_BASE_TOKENIZED_STOCKS, BASE_EXPLORER_URL } from '../../shared';
 
 export interface ExecuteTradeParams {
   ticker: string;

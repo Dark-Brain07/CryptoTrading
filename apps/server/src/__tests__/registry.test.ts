@@ -1,4 +1,4 @@
-import { VERIFIED_BASE_TOKENIZED_STOCKS, BASE_USDC } from '@baseindex/shared';
+import { VERIFIED_BASE_TOKENIZED_STOCKS, BASE_USDC } from '../shared';
 import { getSimulatedOrLiveQuote } from '../services/aerodrome';
 
 describe('BaseIndex Agent - Base Mainnet Tokenized Stocks', () => {

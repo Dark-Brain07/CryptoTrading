@@ -36,7 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.cdpExecutionManager = exports.CDPAgentExecutionManager = void 0;
 const config_1 = require("../../config");
 const portfolioStore_1 = require("../../services/portfolioStore");
-const shared_1 = require("@baseindex/shared");
+const shared_1 = require("../../shared");
 /**
  * Initializes and manages Base Mainnet execution via CDP AgentKit
  */

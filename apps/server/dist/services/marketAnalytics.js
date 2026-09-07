@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBaseMarketIntelligence = getBaseMarketIntelligence;
 exports.getRecentBaseWhaleTransactions = getRecentBaseWhaleTransactions;
 const blockchain_1 = require("./blockchain");
-const shared_1 = require("@baseindex/shared");
+const shared_1 = require("../shared");
 const CORE_BASE_TOKENS = [
     { symbol: 'AERO', address: '0x940181a94A35A4569E4529A3CDfB74e38FD98631' },
     { symbol: 'VIRTUAL', address: '0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b' },

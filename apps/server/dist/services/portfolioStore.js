@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.portfolioStore = void 0;
-const shared_1 = require("@baseindex/shared");
+const shared_1 = require("../shared");
 // In-memory persistent portfolio store (keyed by wallet address or "default")
 class PortfolioStore {
     holdings = new Map();

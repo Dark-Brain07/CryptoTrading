@@ -1,5 +1,5 @@
 import { publicClient } from './blockchain';
-import { BASE_EXPLORER_URL, BASE_USDC } from '@baseindex/shared';
+import { BASE_EXPLORER_URL, BASE_USDC } from '../shared';
 
 export interface BaseTokenMarketStats {
   symbol: string;

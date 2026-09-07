@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.stockRegistryTool = void 0;
 const tools_1 = require("@langchain/core/tools");
 const zod_1 = require("zod");
-const shared_1 = require("@baseindex/shared");
+const shared_1 = require("../../shared");
 exports.stockRegistryTool = new tools_1.DynamicStructuredTool({
     name: 'resolve_tokenized_stock',
     description: 'Resolves a stock ticker (e.g. TSLA, NVDA, AAPL, SPY) to its verified Base Mainnet contract address, reference price, issuer, and decimals.',

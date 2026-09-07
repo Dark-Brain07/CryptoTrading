@@ -37,7 +37,7 @@ exports.telegramWalletStore = void 0;
 const accounts_1 = require("viem/accounts");
 const viem_1 = require("viem");
 const blockchain_1 = require("../services/blockchain");
-const shared_1 = require("@baseindex/shared");
+const shared_1 = require("../shared");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 class TelegramUserWalletStore {

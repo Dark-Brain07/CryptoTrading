@@ -6,7 +6,7 @@ import { AGENT_SYSTEM_PROMPT } from './prompts';
 import { stockRegistryTool } from './tools/stockRegistry';
 import { quoteTool } from './tools/quoteTool';
 import { executeTradeTool } from './tools/executeTool';
-import { VERIFIED_BASE_TOKENIZED_STOCKS, BASE_EXPLORER_URL } from '@baseindex/shared';
+import { VERIFIED_BASE_TOKENIZED_STOCKS, BASE_EXPLORER_URL } from '../shared';
 import { cdpExecutionManager } from './tools/cdpActionProvider';
 import { getSimulatedOrLiveQuote } from '../services/aerodrome';
 import { portfolioStore } from '../services/portfolioStore';

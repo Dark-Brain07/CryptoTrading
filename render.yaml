@@ -7,8 +7,8 @@ services:
     runtime: node
     plan: free
     region: oregon
-    buildCommand: npm --prefix packages/shared run build && cd apps/server && npm install --install-links && npm run build
-    startCommand: cd apps/server && npm start
+    buildCommand: if [ -d "apps/server" ]; then cd apps/server; fi && npm install && npm run build
+    startCommand: if [ -d "apps/server" ]; then cd apps/server; fi && npm start
     healthCheckPath: /health
     autoDeploy: true
     envVars:

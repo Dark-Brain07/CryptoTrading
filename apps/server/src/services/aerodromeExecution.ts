@@ -21,7 +21,7 @@ import {
   ERC20_ABI,
   VERIFIED_BASE_TOKENIZED_STOCKS,
   AerodromeRoute
-} from '@baseindex/shared';
+} from '../shared';
 import { publicClient, getOnChainTokenBalance } from './blockchain';
 import { portfolioStore } from './portfolioStore';
 
