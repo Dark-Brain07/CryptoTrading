@@ -9,6 +9,22 @@ exports.portfolioRouter = (0, express_1.Router)();
 // Get holdings for a wallet
 exports.portfolioRouter.get('/', async (req, res) => {
     const wallet = req.query.wallet || 'default';
+    if (wallet.startsWith('0x') && wallet.length === 42) {
+        try {
+            const liveData = await (0, blockchain_1.scanWalletLiveHoldings)(wallet);
+            res.json({
+                success: true,
+                network: 'Base Mainnet',
+                wallet,
+                totalValueUSD: liveData.totalUSD,
+                holdings: liveData.holdings
+            });
+            return;
+        }
+        catch (e) {
+            console.warn('Could not scan live holdings for wallet, falling back:', e);
+        }
+    }
     const holdings = portfolioStore_1.portfolioStore.getHoldings(wallet);
     const totalUSD = portfolioStore_1.portfolioStore.getTotalValueUSD(wallet);
     res.json({

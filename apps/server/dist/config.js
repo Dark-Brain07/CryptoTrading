@@ -9,8 +9,7 @@ const zod_1 = require("zod");
 dotenv_1.default.config();
 const envSchema = zod_1.z.object({
     PORT: zod_1.z.string().default('4000'),
-    NODE_ENV: zod_1.z.string().default('development'),
-    FRONTEND_URL: zod_1.z.string().default('http://localhost:3000'),
+    FRONTEND_URL: zod_1.z.string().default('https://baseindex-agent.vercel.app'),
     // AI Brain
     OPENAI_API_KEY: zod_1.z.string().optional(),
     OPENAI_BASE_URL: zod_1.z.string().optional(),

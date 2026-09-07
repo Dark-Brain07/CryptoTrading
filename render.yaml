@@ -7,9 +7,8 @@ services:
     runtime: node
     plan: free
     region: oregon
-    rootDir: apps/server
-    buildCommand: npm install --install-links && npm run build
-    startCommand: npm start
+    buildCommand: npm --prefix packages/shared run build && cd apps/server && npm install --install-links && npm run build
+    startCommand: cd apps/server && npm start
     healthCheckPath: /health
     autoDeploy: true
     envVars:
@@ -22,7 +21,7 @@ services:
       - key: BASE_CHAIN_ID
         value: "8453"
       - key: FRONTEND_URL
-        value: https://baseindex-agent-md-raju-ahmeds-projects-a8ce4550.vercel.app
+        value: https://baseindex-agent.vercel.app
       - key: OPENAI_API_KEY
         sync: false
       - key: OPENAI_BASE_URL

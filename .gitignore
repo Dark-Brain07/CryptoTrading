@@ -3,7 +3,9 @@ node_modules/
 .next/
 out/
 dist/
+!packages/shared/dist
 !packages/shared/dist/**
+!apps/server/dist
 !apps/server/dist/**
 build/
 .turbo/
@@ -28,3 +30,4 @@ Thumbs.db
 
 
 .vercel
+apps/server/data/

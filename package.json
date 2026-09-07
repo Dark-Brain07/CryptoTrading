@@ -7,6 +7,8 @@
     "dev:server": "npm --prefix apps/server run dev",
     "build:server": "npm --prefix apps/server run build",
     "dev:web": "npm --prefix apps/web run dev",
-    "build:web": "npm --prefix apps/web run build"
+    "build:web": "npm --prefix apps/web run build",
+    "build": "npm --prefix packages/shared run build && npm --prefix apps/server run build",
+    "start": "npm --prefix apps/server start"
   }
 }
