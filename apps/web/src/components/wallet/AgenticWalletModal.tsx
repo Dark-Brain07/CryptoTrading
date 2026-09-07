@@ -212,23 +212,23 @@ export function AgenticWalletModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="max-w-lg w-full glass-panel rounded-2xl border-obsidian-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+      <div className="max-w-lg w-full glass-panel rounded-2xl border-obsidian-border shadow-2xl overflow-hidden flex flex-col max-h-[92dvh]">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-obsidian-border bg-obsidian-900/90 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-base-blue/20 border border-base-blue/40 flex items-center justify-center text-blue-400">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-obsidian-border bg-obsidian-900/90 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-base-blue/20 border border-base-blue/40 flex items-center justify-center text-blue-400 shrink-0">
               <Wallet className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-white flex items-center gap-2">
+              <h2 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5 sm:gap-2">
                 Agentic Smart Wallet
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  BASE MAINNET
+                <span className="text-[9px] sm:text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  BASE
                 </span>
               </h2>
-              <p className="text-[11px] text-slate-400 font-mono">
-                Client-Isolated MPC &middot; 100% Self-Custodial
+              <p className="text-[10px] sm:text-[11px] text-slate-400 font-mono">
+                Client-Isolated &middot; 100% Self-Custodial
               </p>
             </div>
           </div>
@@ -246,43 +246,43 @@ export function AgenticWalletModal({
           <div className="flex border-b border-obsidian-border bg-obsidian-950 text-xs">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`flex-1 py-2.5 text-center font-medium transition-colors border-b-2 ${
+              className={`flex-1 py-2 sm:py-2.5 text-center font-medium transition-colors border-b-2 text-[11px] sm:text-xs ${
                 activeTab === 'overview'
                   ? 'border-base-blue text-white bg-obsidian-900/50 font-semibold'
                   : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
-              Overview & Deposit
+              Deposit<span className="hidden sm:inline"> & Overview</span>
             </button>
             <button
               onClick={() => setActiveTab('withdraw')}
-              className={`flex-1 py-2.5 text-center font-medium transition-colors border-b-2 ${
+              className={`flex-1 py-2 sm:py-2.5 text-center font-medium transition-colors border-b-2 text-[11px] sm:text-xs ${
                 activeTab === 'withdraw'
                   ? 'border-base-blue text-white bg-obsidian-900/50 font-semibold'
                   : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
-              Withdraw Funds
+              Withdraw<span className="hidden sm:inline"> Funds</span>
             </button>
             <button
               onClick={() => setActiveTab('backup')}
-              className={`flex-1 py-2.5 text-center font-medium transition-colors border-b-2 ${
+              className={`flex-1 py-2 sm:py-2.5 text-center font-medium transition-colors border-b-2 text-[11px] sm:text-xs ${
                 activeTab === 'backup'
                   ? 'border-base-blue text-white bg-obsidian-900/50 font-semibold'
                   : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
-              Backup & Security
+              Backup<span className="hidden sm:inline"> & Key</span>
             </button>
             <button
               onClick={() => setActiveTab('import')}
-              className={`flex-1 py-2.5 text-center font-medium transition-colors border-b-2 ${
+              className={`flex-1 py-2 sm:py-2.5 text-center font-medium transition-colors border-b-2 text-[11px] sm:text-xs ${
                 activeTab === 'import'
                   ? 'border-base-blue text-white bg-obsidian-900/50 font-semibold'
                   : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
-              Import / Switch
+              Import<span className="hidden sm:inline"> / Switch</span>
             </button>
           </div>
         )}

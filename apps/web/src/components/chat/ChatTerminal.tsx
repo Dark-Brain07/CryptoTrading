@@ -687,7 +687,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
       {/* Input Form */}
       <form
         onSubmit={handleSubmit}
-        className="p-3 border-t border-obsidian-border bg-obsidian-900/90 flex items-center gap-2 shrink-0"
+        className="p-2.5 sm:p-3 border-t border-obsidian-border bg-obsidian-900/90 flex items-center gap-2 shrink-0"
       >
         <div className="relative flex-1">
           <input
@@ -695,15 +695,15 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading}
-            placeholder="e.g., Buy $0.10 of AERO, or trade any Base contract 0x..."
-            className="w-full bg-obsidian-950 border border-obsidian-border rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-base-blue focus:ring-1 focus:ring-base-blue transition-all disabled:opacity-50"
+            placeholder="e.g., Buy $0.10 of AERO, or trade Base token 0x..."
+            className="w-full bg-obsidian-950 border border-obsidian-border rounded-xl px-3.5 sm:px-4 py-2.5 text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-base-blue focus:ring-1 focus:ring-base-blue transition-all disabled:opacity-50"
           />
         </div>
 
         <button
           type="submit"
           disabled={!input.trim() || isLoading}
-          className="p-2.5 rounded-xl bg-base-blue hover:bg-base-blueHover disabled:opacity-40 text-white font-medium shadow-md shadow-base-blue/20 transition-all shrink-0"
+          className="p-2.5 sm:p-2.5 w-10 h-10 flex items-center justify-center rounded-xl bg-base-blue hover:bg-base-blueHover disabled:opacity-40 text-white font-medium shadow-md shadow-base-blue/20 transition-all shrink-0 cursor-pointer"
         >
           <Send className="w-4 h-4" />
         </button>

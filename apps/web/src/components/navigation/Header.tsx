@@ -45,23 +45,23 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-obsidian-border bg-obsidian-950/80 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
         {/* Logo & Network Status */}
-        <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 flex-shrink-0 flex items-center justify-center group-hover:scale-105 transition-all duration-300">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+            <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 flex items-center justify-center group-hover:scale-105 transition-all duration-300">
               <img
                 src="/logo.png"
                 alt="BaseIndex Agent Logo"
-                className="w-10 h-10 object-contain drop-shadow-[0_0_10px_rgba(0,82,255,0.5)] group-hover:drop-shadow-[0_0_16px_rgba(0,240,255,0.8)] transition-all duration-300"
+                className="w-8 h-8 sm:w-10 sm:h-10 object-contain drop-shadow-[0_0_10px_rgba(0,82,255,0.5)] group-hover:drop-shadow-[0_0_16px_rgba(0,240,255,0.8)] transition-all duration-300"
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold tracking-tight text-white flex items-center gap-1.5 text-base group-hover:text-cyan-300 transition-colors">
-                BaseIndex <span className="text-xs font-mono px-1.5 py-0.5 rounded bg-base-blue/20 text-blue-400 border border-base-blue/30">AGENT</span>
+              <span className="font-bold tracking-tight text-white flex items-center gap-1 text-sm sm:text-base group-hover:text-cyan-300 transition-colors">
+                BaseIndex <span className="text-[9px] sm:text-xs font-mono px-1 sm:px-1.5 py-0.5 rounded bg-base-blue/20 text-blue-400 border border-base-blue/30">AGENT</span>
               </span>
-              <span className="text-[10px] text-slate-400 -mt-1 font-mono">
-                Base Mainnet &middot; Tokenized Stocks
+              <span className="text-[9px] sm:text-[10px] text-slate-400 -mt-0.5 sm:-mt-1 font-mono hidden xs:inline sm:inline">
+                Base Mainnet &middot; DEX Agent
               </span>
             </div>
           </Link>
@@ -85,35 +85,38 @@ export function Header() {
         </div>
 
         {/* Right: Agentic Wallet & Wallet Connect */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Agentic Wallet Button */}
           <button
             onClick={() => setIsWalletModalOpen(true)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-obsidian-900 hover:bg-obsidian-800 border border-obsidian-border text-xs text-white transition-all shadow-md group"
+            className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-xl bg-obsidian-900 hover:bg-obsidian-800 border border-obsidian-border text-xs text-white transition-all shadow-md group"
           >
-            <div className="w-5 h-5 rounded-md bg-base-blue/20 border border-base-blue/40 flex items-center justify-center text-blue-400">
+            <div className="w-5 h-5 rounded-md bg-base-blue/20 border border-base-blue/40 flex items-center justify-center text-blue-400 shrink-0">
               <Wallet className="w-3 h-3" />
             </div>
             <div className="flex flex-col text-left">
-              <span className="font-semibold text-[11px] flex items-center gap-1">
-                {isCreated && address ? truncateAddress(address) : 'Agent Wallet'}
+              <span className="font-semibold text-[10px] sm:text-[11px] flex items-center gap-1">
+                <span className="hidden sm:inline">{isCreated && address ? truncateAddress(address) : 'Agent Wallet'}</span>
+                <span className="sm:hidden">{isCreated ? `$${usdcBalance.toFixed(2)}` : 'Agent'}</span>
                 <span className={`w-1.5 h-1.5 rounded-full ${isCreated ? 'bg-emerald-400 animate-pulse' : 'bg-blue-400'}`} />
               </span>
-              <span className="text-[9px] text-slate-400 font-mono -mt-0.5">
+              <span className="text-[8px] sm:text-[9px] text-slate-400 font-mono -mt-0.5 hidden sm:block">
                 {isCreated ? `$${usdcBalance.toFixed(2)} USDC` : 'Create / Backup'}
               </span>
             </div>
           </button>
 
           {/* RainbowKit Connect Wallet */}
-          <ConnectButton 
-            chainStatus="icon"
-            showBalance={false}
-            accountStatus={{
-              smallScreen: 'avatar',
-              largeScreen: 'full',
-            }}
-          />
+          <div className="scale-90 sm:scale-100 origin-right">
+            <ConnectButton 
+              chainStatus="icon"
+              showBalance={false}
+              accountStatus={{
+                smallScreen: 'avatar',
+                largeScreen: 'full',
+              }}
+            />
+          </div>
         </div>
       </div>
 

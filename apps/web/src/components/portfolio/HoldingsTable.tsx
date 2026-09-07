@@ -98,96 +98,166 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left text-xs">
-        <thead className="bg-obsidian-900/80 border-b border-obsidian-border text-[10px] font-mono uppercase text-slate-400">
-          <tr>
-            <th className="py-2.5 px-3">Asset</th>
-            <th className="py-2.5 px-3 text-right">Price</th>
-            <th className="py-2.5 px-3 text-right">Holdings</th>
-            <th className="py-2.5 px-3 text-right">Value (USD)</th>
-            <th className="py-2.5 px-3 text-right">24h</th>
-            <th className="py-2.5 px-3 text-center">BaseScan</th>
-            <th className="py-2.5 px-3 text-center">Action</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-obsidian-border/50">
-          {holdings.map((h) => {
-            const isPositive = h.change24h >= 0;
-            return (
-              <tr key={h.ticker} className="hover:bg-obsidian-900/40 transition-colors">
-                {/* Asset */}
-                <td className="py-3 px-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-md bg-base-blue/20 border border-base-blue/30 flex items-center justify-center font-bold text-blue-400 text-[10px]">
+    <div>
+      {/* Mobile Cards View (Visible on < md screens) */}
+      <div className="md:hidden divide-y divide-obsidian-border/60">
+        {holdings.map((h) => {
+          const isPositive = h.change24h >= 0;
+          return (
+            <div key={h.ticker} className="p-3.5 space-y-2.5 hover:bg-obsidian-900/40 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-base-blue/20 border border-base-blue/30 flex items-center justify-center font-bold text-blue-400 text-xs shrink-0">
+                    {h.ticker.substring(0, 4)}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-white text-sm flex items-center gap-1.5">
                       {h.ticker}
+                      <span
+                        className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold ${
+                          isPositive
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                        }`}
+                      >
+                        {isPositive ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
+                        {isPositive ? '+' : ''}{h.change24h}%
+                      </span>
                     </div>
-                    <div>
-                      <div className="font-semibold text-white">{h.ticker}</div>
-                      <div className="text-[10px] text-slate-400 hidden sm:block truncate max-w-[120px]">
-                        {h.name}
-                      </div>
+                    <div className="text-[11px] text-slate-400 truncate max-w-[160px]">
+                      {h.name}
                     </div>
                   </div>
-                </td>
+                </div>
 
-                {/* Price */}
-                <td className="py-3 px-3 text-right font-mono text-slate-200">
-                  ${h.currentPrice.toFixed(2)}
-                </td>
+                <div className="text-right">
+                  <div className="font-mono font-bold text-white text-sm">
+                    ${h.balanceUSD.toFixed(2)}
+                  </div>
+                  <div className="text-[11px] font-mono text-slate-400">
+                    {h.balance < 0.0001 ? h.balance.toFixed(8) : h.balance.toFixed(4)} {h.ticker}
+                  </div>
+                </div>
+              </div>
 
-                {/* Holdings Shares */}
-                <td className="py-3 px-3 text-right font-mono text-slate-300">
-                  {h.balance.toFixed(4)}
-                </td>
+              {/* Action Buttons Row */}
+              <div className="flex items-center justify-between gap-2 pt-1">
+                <a
+                  href={h.explorerUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-blue-400 transition-colors font-mono px-2.5 py-1.5 rounded-lg bg-obsidian-900 border border-obsidian-border/60"
+                >
+                  <span>BaseScan</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
 
-                {/* Value USD */}
-                <td className="py-3 px-3 text-right font-mono font-semibold text-white">
-                  ${h.balanceUSD.toFixed(2)}
-                </td>
+                <button
+                  type="button"
+                  onClick={() => handleOpenSell(h)}
+                  className="flex-1 py-1.5 px-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-mono font-semibold shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <ArrowDownRight className="w-3.5 h-3.5" />
+                  <span>Sell to USDC</span>
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-                {/* 24h Change */}
-                <td className="py-3 px-3 text-right">
-                  <span
-                    className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold ${
-                      isPositive
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        : 'bg-red-500/10 text-red-400 border border-red-500/20'
-                    }`}
-                  >
-                    {isPositive ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
-                    {isPositive ? '+' : ''}{h.change24h}%
-                  </span>
-                </td>
+      {/* Desktop Table View (Visible on >= md screens) */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full text-left text-xs">
+          <thead className="bg-obsidian-900/80 border-b border-obsidian-border text-[10px] font-mono uppercase text-slate-400">
+            <tr>
+              <th className="py-2.5 px-3">Asset</th>
+              <th className="py-2.5 px-3 text-right">Price</th>
+              <th className="py-2.5 px-3 text-right">Holdings</th>
+              <th className="py-2.5 px-3 text-right">Value (USD)</th>
+              <th className="py-2.5 px-3 text-right">24h</th>
+              <th className="py-2.5 px-3 text-center">BaseScan</th>
+              <th className="py-2.5 px-3 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-obsidian-border/50">
+            {holdings.map((h) => {
+              const isPositive = h.change24h >= 0;
+              return (
+                <tr key={h.ticker} className="hover:bg-obsidian-900/40 transition-colors">
+                  {/* Asset */}
+                  <td className="py-3 px-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-md bg-base-blue/20 border border-base-blue/30 flex items-center justify-center font-bold text-blue-400 text-[10px]">
+                        {h.ticker}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-white">{h.ticker}</div>
+                        <div className="text-[10px] text-slate-400 hidden sm:block truncate max-w-[120px]">
+                          {h.name}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
 
-                {/* BaseScan Link */}
-                <td className="py-3 px-3 text-center">
-                  <a
-                    href={h.explorerUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center text-slate-400 hover:text-blue-400 transition-colors p-1"
-                    title="View on BaseScan"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </td>
+                  {/* Price */}
+                  <td className="py-3 px-3 text-right font-mono text-slate-200">
+                    ${h.currentPrice.toFixed(2)}
+                  </td>
 
-                {/* Sell Action Button */}
-                <td className="py-3 px-3 text-center">
-                  <button
-                    onClick={() => handleOpenSell(h)}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-mono font-semibold shadow-sm transition-all"
-                  >
-                    <ArrowDownRight className="w-3 h-3" />
-                    Sell to USDC
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                  {/* Holdings Shares */}
+                  <td className="py-3 px-3 text-right font-mono text-slate-300">
+                    {h.balance.toFixed(4)}
+                  </td>
+
+                  {/* Value USD */}
+                  <td className="py-3 px-3 text-right font-mono font-semibold text-white">
+                    ${h.balanceUSD.toFixed(2)}
+                  </td>
+
+                  {/* 24h Change */}
+                  <td className="py-3 px-3 text-right">
+                    <span
+                      className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold ${
+                        isPositive
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                          : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                      }`}
+                    >
+                      {isPositive ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
+                      {isPositive ? '+' : ''}{h.change24h}%
+                    </span>
+                  </td>
+
+                  {/* BaseScan Link */}
+                  <td className="py-3 px-3 text-center">
+                    <a
+                      href={h.explorerUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center text-slate-400 hover:text-blue-400 transition-colors p-1"
+                      title="View on BaseScan"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </td>
+
+                  {/* Sell Action Button */}
+                  <td className="py-3 px-3 text-center">
+                    <button
+                      onClick={() => handleOpenSell(h)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-mono font-semibold shadow-sm transition-all"
+                    >
+                      <ArrowDownRight className="w-3 h-3" />
+                      Sell to USDC
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {/* Quick Sell Modal */}
       {selectedHolding && (
