@@ -132,6 +132,14 @@ exports.AERODROME_SWAP_ROUTES = {
             factory: exports.AERODROME_FACTORY_ADDRESS
         }
     ],
+    ETH: [
+        {
+            from: exports.BASE_USDC.contractAddress,
+            to: exports.BASE_WETH_ADDRESS,
+            stable: false,
+            factory: exports.AERODROME_FACTORY_ADDRESS
+        }
+    ],
     cbBTC: [
         {
             from: exports.BASE_USDC.contractAddress,

@@ -225,13 +225,12 @@ function initializeTelegramBot() {
                 await ctx.reply('Please provide a valid 42-character Base destination address (0x...).');
                 return;
             }
-            // Detect asset: ETH or USDC (default to ETH if 'eth' or fractional < 0.05, else USDC)
+            // Detect asset: ETH or USDC
             const isExplicitETH = parts.some(p => p.toUpperCase() === 'ETH' || p.toUpperCase() === 'WETH');
             const isExplicitUSDC = parts.some(p => p.toUpperCase() === 'USDC' || p.toUpperCase() === 'USD');
             const isAll = parts.some(p => p.toLowerCase() === 'all' || p.toLowerCase() === 'max' || p.toLowerCase() === 'everything');
             const numPart = parts.find(p => !p.startsWith('0x') && !['ETH', 'USDC', 'WETH', 'USD', 'ALL', 'MAX'].includes(p.toUpperCase()) && !isNaN(parseFloat(p)));
             const parsedAmount = numPart ? parseFloat(numPart) : 0;
-            const isETH = isExplicitETH || (!isExplicitUSDC && parsedAmount > 0 && parsedAmount < 0.05);
             await ctx.sendChatAction('typing');
             try {
                 const account = (0, accounts_1.privateKeyToAccount)(wallet.privateKey);
@@ -244,6 +243,17 @@ function initializeTelegramBot() {
                         (0, viem_1.http)('https://mainnet.base.org')
                     ])
                 });
+                // Determine target asset
+                let isETH = isExplicitETH;
+                if (!isExplicitETH && !isExplicitUSDC) {
+                    if (isAll) {
+                        const currentUSDC = await (0, blockchain_1.getOnChainTokenBalance)(shared_1.BASE_USDC.contractAddress, account.address, shared_1.BASE_USDC.decimals);
+                        isETH = currentUSDC <= 0;
+                    }
+                    else if (parsedAmount > 0 && parsedAmount < 0.05) {
+                        isETH = true;
+                    }
+                }
                 if (isETH) {
                     const balanceRaw = await blockchain_1.publicClient.getBalance({ address: account.address });
                     const balanceETH = parseFloat((0, viem_1.formatUnits)(balanceRaw, 18));
@@ -434,21 +444,6 @@ function initializeTelegramBot() {
                         `Send: \`/import <your_private_key>\` to link your funded wallet.`);
                     return;
                 }
-                const supportedTokens = ['AERO', 'WETH', 'CBBTC', 'VIRTUAL', 'DEGEN', 'NVDA', 'TSLA', 'SPY'];
-                let fromToken = 'AERO';
-                const contractMatch = text.match(/0x[a-fA-F0-9]{40}/);
-                if (contractMatch && contractMatch[0].toLowerCase() !== userWallet.address.toLowerCase()) {
-                    fromToken = contractMatch[0];
-                }
-                else {
-                    for (const tok of supportedTokens) {
-                        const re = new RegExp(`\\b${tok}\\b|\\$${tok}`, 'i');
-                        if (re.test(text)) {
-                            fromToken = tok;
-                            break;
-                        }
-                    }
-                }
                 let toToken = 'ETH';
                 if (textLower.includes('to usdc') || textLower.includes('into usdc') || textLower.includes('for usdc') || textLower.includes('to usd')) {
                     toToken = 'USDC';
@@ -458,6 +453,22 @@ function initializeTelegramBot() {
                 }
                 else if (textLower.includes('to weth') || textLower.includes('for weth')) {
                     toToken = 'WETH';
+                }
+                const candidateTokens = ['USDC', 'USD', 'ETH', 'WETH', 'AERO', 'CBBTC', 'VIRTUAL', 'DEGEN', 'NVDA', 'TSLA', 'SPY'];
+                let fromToken = toToken === 'ETH' ? 'USDC' : 'AERO';
+                const contractMatch = text.match(/0x[a-fA-F0-9]{40}/);
+                if (contractMatch && contractMatch[0].toLowerCase() !== userWallet.address.toLowerCase()) {
+                    fromToken = contractMatch[0];
+                }
+                else {
+                    const beforeTo = textLower.split(/\bto\b|\binto\b|\bfor\b/)[0] || textLower;
+                    for (const tok of candidateTokens) {
+                        const re = new RegExp(`\\b${tok}\\b|\\$${tok}`, 'i');
+                        if (re.test(beforeTo)) {
+                            fromToken = tok === 'USD' ? 'USDC' : tok;
+                            break;
+                        }
+                    }
                 }
                 const isAll = textLower.includes('all') || textLower.includes('100%') || textLower.includes('everything');
                 const amountMatch = text.match(/(?:\$|\b)(\d+(?:\.\d+)?|\.\d+)/);
@@ -516,7 +527,7 @@ function initializeTelegramBot() {
                 const amountMatch = text.match(/(?:\$|\b)(\d+(?:\.\d+)?|\.\d+)/);
                 const amountUSD = amountMatch ? parseFloat(amountMatch[1]) : 0.10;
                 // Parse target token
-                const supportedTokens = ['AERO', 'WETH', 'CBBTC', 'VIRTUAL', 'DEGEN', 'NVDA', 'TSLA', 'SPY'];
+                const supportedTokens = ['AERO', 'WETH', 'ETH', 'CBBTC', 'VIRTUAL', 'DEGEN', 'NVDA', 'TSLA', 'SPY'];
                 let targetToken = 'AERO';
                 // Check for 0x contract address
                 const contractMatch = text.match(/0x[a-fA-F0-9]{40}/);

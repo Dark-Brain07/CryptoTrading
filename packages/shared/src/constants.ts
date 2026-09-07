@@ -143,6 +143,14 @@ export const AERODROME_SWAP_ROUTES: Record<string, AerodromeRoute[]> = {
       factory: AERODROME_FACTORY_ADDRESS
     }
   ],
+  ETH: [
+    {
+      from: BASE_USDC.contractAddress,
+      to: BASE_WETH_ADDRESS,
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    }
+  ],
   cbBTC: [
     {
       from: BASE_USDC.contractAddress,
