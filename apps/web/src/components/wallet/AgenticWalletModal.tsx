@@ -248,8 +248,8 @@ export function AgenticWalletModal({
               onClick={() => setActiveTab('overview')}
               className={`flex-1 py-2 sm:py-2.5 text-center font-medium transition-colors border-b-2 text-[11px] sm:text-xs ${
                 activeTab === 'overview'
-                  ? 'border-base-blue text-white bg-obsidian-900/50 font-semibold'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
+                  ? 'border-base-blue text-slate-900 dark:text-white bg-obsidian-900/50 font-semibold'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
               Deposit<span className="hidden sm:inline"> & Overview</span>
@@ -258,8 +258,8 @@ export function AgenticWalletModal({
               onClick={() => setActiveTab('withdraw')}
               className={`flex-1 py-2 sm:py-2.5 text-center font-medium transition-colors border-b-2 text-[11px] sm:text-xs ${
                 activeTab === 'withdraw'
-                  ? 'border-base-blue text-white bg-obsidian-900/50 font-semibold'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
+                  ? 'border-base-blue text-slate-900 dark:text-white bg-obsidian-900/50 font-semibold'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
               Withdraw<span className="hidden sm:inline"> Funds</span>
@@ -268,8 +268,8 @@ export function AgenticWalletModal({
               onClick={() => setActiveTab('backup')}
               className={`flex-1 py-2 sm:py-2.5 text-center font-medium transition-colors border-b-2 text-[11px] sm:text-xs ${
                 activeTab === 'backup'
-                  ? 'border-base-blue text-white bg-obsidian-900/50 font-semibold'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
+                  ? 'border-base-blue text-slate-900 dark:text-white bg-obsidian-900/50 font-semibold'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
               Backup<span className="hidden sm:inline"> & Key</span>
@@ -278,8 +278,8 @@ export function AgenticWalletModal({
               onClick={() => setActiveTab('import')}
               className={`flex-1 py-2 sm:py-2.5 text-center font-medium transition-colors border-b-2 text-[11px] sm:text-xs ${
                 activeTab === 'import'
-                  ? 'border-base-blue text-white bg-obsidian-900/50 font-semibold'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
+                  ? 'border-base-blue text-slate-900 dark:text-white bg-obsidian-900/50 font-semibold'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
               Import<span className="hidden sm:inline"> / Switch</span>
@@ -450,12 +450,12 @@ export function AgenticWalletModal({
             <div className="space-y-4">
               {/* Address Card */}
               <div className="p-4 rounded-xl bg-obsidian-900 border border-obsidian-border space-y-2">
-                <div className="flex items-center justify-between text-xs text-slate-400">
+                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                   <span>Your Base Deposit Address</span>
                   <button
                     onClick={handleRefresh}
                     disabled={isRefreshing}
-                    className="flex items-center gap-1 text-[11px] text-blue-400 hover:text-blue-300 font-mono"
+                    className="flex items-center gap-1 text-[11px] text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 font-mono"
                   >
                     <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
                     Refresh
@@ -463,13 +463,13 @@ export function AgenticWalletModal({
                 </div>
 
                 <div className="flex items-center justify-between p-2.5 rounded-lg bg-obsidian-950 border border-obsidian-border/80">
-                  <span className="font-mono text-xs text-white truncate max-w-[260px] sm:max-w-[340px]">
+                  <span className="font-mono text-xs text-slate-900 dark:text-white truncate max-w-[260px] sm:max-w-[340px]">
                     {address}
                   </span>
                   <div className="flex items-center gap-1.5 shrink-0 ml-2">
                     <button
                       onClick={() => handleCopy(address || '')}
-                      className="p-1.5 rounded-md bg-obsidian-800 hover:bg-obsidian-700 text-slate-300 transition-colors"
+                      className="p-1.5 rounded-md bg-obsidian-800 hover:bg-obsidian-700 text-slate-600 dark:text-slate-300 transition-colors"
                       title="Copy Address"
                     >
                       {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -478,7 +478,7 @@ export function AgenticWalletModal({
                       href={`${BASE_EXPLORER_URL}/address/${address}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-1.5 rounded-md bg-obsidian-800 hover:bg-obsidian-700 text-slate-300 transition-colors"
+                      className="p-1.5 rounded-md bg-obsidian-800 hover:bg-obsidian-700 text-slate-600 dark:text-slate-300 transition-colors"
                       title="View on BaseScan"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -490,20 +490,20 @@ export function AgenticWalletModal({
               {/* Balances Card */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3.5 rounded-xl bg-obsidian-900/80 border border-obsidian-border">
-                  <div className="text-[10px] font-mono uppercase text-slate-400 mb-1">
+                  <div className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 mb-1">
                     Base USDC (Trading)
                   </div>
-                  <div className="text-xl font-bold font-mono text-white">
+                  <div className="text-xl font-bold font-mono text-slate-900 dark:text-white">
                     ${usdcBalance.toFixed(2)}
                   </div>
                   <div className="text-[10px] text-slate-500 mt-1">Native Base Settlement</div>
                 </div>
 
                 <div className="p-3.5 rounded-xl bg-obsidian-900/80 border border-obsidian-border">
-                  <div className="text-[10px] font-mono uppercase text-slate-400 mb-1">
+                  <div className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 mb-1">
                     ETH Balance (Gas)
                   </div>
-                  <div className="text-xl font-bold font-mono text-slate-200">
+                  <div className="text-xl font-bold font-mono text-slate-900 dark:text-slate-200">
                     {ethBalance.toFixed(4)} ETH
                   </div>
                   <div className="text-[10px] text-slate-500 mt-1">Gas Cost &lt;$0.003/tx</div>
@@ -511,12 +511,12 @@ export function AgenticWalletModal({
               </div>
 
               {/* Deposit Instructions */}
-              <div className="p-3.5 rounded-xl bg-blue-950/20 border border-blue-500/20 text-xs text-slate-300 space-y-1.5">
-                <div className="font-semibold text-blue-300 flex items-center gap-1.5">
+              <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-slate-700 dark:text-slate-300 space-y-1.5">
+                <div className="font-semibold text-blue-600 dark:text-blue-300 flex items-center gap-1.5">
                   <span>How to Fund Your Agentic Wallet:</span>
                 </div>
-                <p className="text-[11px] text-slate-400 leading-relaxed">
-                  Send <strong className="text-white">USDC on Base Mainnet</strong> (and a small fraction of ETH for gas) from your Coinbase account or MetaMask to the address above. Your agent will detect it automatically!
+                <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Send <strong className="text-slate-900 dark:text-white">USDC on Base Mainnet</strong> (and a small fraction of ETH for gas) from your Coinbase account or MetaMask to the address above. Your agent will detect it automatically!
                 </p>
               </div>
             </div>

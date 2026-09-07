@@ -143,29 +143,29 @@ export function PortfolioTracker({ refreshTrigger, walletAddress }: PortfolioTra
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Total Value */}
           <div className="p-4 rounded-xl bg-obsidian-900/80 border border-obsidian-border">
-            <div className="text-[10px] font-mono uppercase text-slate-400 mb-1">
+            <div className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 mb-1">
               Indexed Portfolio Value
             </div>
-            <div className="text-2xl font-bold font-mono text-white tracking-tight">
+            <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white tracking-tight">
               ${totalValueUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
-            <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-400 font-medium">
+            <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-500 dark:text-emerald-400 font-medium">
               <TrendingUp className="w-3.5 h-3.5" />
               <span>+2.45% past 24h</span>
-              <span className="text-[10px] text-slate-500 font-mono">(&lt;Base Mainnet&gt;)</span>
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">(&lt;Base Mainnet&gt;)</span>
             </div>
           </div>
 
           {/* Holdings Counter & Safety */}
           <div className="p-4 rounded-xl bg-obsidian-900/80 border border-obsidian-border flex flex-col justify-between">
-            <div className="text-[10px] font-mono uppercase text-slate-400 mb-1">
+            <div className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 mb-1">
               On-Chain DEX Liquidity
             </div>
-            <div className="text-lg font-bold font-mono text-slate-200">
+            <div className="text-lg font-bold font-mono text-slate-900 dark:text-slate-200">
               {holdings.length} Base Tokens & Assets
             </div>
-            <div className="flex items-center gap-1 mt-2 text-[10px] text-slate-400 font-mono">
-              <ShieldCheck className="w-3 h-3 text-emerald-400" />
+            <div className="flex items-center gap-1 mt-2 text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+              <ShieldCheck className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
               <span>Aerodrome V2 Pools & Verified Base Contracts</span>
             </div>
           </div>

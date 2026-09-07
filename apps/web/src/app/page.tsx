@@ -30,7 +30,7 @@ export default function Home() {
             className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
               mobileTab === 'chat'
                 ? 'bg-base-blue text-white shadow-md shadow-base-blue/25'
-                : 'text-slate-400 hover:text-slate-200'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -42,7 +42,7 @@ export default function Home() {
             className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
               mobileTab === 'portfolio'
                 ? 'bg-base-blue text-white shadow-md shadow-base-blue/25'
-                : 'text-slate-400 hover:text-slate-200'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             <span>📊 Portfolio & Holdings</span>

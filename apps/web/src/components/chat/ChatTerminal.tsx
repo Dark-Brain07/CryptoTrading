@@ -468,7 +468,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
       <div className="px-4 py-3 border-b border-obsidian-border/80 bg-obsidian-900/90 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4 text-base-blue" />
-          <span className="text-xs font-mono font-semibold text-slate-200">
+          <span className="text-xs font-mono font-semibold text-slate-800 dark:text-slate-200">
             agent-terminal &middot; base-mainnet
           </span>
         </div>
@@ -533,14 +533,14 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-              <span className="text-[11px] font-mono font-semibold text-slate-300">Agent Wallet:</span>
-              <span className="text-xs font-mono text-white font-medium">
+              <span className="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-300">Agent Wallet:</span>
+              <span className="text-xs font-mono text-slate-900 dark:text-white font-semibold">
                 {truncateAddress(address || '')}
               </span>
               <div className="flex items-center gap-1">
                 <button
                   onClick={handleCopyAgenticAddress}
-                  className="p-1 rounded bg-obsidian-800 hover:bg-obsidian-700 text-slate-300 transition-colors"
+                  className="p-1 rounded bg-obsidian-800 hover:bg-obsidian-700 text-slate-600 dark:text-slate-300 transition-colors"
                   title="Copy Address"
                 >
                   {copiedAddress ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
@@ -549,7 +549,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
                   href={`${BASE_EXPLORER_URL}/address/${address}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-1 rounded bg-obsidian-800 hover:bg-obsidian-700 text-slate-300 transition-colors"
+                  className="p-1 rounded bg-obsidian-800 hover:bg-obsidian-700 text-slate-600 dark:text-slate-300 transition-colors"
                   title="View on BaseScan"
                 >
                   <ExternalLink className="w-3 h-3" />
@@ -560,16 +560,16 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
             {/* Live Balance & Refresh */}
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 font-mono text-xs">
-                <span className="text-slate-400 text-[10px]">USDC:</span>
-                <span className="text-white font-bold">${usdcBalance.toFixed(2)}</span>
-                <span className="text-slate-500">|</span>
-                <span className="text-slate-400 text-[10px]">ETH:</span>
-                <span className="text-slate-300">{ethBalance.toFixed(4)}</span>
+                <span className="text-slate-500 dark:text-slate-400 text-[10px]">USDC:</span>
+                <span className="text-slate-900 dark:text-white font-bold">${usdcBalance.toFixed(2)}</span>
+                <span className="text-slate-400 dark:text-slate-500">|</span>
+                <span className="text-slate-500 dark:text-slate-400 text-[10px]">ETH:</span>
+                <span className="text-slate-800 dark:text-slate-300 font-medium">{ethBalance.toFixed(4)}</span>
               </div>
               <button
                 onClick={handleRefreshBalances}
                 disabled={isRefreshingBalances}
-                className="p-1 rounded bg-obsidian-800 hover:bg-obsidian-700 text-blue-400 transition-colors"
+                className="p-1 rounded bg-obsidian-800 hover:bg-obsidian-700 text-blue-500 dark:text-blue-400 transition-colors"
                 title="Refresh Live Balances on Base"
               >
                 <RefreshCw className={`w-3 h-3 ${isRefreshingBalances ? 'animate-spin' : ''}`} />
@@ -581,30 +581,30 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 border-t border-obsidian-border/50">
             <button
               onClick={() => openWalletModal('overview')}
-              className="py-1.5 px-2 rounded-lg bg-obsidian-800/90 hover:bg-obsidian-700 text-[11px] font-medium text-slate-200 border border-obsidian-border/60 flex items-center justify-center gap-1 transition-colors"
+              className="py-1.5 px-2 rounded-lg bg-obsidian-800/90 hover:bg-obsidian-700 text-[11px] font-medium text-slate-700 dark:text-slate-200 border border-obsidian-border/60 flex items-center justify-center gap-1 transition-colors"
             >
-              <ArrowDownLeft className="w-3 h-3 text-emerald-400" />
+              <ArrowDownLeft className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
               Deposit
             </button>
             <button
               onClick={() => openWalletModal('withdraw')}
-              className="py-1.5 px-2 rounded-lg bg-obsidian-800/90 hover:bg-obsidian-700 text-[11px] font-medium text-slate-200 border border-obsidian-border/60 flex items-center justify-center gap-1 transition-colors"
+              className="py-1.5 px-2 rounded-lg bg-obsidian-800/90 hover:bg-obsidian-700 text-[11px] font-medium text-slate-700 dark:text-slate-200 border border-obsidian-border/60 flex items-center justify-center gap-1 transition-colors"
             >
-              <ArrowUpRight className="w-3 h-3 text-blue-400" />
+              <ArrowUpRight className="w-3 h-3 text-blue-500 dark:text-blue-400" />
               Withdraw
             </button>
             <button
               onClick={() => openWalletModal('backup')}
-              className="py-1.5 px-2 rounded-lg bg-red-950/20 hover:bg-red-900/30 text-[11px] font-medium text-red-300 border border-red-500/30 flex items-center justify-center gap-1 transition-colors"
+              className="py-1.5 px-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-[11px] font-medium text-red-600 dark:text-red-300 border border-red-500/30 flex items-center justify-center gap-1 transition-colors"
             >
-              <Shield className="w-3 h-3 text-red-400" />
+              <Shield className="w-3 h-3 text-red-500 dark:text-red-400" />
               Backup
             </button>
             <button
               onClick={() => openWalletModal('import')}
-              className="py-1.5 px-2 rounded-lg bg-obsidian-800/90 hover:bg-obsidian-700 text-[11px] font-medium text-slate-200 border border-obsidian-border/60 flex items-center justify-center gap-1 transition-colors"
+              className="py-1.5 px-2 rounded-lg bg-obsidian-800/90 hover:bg-obsidian-700 text-[11px] font-medium text-slate-700 dark:text-slate-200 border border-obsidian-border/60 flex items-center justify-center gap-1 transition-colors"
             >
-              <Key className="w-3 h-3 text-blue-400" />
+              <Key className="w-3 h-3 text-blue-500 dark:text-blue-400" />
               Import
             </button>
           </div>
@@ -621,8 +621,8 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
 
       {/* Quick Prompts Container */}
       <div className="px-4 py-2 border-t border-obsidian-border/50 bg-obsidian-900/40">
-        <div className="text-[10px] font-mono text-slate-400 mb-1.5 flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-blue-400" />
+        <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 mb-1.5 flex items-center gap-1">
+          <Sparkles className="w-3 h-3 text-blue-500 dark:text-blue-400" />
           Quick Index Templates
         </div>
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
@@ -631,7 +631,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
               key={idx}
               disabled={isLoading}
               onClick={() => handleSubmit(undefined, qp)}
-              className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full bg-obsidian-800 hover:bg-obsidian-700 hover:text-white border border-obsidian-border text-slate-300 transition-colors flex items-center gap-1"
+              className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full bg-obsidian-800 hover:bg-obsidian-700 hover:text-slate-900 dark:hover:text-white border border-obsidian-border text-slate-700 dark:text-slate-300 transition-colors flex items-center gap-1"
             >
               <span>{qp}</span>
               <ArrowUpRight className="w-2.5 h-2.5 text-slate-400" />
@@ -642,12 +642,12 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
 
       {/* Pending Trade Execution Action Banner */}
       {pendingExternalTrade && (
-        <div className="px-4 py-2 bg-gradient-to-r from-blue-950/90 via-obsidian-900 to-obsidian-950 border-t border-blue-500/40 flex items-center justify-between gap-3 animate-fadeIn">
+        <div className="px-4 py-2 bg-gradient-to-r from-blue-500/15 via-obsidian-900 to-obsidian-950 border-t border-blue-500/40 flex items-center justify-between gap-3 animate-fadeIn">
           <div className="flex items-center gap-2 text-xs">
-            <Zap className="w-4 h-4 text-yellow-400 animate-pulse shrink-0" />
+            <Zap className="w-4 h-4 text-amber-500 animate-pulse shrink-0" />
             <div>
-              <span className="font-semibold text-white">Execute ${pendingExternalTrade.amountUSD.toFixed(2)} of {pendingExternalTrade.symbol} on BaseScan:</span>
-              <span className="text-slate-400 ml-1 text-[11px] hidden sm:inline">Choose signing method</span>
+              <span className="font-semibold text-slate-900 dark:text-white">Execute ${pendingExternalTrade.amountUSD.toFixed(2)} of {pendingExternalTrade.symbol} on BaseScan:</span>
+              <span className="text-slate-500 dark:text-slate-400 ml-1 text-[11px] hidden sm:inline">Choose signing method</span>
             </div>
           </div>
 
@@ -666,16 +666,16 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
               <button
                 type="button"
                 onClick={() => openWalletModal('overview')}
-                className="px-3 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/40 text-blue-300 border border-blue-500/30 font-medium text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-600 dark:text-blue-300 border border-blue-500/30 font-medium text-xs flex items-center gap-1.5 transition-all cursor-pointer"
               >
-                <Wallet className="w-3.5 h-3.5 text-blue-400" />
+                <Wallet className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
                 <span>Deposit to Agent Wallet</span>
               </button>
             )}
             <button
               type="button"
               onClick={() => setPendingExternalTrade(null)}
-              className="p-1 rounded text-slate-500 hover:text-slate-300 transition-colors text-base leading-none"
+              className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors text-base leading-none"
               title="Dismiss"
             >
               &times;
@@ -696,7 +696,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading}
             placeholder="e.g., Buy $0.10 of NVDAc, trade Tesla, or paste Base 0x..."
-            className="w-full bg-obsidian-950 border border-obsidian-border rounded-xl px-3.5 sm:px-4 py-2.5 text-[16px] sm:text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-base-blue focus:ring-1 focus:ring-base-blue transition-all disabled:opacity-50"
+            className="w-full bg-obsidian-950 border border-obsidian-border rounded-xl px-3.5 sm:px-4 py-2.5 text-[16px] sm:text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-base-blue focus:ring-1 focus:ring-base-blue transition-all disabled:opacity-50"
           />
         </div>
 

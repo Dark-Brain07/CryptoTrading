@@ -32,7 +32,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           className={`rounded-2xl px-4 py-3 ${
             isUser
               ? 'bg-base-blue text-white rounded-tr-sm'
-              : 'glass-panel text-slate-200 rounded-tl-sm border-obsidian-border'
+              : 'glass-panel text-slate-800 dark:text-slate-200 rounded-tl-sm border-obsidian-border'
           }`}
         >
           {/* Main text content */}

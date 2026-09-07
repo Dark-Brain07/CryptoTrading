@@ -3,15 +3,74 @@
 @tailwind utilities;
 
 :root {
-  --background: #080A0F;
-  --foreground: #F1F5F9;
+  /* Day Mode (Light Theme) Tokens */
+  --bg-app: #F8FAFC;
+  --bg-panel: rgba(255, 255, 255, 0.94);
+  --bg-card: #F1F5F9;
+  --bg-card-hover: #E2E8F0;
+  --bg-input: #FFFFFF;
+  --bg-elevated: #E2E8F0;
+  --border-color: #E2E8F0;
+  --border-subtle: #CBD5E1;
+
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  --text-faint: #94A3B8;
+
+  --panel-glass: rgba(255, 255, 255, 0.90);
+  --panel-border: #E2E8F0;
+  --panel-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+  --scrollbar-track: #F1F5F9;
+  --scrollbar-thumb: #CBD5E1;
+}
+
+.dark {
+  /* Night Mode (Dark Theme) Tokens */
+  --bg-app: #080A0F;
+  --bg-panel: rgba(14, 18, 26, 0.90);
+  --bg-card: #141A24;
+  --bg-card-hover: #1A2230;
+  --bg-input: #080A0F;
+  --bg-elevated: #1A2230;
+  --border-color: #1E2638;
+  --border-subtle: #2A364F;
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  --text-faint: #64748B;
+
+  --panel-glass: rgba(14, 18, 26, 0.75);
+  --panel-border: #1E2638;
+  --panel-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+  --scrollbar-track: #0E121A;
+  --scrollbar-thumb: #1E2638;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: var(--text-primary);
+  background: var(--bg-app);
   font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
   overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Ambient lighting background glow */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 520px;
+  background: radial-gradient(circle at 50% -20%, rgba(0, 82, 255, 0.08) 0%, rgba(248, 250, 252, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dark body::before {
+  background: radial-gradient(circle at 50% -20%, rgba(0, 82, 255, 0.18) 0%, rgba(8, 10, 15, 0) 70%);
 }
 
 /* Custom Scrollbars */
@@ -21,11 +80,11 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0E121A;
+  background: var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E2638;
+  background: var(--scrollbar-thumb);
   border-radius: 9999px;
 }
 
@@ -35,10 +94,11 @@ body {
 
 /* Glassmorphic Neobank Utilities */
 .glass-panel {
-  background: rgba(14, 18, 26, 0.75);
+  background: var(--panel-glass);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid #1E2638;
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--panel-shadow);
 }
 
 .glass-panel-hover {
@@ -47,7 +107,7 @@ body {
 
 .glass-panel-hover:hover {
   border-color: rgba(0, 82, 255, 0.4);
-  box-shadow: 0 0 20px rgba(0, 82, 255, 0.1);
+  box-shadow: 0 0 20px rgba(0, 82, 255, 0.12);
 }
 
 .glow-blue {

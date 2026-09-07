@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
+  darkMode: 'class',
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -10,11 +11,14 @@ const config: Config = {
     extend: {
       colors: {
         obsidian: {
-          950: '#080A0F',
-          900: '#0E121A',
-          800: '#141A24',
-          700: '#1A2230',
-          border: '#1E2638'
+          950: 'var(--bg-app)',
+          900: 'var(--bg-panel)',
+          800: 'var(--bg-card)',
+          700: 'var(--bg-elevated)',
+          border: 'var(--border-color)',
+          textPrimary: 'var(--text-primary)',
+          textSecondary: 'var(--text-secondary)',
+          textMuted: 'var(--text-muted)'
         },
         base: {
           blue: '#0052FF',

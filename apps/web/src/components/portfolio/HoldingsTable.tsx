@@ -107,34 +107,34 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
             <div key={h.ticker} className="p-3.5 space-y-2.5 hover:bg-obsidian-900/40 transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-base-blue/20 border border-base-blue/30 flex items-center justify-center font-bold text-blue-400 text-xs shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-base-blue/20 border border-base-blue/30 flex items-center justify-center font-bold text-blue-500 dark:text-blue-400 text-xs shrink-0">
                     {h.ticker.substring(0, 4)}
                   </div>
                   <div>
-                    <div className="font-semibold text-white text-sm flex items-center gap-1.5">
+                    <div className="font-semibold text-slate-900 dark:text-white text-sm flex items-center gap-1.5">
                       {h.ticker}
                       <span
                         className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold ${
                           isPositive
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                            : 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'
                         }`}
                       >
                         {isPositive ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
                         {isPositive ? '+' : ''}{h.change24h}%
                       </span>
                     </div>
-                    <div className="text-[11px] text-slate-400 truncate max-w-[160px]">
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[160px]">
                       {h.name}
                     </div>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <div className="font-mono font-bold text-white text-sm">
+                  <div className="font-mono font-bold text-slate-900 dark:text-white text-sm">
                     ${h.balanceUSD.toFixed(2)}
                   </div>
-                  <div className="text-[11px] font-mono text-slate-400">
+                  <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
                     {h.balance < 0.0001 ? h.balance.toFixed(8) : h.balance.toFixed(4)} {h.ticker}
                   </div>
                 </div>
@@ -146,7 +146,7 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
                   href={h.explorerUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-blue-400 transition-colors font-mono px-2.5 py-1.5 rounded-lg bg-obsidian-900 border border-obsidian-border/60"
+                  className="inline-flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-mono px-2.5 py-1.5 rounded-lg bg-obsidian-900 border border-obsidian-border/60"
                 >
                   <span>BaseScan</span>
                   <ExternalLink className="w-3 h-3" />
@@ -169,7 +169,7 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
       {/* Desktop Table View (Visible on >= md screens) */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left text-xs">
-          <thead className="bg-obsidian-900/80 border-b border-obsidian-border text-[10px] font-mono uppercase text-slate-400">
+          <thead className="bg-obsidian-900/80 border-b border-obsidian-border text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400">
             <tr>
               <th className="py-2.5 px-3">Asset</th>
               <th className="py-2.5 px-3 text-right">Price</th>
@@ -188,12 +188,12 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
                   {/* Asset */}
                   <td className="py-3 px-3">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-md bg-base-blue/20 border border-base-blue/30 flex items-center justify-center font-bold text-blue-400 text-[10px]">
+                      <div className="w-6 h-6 rounded-md bg-base-blue/20 border border-base-blue/30 flex items-center justify-center font-bold text-blue-500 dark:text-blue-400 text-[10px]">
                         {h.ticker}
                       </div>
                       <div>
-                        <div className="font-semibold text-white">{h.ticker}</div>
-                        <div className="text-[10px] text-slate-400 hidden sm:block truncate max-w-[120px]">
+                        <div className="font-semibold text-slate-900 dark:text-white">{h.ticker}</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 hidden sm:block truncate max-w-[120px]">
                           {h.name}
                         </div>
                       </div>
@@ -201,17 +201,17 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
                   </td>
 
                   {/* Price */}
-                  <td className="py-3 px-3 text-right font-mono text-slate-200">
+                  <td className="py-3 px-3 text-right font-mono text-slate-700 dark:text-slate-200">
                     ${h.currentPrice.toFixed(2)}
                   </td>
 
                   {/* Holdings Shares */}
-                  <td className="py-3 px-3 text-right font-mono text-slate-300">
+                  <td className="py-3 px-3 text-right font-mono text-slate-600 dark:text-slate-300">
                     {h.balance.toFixed(4)}
                   </td>
 
                   {/* Value USD */}
-                  <td className="py-3 px-3 text-right font-mono font-semibold text-white">
+                  <td className="py-3 px-3 text-right font-mono font-semibold text-slate-900 dark:text-white">
                     ${h.balanceUSD.toFixed(2)}
                   </td>
 
@@ -220,8 +220,8 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
                     <span
                       className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold ${
                         isPositive
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                          : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                          : 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'
                       }`}
                     >
                       {isPositive ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
