@@ -21,7 +21,8 @@ const DEFAULT_REAL_BASE_HOLDINGS: PortfolioHolding[] = [
     change24h: 3.12,
     allocationPercentage: 20.2,
     contractAddress: '0xb20000000000000000000078ee7ce2fE4908108C',
-    explorerUrl: 'https://basescan.org/token/0xb20000000000000000000078ee7ce2fE4908108C'
+    explorerUrl: 'https://basescan.org/token/0xb20000000000000000000078ee7ce2fE4908108C',
+    iconUrl: 'https://cryptologos.cc/logos/nvidia-logo.png'
   },
   {
     ticker: 'TSLAc',
@@ -32,7 +33,8 @@ const DEFAULT_REAL_BASE_HOLDINGS: PortfolioHolding[] = [
     change24h: 3.80,
     allocationPercentage: 16.7,
     contractAddress: '0xb2000000000000000000001e800a7f5189430cD0',
-    explorerUrl: 'https://basescan.org/token/0xb2000000000000000000001e800a7f5189430cD0'
+    explorerUrl: 'https://basescan.org/token/0xb2000000000000000000001e800a7f5189430cD0',
+    iconUrl: 'https://cryptologos.cc/logos/tesla-logo.png'
   },
   {
     ticker: 'AERO',
@@ -43,7 +45,8 @@ const DEFAULT_REAL_BASE_HOLDINGS: PortfolioHolding[] = [
     change24h: 4.82,
     allocationPercentage: 26.1,
     contractAddress: '0x940181a94A35A4569E4529A3CDfB74e38FD98631',
-    explorerUrl: 'https://basescan.org/token/0x940181a94A35A4569E4529A3CDfB74e38FD98631'
+    explorerUrl: 'https://basescan.org/token/0x940181a94A35A4569E4529A3CDfB74e38FD98631',
+    iconUrl: 'https://aerodrome.finance/favicon.ico'
   },
   {
     ticker: 'WETH',
@@ -54,7 +57,8 @@ const DEFAULT_REAL_BASE_HOLDINGS: PortfolioHolding[] = [
     change24h: 1.65,
     allocationPercentage: 20.4,
     contractAddress: '0x4200000000000000000000000000000000000006',
-    explorerUrl: 'https://basescan.org/token/0x4200000000000000000000000000000000000006'
+    explorerUrl: 'https://basescan.org/token/0x4200000000000000000000000000000000000006',
+    iconUrl: 'https://cryptologos.cc/logos/ethereum-eth-logo.png'
   },
   {
     ticker: 'VIRTUAL',
@@ -65,7 +69,8 @@ const DEFAULT_REAL_BASE_HOLDINGS: PortfolioHolding[] = [
     change24h: 8.42,
     allocationPercentage: 16.6,
     contractAddress: '0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b',
-    explorerUrl: 'https://basescan.org/token/0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b'
+    explorerUrl: 'https://basescan.org/token/0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b',
+    iconUrl: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/base/assets/0x0b3e328455c4059EEb9e3f84b5543F74E24e7E1b/logo.png'
   }
 ];
 

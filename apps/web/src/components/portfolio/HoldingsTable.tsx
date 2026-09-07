@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ExternalLink, TrendingUp, TrendingDown, ArrowDownRight, Check, AlertCircle, RefreshCw, X } from 'lucide-react';
-import { PortfolioHolding } from '@baseindex/shared';
+import { PortfolioHolding, VERIFIED_BASE_TOKENIZED_STOCKS } from '@baseindex/shared';
 import { useAgenticWallet } from '../../hooks/useAgenticWallet';
 
 interface HoldingsTableProps {
@@ -103,12 +103,27 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
       <div className="md:hidden divide-y divide-obsidian-border/60">
         {holdings.map((h) => {
           const isPositive = h.change24h >= 0;
+          const tokenMeta = VERIFIED_BASE_TOKENIZED_STOCKS[h.ticker] || VERIFIED_BASE_TOKENIZED_STOCKS[h.ticker.replace(/c$/, '')];
+          const iconSrc = h.iconUrl || tokenMeta?.iconUrl;
+
           return (
             <div key={h.ticker} className="p-3.5 space-y-2.5 hover:bg-obsidian-900/40 transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-base-blue/20 border border-base-blue/30 flex items-center justify-center font-bold text-blue-500 dark:text-blue-400 text-xs shrink-0">
-                    {h.ticker.substring(0, 4)}
+                  <div className="w-8 h-8 rounded-lg bg-base-blue/10 border border-obsidian-border flex items-center justify-center font-bold text-blue-500 dark:text-blue-400 text-xs shrink-0 overflow-hidden shadow-sm p-1">
+                    {iconSrc ? (
+                      <img
+                        src={iconSrc}
+                        alt={h.ticker}
+                        className="w-full h-full object-contain rounded-md"
+                        onError={(e) => {
+                          // Hide image and fall back to ticker text if URL fails to load
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <span>{h.ticker.substring(0, 3)}</span>
+                    )}
                   </div>
                   <div>
                     <div className="font-semibold text-slate-900 dark:text-white text-sm flex items-center gap-1.5">
@@ -183,13 +198,27 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
           <tbody className="divide-y divide-obsidian-border/50">
             {holdings.map((h) => {
               const isPositive = h.change24h >= 0;
+              const tokenMeta = VERIFIED_BASE_TOKENIZED_STOCKS[h.ticker] || VERIFIED_BASE_TOKENIZED_STOCKS[h.ticker.replace(/c$/, '')];
+              const iconSrc = h.iconUrl || tokenMeta?.iconUrl;
+
               return (
                 <tr key={h.ticker} className="hover:bg-obsidian-900/40 transition-colors">
                   {/* Asset */}
                   <td className="py-3 px-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-md bg-base-blue/20 border border-base-blue/30 flex items-center justify-center font-bold text-blue-500 dark:text-blue-400 text-[10px]">
-                        {h.ticker}
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-lg bg-base-blue/10 border border-obsidian-border flex items-center justify-center font-bold text-blue-500 dark:text-blue-400 text-[10px] shrink-0 overflow-hidden p-1 shadow-sm">
+                        {iconSrc ? (
+                          <img
+                            src={iconSrc}
+                            alt={h.ticker}
+                            className="w-full h-full object-contain rounded-md"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <span>{h.ticker.substring(0, 3)}</span>
+                        )}
                       </div>
                       <div>
                         <div className="font-semibold text-slate-900 dark:text-white">{h.ticker}</div>
@@ -265,9 +294,20 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
           <div className="w-full max-w-sm glass-panel rounded-2xl border border-obsidian-border bg-obsidian-900 shadow-2xl p-5 space-y-4">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-obsidian-border/80 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 font-bold text-xs">
-                  {selectedHolding.ticker}
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-base-blue/10 border border-obsidian-border flex items-center justify-center font-bold text-blue-500 dark:text-blue-400 text-xs shrink-0 overflow-hidden p-1 shadow-sm">
+                  {(selectedHolding.iconUrl || VERIFIED_BASE_TOKENIZED_STOCKS[selectedHolding.ticker]?.iconUrl) ? (
+                    <img
+                      src={selectedHolding.iconUrl || VERIFIED_BASE_TOKENIZED_STOCKS[selectedHolding.ticker]?.iconUrl}
+                      alt={selectedHolding.ticker}
+                      className="w-full h-full object-contain rounded-md"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <span>{selectedHolding.ticker.substring(0, 3)}</span>
+                  )}
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-white">Sell {selectedHolding.ticker} to USDC</h3>
