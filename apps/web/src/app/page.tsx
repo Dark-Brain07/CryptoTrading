@@ -17,7 +17,7 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-obsidian-950 selection:bg-base-blue selection:text-white lg:overflow-hidden">
+    <div className="h-full min-h-screen lg:min-h-0 lg:h-screen flex flex-col bg-obsidian-950 selection:bg-base-blue selection:text-white lg:overflow-hidden">
       {/* Top Navigation */}
       <Header />
 
@@ -51,10 +51,10 @@ export default function Home() {
       </div>
 
       {/* Main Interface: Side-by-side on lg+, Mobile-Tab switched on mobile */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-2.5 sm:p-4 lg:p-5 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-5 lg:h-[calc(100vh-4rem)] lg:overflow-hidden">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-2.5 sm:p-4 lg:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-4 min-h-0 lg:h-[calc(100vh-4rem)] lg:max-h-[calc(100vh-4rem)] lg:overflow-hidden">
         {/* Left Column: Interactive Agent Chat Terminal (5 cols on lg) */}
         <section
-          className={`lg:col-span-5 flex flex-col h-full min-h-0 ${
+          className={`lg:col-span-5 flex flex-col h-full min-h-0 lg:overflow-hidden ${
             mobileTab === 'chat' ? 'flex h-[calc(100dvh-8rem)] lg:h-full' : 'hidden lg:flex lg:h-full'
           }`}
         >
@@ -66,7 +66,7 @@ export default function Home() {
 
         {/* Right Column: Live Portfolio & Asset Tracker (7 cols on lg) */}
         <section
-          className={`lg:col-span-7 flex flex-col h-full min-h-0 ${
+          className={`lg:col-span-7 flex flex-col h-full min-h-0 lg:overflow-hidden ${
             mobileTab === 'portfolio' ? 'flex h-[calc(100dvh-8rem)] lg:h-full' : 'hidden lg:flex lg:h-full'
           }`}
         >

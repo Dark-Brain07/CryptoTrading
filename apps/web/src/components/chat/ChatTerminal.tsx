@@ -463,9 +463,9 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
   };
 
   return (
-    <div className="flex flex-col h-full glass-panel rounded-2xl border-obsidian-border overflow-hidden shadow-2xl">
+    <div className="flex flex-col h-full min-h-0 glass-panel rounded-2xl border-obsidian-border overflow-hidden shadow-2xl">
       {/* Terminal Bar */}
-      <div className="px-4 py-3 border-b border-obsidian-border/80 bg-obsidian-900/90 flex items-center justify-between shrink-0">
+      <div className="px-4 py-2.5 sm:py-3 border-b border-obsidian-border/80 bg-obsidian-900/90 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4 text-base-blue" />
           <span className="text-xs font-mono font-semibold text-slate-900 dark:text-slate-200">
@@ -481,7 +481,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
-          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono border border-emerald-500/20">
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-mono border border-emerald-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             LIVE
           </div>
@@ -490,10 +490,10 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
 
       {/* Embedded Agentic Wallet Command Center */}
       {!isCreated ? (
-        <div className="m-3 p-3 rounded-xl bg-gradient-to-r from-base-blue/15 via-obsidian-900 to-base-blue/10 border border-base-blue/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg shrink-0">
+        <div className="m-2.5 sm:m-3 p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-base-blue/15 via-obsidian-900 to-base-blue/10 border border-base-blue/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-lg shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-base-blue/20 border border-base-blue/40 flex items-center justify-center text-blue-500 dark:text-blue-400 shrink-0">
-              <Wallet className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-base-blue/20 border border-base-blue/40 flex items-center justify-center text-blue-500 dark:text-blue-400 shrink-0">
+              <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
             <div>
               <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
@@ -502,7 +502,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
                   NOT INITIALIZED
                 </span>
               </div>
-              <div className="text-[11px] text-slate-600 dark:text-slate-400">
+              <div className="text-[11px] text-slate-600 dark:text-slate-400 leading-tight">
                 Generate your client-isolated Base wallet for sub-second zero-signature trading.
               </div>
             </div>
@@ -510,7 +510,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => openWalletModal('import')}
-              className="px-3 py-1.5 rounded-xl bg-obsidian-800 hover:bg-obsidian-700 border border-obsidian-border text-slate-800 dark:text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
+              className="px-2.5 py-1.5 rounded-xl bg-obsidian-800 hover:bg-obsidian-700 border border-obsidian-border text-slate-800 dark:text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
             >
               <Key className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
               Import Key
@@ -520,7 +520,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
                 createWallet();
                 openWalletModal('overview');
               }}
-              className="px-3.5 py-1.5 rounded-xl bg-base-blue hover:bg-base-blueHover text-white text-xs font-bold shadow-md shadow-base-blue/25 flex items-center justify-center gap-1.5 transition-all"
+              className="px-3 py-1.5 rounded-xl bg-base-blue hover:bg-base-blueHover text-white text-xs font-bold shadow-md shadow-base-blue/25 flex items-center justify-center gap-1.5 transition-all"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Create Wallet
@@ -528,7 +528,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           </div>
         </div>
       ) : (
-        <div className="m-3 p-3 rounded-xl bg-obsidian-900/95 border border-obsidian-border shadow-xl space-y-2 shrink-0">
+        <div className="m-2.5 sm:m-3 p-2.5 sm:p-3 rounded-xl bg-obsidian-900/95 border border-obsidian-border shadow-xl space-y-2 shrink-0">
           {/* Top: Address & Balances */}
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -611,8 +611,8 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
         </div>
       )}
 
-      {/* Messages Scroll Area */}
-      <div className="flex-1 p-4 overflow-y-auto space-y-4">
+      {/* Messages Scroll Area - Automatically pushes older messages upward */}
+      <div className="flex-1 min-h-0 p-3 sm:p-4 overflow-y-auto space-y-4">
         {messages.map((msg) => (
           <MessageBubble key={msg.id} message={msg} />
         ))}

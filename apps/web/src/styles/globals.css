@@ -48,12 +48,25 @@
   --scrollbar-thumb: #1E2638;
 }
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   color: var(--text-primary);
   background: var(--bg-app);
   font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
   overflow-x: hidden;
   transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+@media (min-width: 1024px) {
+  html,
+  body {
+    overflow: hidden;
+    height: 100vh;
+  }
 }
 
 /* Ambient lighting background glow */
