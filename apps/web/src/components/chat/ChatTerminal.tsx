@@ -204,7 +204,19 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
     try {
       const isSell = /\b(sell|liquidate|dump|exit)\b/i.test(promptToSend);
       const contractMatch = promptToSend.match(/(0x[a-fA-F0-9]{40})/i);
-      const tokenSymbols = ['AERO', 'WETH', 'CBBTC', 'VIRTUAL', 'DEGEN'];
+      const tokenSymbols = [
+        'AERO', 'WETH', 'CBBTC', 'VIRTUAL', 'DEGEN',
+        'NVDAC', 'NVDA', 'NVIDIA',
+        'METAC', 'META',
+        'AAPLC', 'AAPL', 'APPLE',
+        'GOOGLC', 'GOOGL', 'GOOGLE', 'ALPHABET',
+        'AMZNC', 'AMZN', 'AMAZON',
+        'MSFTC', 'MSFT', 'MICROSOFT',
+        'MSTRC', 'MSTR', 'MICROSTRATEGY',
+        'SNDKC', 'SNDK', 'SANDISK',
+        'SPCXC', 'SPCX', 'SPACEX',
+        'TSLAC', 'TSLA', 'TESLA'
+      ];
       const matchedSymbol = tokenSymbols.find(s => new RegExp(`\\b${s}\\b`, 'i').test(promptToSend));
       const targetAsset = contractMatch ? contractMatch[1] : matchedSymbol;
 

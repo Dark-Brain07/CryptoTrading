@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.safeReplyMarkdown = safeReplyMarkdown;
 exports.initializeTelegramBot = initializeTelegramBot;
 const telegraf_1 = require("telegraf");
 const config_1 = require("../config");
@@ -14,6 +15,21 @@ const accounts_1 = require("viem/accounts");
 const chains_1 = require("viem/chains");
 const blockchain_1 = require("../services/blockchain");
 let bot = null;
+async function safeReplyMarkdown(ctx, text, extra) {
+    try {
+        return await ctx.replyWithMarkdown(text, extra);
+    }
+    catch (err) {
+        console.warn('safeReplyMarkdown fallback triggered due to entity parse error:', err?.message || err);
+        try {
+            const plainText = text.replace(/[*_`]/g, '');
+            return await ctx.reply(plainText, extra);
+        }
+        catch (fallbackErr) {
+            return await ctx.reply(text.slice(0, 1000));
+        }
+    }
+}
 function initializeTelegramBot() {
     if (!config_1.isTelegramConfigured) {
         console.log('📱 Telegram Bot: TELEGRAM_BOT_TOKEN not provided. (Telegram bot interface inactive; web terminal active)');
@@ -678,10 +694,11 @@ function initializeTelegramBot() {
                 : undefined;
             try {
                 const result = await (0, agent_1.processNaturalLanguageIntent)(text, userWallet?.address || userId, walletMeta);
-                await ctx.replyWithMarkdown(result.reply, { link_preview_options: { is_disabled: true } });
+                await safeReplyMarkdown(ctx, result.reply, { link_preview_options: { is_disabled: true } });
             }
             catch (err) {
-                await ctx.reply(`❌ Processing error: ${err?.message || 'Unknown error'}`);
+                console.error('Bot natural language processing error:', err);
+                await safeReplyMarkdown(ctx, `❌ Processing error: ${err?.message || 'Unknown error'}`);
             }
         });
         bot.launch(() => {

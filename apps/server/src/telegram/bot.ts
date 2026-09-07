@@ -13,6 +13,20 @@ import { publicClient, getOnChainTokenBalance, scanWalletLiveHoldings } from '..
 
 let bot: Telegraf | null = null;
 
+export async function safeReplyMarkdown(ctx: any, text: string, extra?: any): Promise<any> {
+  try {
+    return await ctx.replyWithMarkdown(text, extra);
+  } catch (err: any) {
+    console.warn('safeReplyMarkdown fallback triggered due to entity parse error:', err?.message || err);
+    try {
+      const plainText = text.replace(/[*_`]/g, '');
+      return await ctx.reply(plainText, extra);
+    } catch (fallbackErr: any) {
+      return await ctx.reply(text.slice(0, 1000));
+    }
+  }
+}
+
 export function initializeTelegramBot(): Telegraf | null {
   if (!isTelegramConfigured) {
     console.log('📱 Telegram Bot: TELEGRAM_BOT_TOKEN not provided. (Telegram bot interface inactive; web terminal active)');
@@ -797,9 +811,10 @@ export function initializeTelegramBot(): Telegraf | null {
 
       try {
         const result = await processNaturalLanguageIntent(text, userWallet?.address || userId, walletMeta);
-        await ctx.replyWithMarkdown(result.reply, { link_preview_options: { is_disabled: true } });
+        await safeReplyMarkdown(ctx, result.reply, { link_preview_options: { is_disabled: true } });
       } catch (err: any) {
-        await ctx.reply(`❌ Processing error: ${err?.message || 'Unknown error'}`);
+        console.error('Bot natural language processing error:', err);
+        await safeReplyMarkdown(ctx, `❌ Processing error: ${err?.message || 'Unknown error'}`);
       }
     });
 
