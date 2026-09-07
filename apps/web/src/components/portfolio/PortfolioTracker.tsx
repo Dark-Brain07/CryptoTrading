@@ -11,7 +11,7 @@ interface PortfolioTrackerProps {
   walletAddress?: string;
 }
 
-const DEFAULT_REAL_BASE_HOLDINGS: PortfolioHolding[] = [
+const DEFAULT_REAL_BASE_HOLDINGS: (PortfolioHolding & { iconUrl?: string })[] = [
   {
     ticker: 'NVDAc',
     name: 'NVIDIA (NVDAc)',
