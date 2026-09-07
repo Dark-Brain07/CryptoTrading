@@ -37,7 +37,7 @@ export interface ServerSwapResult {
   timestamp: number;
 }
 
-const KNOWN_BASE_TOKENS_BY_SYMBOL: Record<string, `0x${string}`> = {
+export const KNOWN_BASE_TOKENS_BY_SYMBOL: Record<string, `0x${string}`> = {
   AERO: '0x940181a94A35A4569E4529A3CDfB74e38FD98631',
   WETH: BASE_WETH_ADDRESS,
   ETH: BASE_WETH_ADDRESS,

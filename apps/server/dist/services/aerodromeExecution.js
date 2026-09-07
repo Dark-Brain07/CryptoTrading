@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.KNOWN_BASE_TOKENS_BY_SYMBOL = void 0;
 exports.ensureTokenAllowanceServer = ensureTokenAllowanceServer;
 exports.discoverTokenMetadataServer = discoverTokenMetadataServer;
 exports.executeServerBuyOnAerodrome = executeServerBuyOnAerodrome;
@@ -10,7 +11,7 @@ const chains_1 = require("viem/chains");
 const shared_1 = require("../shared");
 const blockchain_1 = require("./blockchain");
 const portfolioStore_1 = require("./portfolioStore");
-const KNOWN_BASE_TOKENS_BY_SYMBOL = {
+exports.KNOWN_BASE_TOKENS_BY_SYMBOL = {
     AERO: '0x940181a94A35A4569E4529A3CDfB74e38FD98631',
     WETH: shared_1.BASE_WETH_ADDRESS,
     ETH: shared_1.BASE_WETH_ADDRESS,
@@ -64,8 +65,8 @@ async function ensureTokenAllowanceServer(walletClient, tokenAddress, spenderAdd
 async function discoverTokenMetadataServer(target) {
     const upper = target.toUpperCase().replace(/^[$]/, '');
     let resolvedAddress = null;
-    if (KNOWN_BASE_TOKENS_BY_SYMBOL[upper]) {
-        resolvedAddress = KNOWN_BASE_TOKENS_BY_SYMBOL[upper];
+    if (exports.KNOWN_BASE_TOKENS_BY_SYMBOL[upper]) {
+        resolvedAddress = exports.KNOWN_BASE_TOKENS_BY_SYMBOL[upper];
     }
     else if (shared_1.VERIFIED_BASE_TOKENIZED_STOCKS[target] || shared_1.VERIFIED_BASE_TOKENIZED_STOCKS[upper]) {
         const stock = shared_1.VERIFIED_BASE_TOKENIZED_STOCKS[target] || shared_1.VERIFIED_BASE_TOKENIZED_STOCKS[upper];
