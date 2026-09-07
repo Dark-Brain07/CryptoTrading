@@ -90,7 +90,7 @@ export function AssetDistributionChart({ holdings }: AssetDistributionChartProps
         {holdings.map((item, idx) => (
           <div
             key={item.ticker}
-            className="flex items-center justify-between p-2 rounded-lg bg-obsidian-800/60 border border-obsidian-border text-xs"
+            className="flex items-center justify-between p-2 rounded-lg bg-obsidian-800/80 border border-obsidian-border text-xs shadow-sm"
           >
             <div className="flex items-center gap-2">
               <span
@@ -99,7 +99,7 @@ export function AssetDistributionChart({ holdings }: AssetDistributionChartProps
               />
               <span className="font-semibold text-slate-900 dark:text-white">{item.ticker}</span>
             </div>
-            <span className="font-mono text-slate-700 dark:text-slate-300 font-medium">
+            <span className="font-mono text-slate-800 dark:text-slate-300 font-bold">
               {item.allocationPercentage}%
             </span>
           </div>

@@ -17,7 +17,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-obsidian-950 selection:bg-base-blue selection:text-white">
+    <div className="h-screen flex flex-col bg-obsidian-950 selection:bg-base-blue selection:text-white lg:overflow-hidden">
       {/* Top Navigation */}
       <Header />
 
