@@ -80,8 +80,8 @@ export function AssetDistributionChart({ holdings }: AssetDistributionChartProps
           ))}
         </svg>
         <div className="absolute flex flex-col items-center justify-center pointer-events-none text-center">
-          <span className="text-[10px] uppercase font-mono text-slate-400">Assets</span>
-          <span className="text-base font-bold text-white font-mono">{holdings.length}</span>
+          <span className="text-[10px] uppercase font-mono text-slate-500 dark:text-slate-400">Assets</span>
+          <span className="text-base font-bold text-slate-900 dark:text-white font-mono">{holdings.length}</span>
         </div>
       </div>
 
@@ -97,9 +97,9 @@ export function AssetDistributionChart({ holdings }: AssetDistributionChartProps
                 className="w-2.5 h-2.5 rounded-full"
                 style={{ backgroundColor: COLORS[idx % COLORS.length] }}
               />
-              <span className="font-semibold text-white">{item.ticker}</span>
+              <span className="font-semibold text-slate-900 dark:text-white">{item.ticker}</span>
             </div>
-            <span className="font-mono text-slate-300 font-medium">
+            <span className="font-mono text-slate-700 dark:text-slate-300 font-medium">
               {item.allocationPercentage}%
             </span>
           </div>

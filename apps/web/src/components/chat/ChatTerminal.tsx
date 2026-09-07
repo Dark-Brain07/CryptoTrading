@@ -490,19 +490,19 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
 
       {/* Embedded Agentic Wallet Command Center */}
       {!isCreated ? (
-        <div className="m-3 p-3.5 rounded-xl bg-gradient-to-r from-base-blue/20 via-obsidian-900 to-base-blue/10 border border-base-blue/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg shrink-0">
+        <div className="m-3 p-3 rounded-xl bg-gradient-to-r from-base-blue/15 via-obsidian-900 to-base-blue/10 border border-base-blue/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-base-blue/20 border border-base-blue/40 flex items-center justify-center text-blue-400 shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-base-blue/20 border border-base-blue/40 flex items-center justify-center text-blue-500 dark:text-blue-400 shrink-0">
               <Wallet className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-xs font-bold text-white flex items-center gap-1.5">
+              <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                 Autonomous Agent Wallet
-                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/30">
                   NOT INITIALIZED
                 </span>
               </div>
-              <div className="text-[11px] text-slate-400">
+              <div className="text-[11px] text-slate-600 dark:text-slate-400">
                 Generate your client-isolated Base wallet for sub-second zero-signature trading.
               </div>
             </div>
@@ -510,9 +510,9 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => openWalletModal('import')}
-              className="px-3 py-2 rounded-xl bg-obsidian-800 hover:bg-obsidian-700 border border-obsidian-border text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
+              className="px-3 py-1.5 rounded-xl bg-obsidian-800 hover:bg-obsidian-700 border border-obsidian-border text-slate-800 dark:text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
             >
-              <Key className="w-3.5 h-3.5 text-blue-400" />
+              <Key className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
               Import Key
             </button>
             <button
@@ -520,7 +520,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
                 createWallet();
                 openWalletModal('overview');
               }}
-              className="px-3.5 py-2 rounded-xl bg-base-blue hover:bg-base-blueHover text-white text-xs font-bold shadow-md shadow-base-blue/25 flex items-center justify-center gap-1.5 transition-all"
+              className="px-3.5 py-1.5 rounded-xl bg-base-blue hover:bg-base-blueHover text-white text-xs font-bold shadow-md shadow-base-blue/25 flex items-center justify-center gap-1.5 transition-all"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Create Wallet

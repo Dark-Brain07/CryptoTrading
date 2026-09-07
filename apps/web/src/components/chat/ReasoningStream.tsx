@@ -37,9 +37,9 @@ export function ReasoningStream({ steps }: ReasoningStreamProps) {
             </div>
 
             <div className="flex-1">
-              <div className="text-slate-200 font-medium">{step.title}</div>
+              <div className="text-slate-800 dark:text-slate-200 font-medium">{step.title}</div>
               {step.detail && (
-                <div className="text-slate-400 text-[11px] font-mono mt-0.5">
+                <div className="text-slate-500 dark:text-slate-400 text-[11px] font-mono mt-0.5">
                   {step.detail}
                 </div>
               )}
