@@ -67,6 +67,7 @@ export interface PortfolioHolding {
     allocationPercentage: number;
     contractAddress: `0x${string}`;
     explorerUrl: string;
+    iconUrl?: string;
 }
 export interface PreparedTransaction {
     to: `0x${string}`;
