@@ -17,7 +17,7 @@ services:
       - key: PORT
         value: 10000
       - key: BASE_RPC_URL
-        value: https://mainnet.base.org
+        value: https://base-rpc.publicnode.com
       - key: BASE_CHAIN_ID
         value: "8453"
       - key: FRONTEND_URL

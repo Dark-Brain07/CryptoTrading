@@ -20,13 +20,20 @@ async function safeReplyMarkdown(ctx, text, extra) {
         return await ctx.replyWithMarkdown(text, extra);
     }
     catch (err) {
-        console.warn('safeReplyMarkdown fallback triggered due to entity parse error:', err?.message || err);
+        console.warn('safeReplyMarkdown fallback triggered:', err?.message || err);
         try {
-            const plainText = text.replace(/[*_`]/g, '');
-            return await ctx.reply(plainText, extra);
+            const plainText = text.replace(/[*_`[\]()]/g, '');
+            const safeExtra = { ...(extra || {}) };
+            delete safeExtra.parse_mode;
+            return await ctx.reply(plainText, safeExtra);
         }
         catch (fallbackErr) {
-            return await ctx.reply(text.slice(0, 1000));
+            try {
+                return await ctx.reply(text.replace(/[*_`[\]()]/g, '').slice(0, 1000));
+            }
+            catch (e) {
+                console.error('Failed all reply attempts:', e);
+            }
         }
     }
 }
@@ -257,11 +264,7 @@ function initializeTelegramBot() {
                 const walletClient = (0, viem_1.createWalletClient)({
                     account,
                     chain: chains_1.base,
-                    transport: (0, viem_1.fallback)([
-                        (0, viem_1.http)('https://base.llamarpc.com'),
-                        (0, viem_1.http)('https://1rpc.io/base'),
-                        (0, viem_1.http)('https://mainnet.base.org')
-                    ])
+                    transport: blockchain_1.baseTransport
                 });
                 // Determine target asset
                 let isETH = isExplicitETH;
@@ -559,7 +562,7 @@ function initializeTelegramBot() {
                 const amountMatch = text.match(/(?:\$|\b)(\d+(?:\.\d+)?|\.\d+)/);
                 const amountToSell = (!isAll && amountMatch) ? parseFloat(amountMatch[1]) : undefined;
                 await ctx.replyWithMarkdown(`⏳ *Executing 100% Real Swap on Base Mainnet (Aerodrome DEX)...*\n\n` +
-                    `• *Action:* Sell \`${fromToken}\` &rarr; \`${toToken}\`\n` +
+                    `• *Action:* Sell \`${fromToken}\` → \`${toToken}\`\n` +
                     `• *Wallet:* \`${userWallet.address}\`\n` +
                     `• *Router:* Aerodrome Router (\`0xcF77...4E43\`)`);
                 try {
@@ -577,12 +580,16 @@ function initializeTelegramBot() {
                         `⛽ *Gas Incurred:* \`~$${result.gasUsedUSD.toFixed(4)} USD\`\n\n` +
                         `🔍 *BaseScan Explorer:*\n[View Confirmed Transaction](${result.explorerUrl})\n\n` +
                         `_Funds have been credited directly to your Base deposit address!_`;
-                    await ctx.replyWithMarkdown(sellCard, { link_preview_options: { is_disabled: false } });
+                    await safeReplyMarkdown(ctx, sellCard, { link_preview_options: { is_disabled: false } });
                     return;
                 }
                 catch (sellErr) {
                     console.error('Server Aerodrome sell error:', sellErr);
-                    await ctx.replyWithMarkdown(`❌ *On-Chain Swap Failed:*\n${sellErr?.message || 'Transaction error on Base node'}`);
+                    const cleanErr = (sellErr?.shortMessage || sellErr?.message || 'Transaction error on Base node')
+                        .split('\n')[0]
+                        .replace(/https?:\/\/[^\s]+/g, '')
+                        .slice(0, 300);
+                    await safeReplyMarkdown(ctx, `❌ *On-Chain Swap Failed:*\n${cleanErr}`);
                     return;
                 }
             }
@@ -661,8 +668,8 @@ function initializeTelegramBot() {
                     return;
                 }
                 // Execute REAL On-Chain DEX Swap
-                const statusMsg = await ctx.replyWithMarkdown(`⏳ *Executing 100% Real Swap on Base Mainnet (Aerodrome DEX)...*\n\n` +
-                    `• *Swapping:* \`$${amountUSD.toFixed(2)} USDC\` &rarr; \`${targetToken}\`\n` +
+                const statusMsg = await safeReplyMarkdown(ctx, `⏳ *Executing 100% Real Swap on Base Mainnet (Aerodrome DEX)...*\n\n` +
+                    `• *Swapping:* \`$${amountUSD.toFixed(2)} USDC\` → \`${targetToken}\`\n` +
                     `• *Signing with Wallet:* \`${userWallet.address}\`\n` +
                     `• *Router:* Aerodrome Router (\`0xcF77...4E43\`)`);
                 try {
@@ -678,12 +685,16 @@ function initializeTelegramBot() {
                         `⛽ *Gas Incurred:* \`~$${result.gasUsedUSD.toFixed(4)} USD\`\n\n` +
                         `🔍 *BaseScan Explorer:*\n[View On-Chain Receipt](${result.explorerUrl})\n\n` +
                         `_Tokens are now in your wallet address! Use /portfolio to see your updated holdings._`;
-                    await ctx.replyWithMarkdown(successCard, { link_preview_options: { is_disabled: false } });
+                    await safeReplyMarkdown(ctx, successCard, { link_preview_options: { is_disabled: false } });
                     return;
                 }
                 catch (swapErr) {
                     console.error('Server Aerodrome swap error:', swapErr);
-                    await ctx.replyWithMarkdown(`❌ *On-Chain Execution Failed:*\n${swapErr?.message || 'Transaction error on Base node'}`);
+                    const cleanErr = (swapErr?.shortMessage || swapErr?.message || 'Transaction error on Base node')
+                        .split('\n')[0]
+                        .replace(/https?:\/\/[^\s]+/g, '')
+                        .slice(0, 300);
+                    await safeReplyMarkdown(ctx, `❌ *On-Chain Execution Failed:*\n${cleanErr}`);
                     return;
                 }
             }

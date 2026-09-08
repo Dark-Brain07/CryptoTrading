@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ExternalLink, TrendingUp, TrendingDown, ArrowDownRight, Check, AlertCircle, RefreshCw, X } from 'lucide-react';
 import { PortfolioHolding, VERIFIED_BASE_TOKENIZED_STOCKS } from '@baseindex/shared';
 import { useAgenticWallet } from '../../hooks/useAgenticWallet';
+import { TokenIcon } from '../common/TokenIcon';
 
 interface HoldingsTableProps {
   holdings: PortfolioHolding[];
@@ -83,7 +84,8 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
         onTradeCompleted();
       }
     } catch (err: any) {
-      setSellError(err?.message || 'Error processing sell order');
+      console.error('Sell execution failed:', err);
+      setSellError(err?.message || 'Transaction reverted on Base DEX Router');
     } finally {
       setIsSelling(false);
     }
@@ -91,39 +93,25 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
 
   if (holdings.length === 0) {
     return (
-      <div className="p-8 text-center text-slate-500 text-xs font-mono">
-        No tokenized equity holdings found for this address on Base Mainnet.
+      <div className="p-8 text-center text-slate-500 font-mono text-xs">
+        No active holdings discovered on Base Mainnet.
       </div>
     );
   }
 
   return (
-    <div>
-      {/* Mobile Cards View (Visible on < md screens) */}
-      <div className="md:hidden divide-y divide-obsidian-border/60">
+    <div className="w-full">
+      {/* Mobile Card View (Visible on < md screens) */}
+      <div className="block md:hidden divide-y divide-obsidian-border">
         {holdings.map((h) => {
           const isPositive = h.change24h >= 0;
-          const tokenMeta = VERIFIED_BASE_TOKENIZED_STOCKS[h.ticker] || VERIFIED_BASE_TOKENIZED_STOCKS[h.ticker.replace(/c$/, '')];
-          const iconSrc = (h as any).iconUrl || tokenMeta?.iconUrl;
 
           return (
-            <div key={h.ticker} className="p-3.5 space-y-2.5 hover:bg-obsidian-900/40 transition-colors">
+            <div key={h.ticker} className="p-3.5 space-y-2.5 hover:bg-obsidian-800 transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-base-blue/10 border border-obsidian-border flex items-center justify-center font-bold text-blue-500 dark:text-blue-400 text-xs shrink-0 overflow-hidden shadow-sm p-1">
-                    {iconSrc ? (
-                      <img
-                        src={iconSrc}
-                        alt={h.ticker}
-                        className="w-full h-full object-contain rounded-md"
-                        onError={(e) => {
-                          // Hide image and fall back to ticker text if URL fails to load
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      <span>{h.ticker.substring(0, 3)}</span>
-                    )}
+                  <div className="w-8 h-8 rounded-lg bg-base-blue/10 border border-obsidian-border flex items-center justify-center shrink-0 overflow-hidden shadow-sm p-1">
+                    <TokenIcon ticker={h.ticker} className="w-full h-full object-contain" />
                   </div>
                   <div>
                     <div className="font-semibold text-slate-900 dark:text-white text-sm flex items-center gap-1.5">
@@ -161,7 +149,7 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
                   href={h.explorerUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-mono px-2.5 py-1.5 rounded-lg bg-obsidian-900 border border-obsidian-border/60"
+                  className="inline-flex items-center gap-1 text-[11px] text-slate-600 dark:text-slate-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors font-mono px-2.5 py-1.5 rounded-lg bg-obsidian-800 border border-obsidian-border"
                 >
                   <span>BaseScan</span>
                   <ExternalLink className="w-3 h-3" />
@@ -184,7 +172,7 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
       {/* Desktop Table View (Visible on >= md screens) */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left text-xs">
-          <thead className="bg-obsidian-900/80 border-b border-obsidian-border text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400">
+          <thead className="bg-obsidian-900 border-b border-obsidian-border text-[10px] font-mono uppercase text-slate-600 dark:text-slate-400">
             <tr>
               <th className="py-2.5 px-3">Asset</th>
               <th className="py-2.5 px-3 text-right">Price</th>
@@ -195,30 +183,17 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
               <th className="py-2.5 px-3 text-center">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-obsidian-border/50">
+          <tbody className="divide-y divide-obsidian-border">
             {holdings.map((h) => {
               const isPositive = h.change24h >= 0;
-              const tokenMeta = VERIFIED_BASE_TOKENIZED_STOCKS[h.ticker] || VERIFIED_BASE_TOKENIZED_STOCKS[h.ticker.replace(/c$/, '')];
-              const iconSrc = (h as any).iconUrl || tokenMeta?.iconUrl;
 
               return (
-                <tr key={h.ticker} className="hover:bg-obsidian-900/40 transition-colors">
+                <tr key={h.ticker} className="hover:bg-obsidian-800 transition-colors">
                   {/* Asset */}
                   <td className="py-3 px-3">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-base-blue/10 border border-obsidian-border flex items-center justify-center font-bold text-blue-500 dark:text-blue-400 text-[10px] shrink-0 overflow-hidden p-1 shadow-sm">
-                        {iconSrc ? (
-                          <img
-                            src={iconSrc}
-                            alt={h.ticker}
-                            className="w-full h-full object-contain rounded-md"
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                            }}
-                          />
-                        ) : (
-                          <span>{h.ticker.substring(0, 3)}</span>
-                        )}
+                      <div className="w-7 h-7 rounded-lg bg-base-blue/10 border border-obsidian-border flex items-center justify-center shrink-0 overflow-hidden p-0.5 shadow-sm">
+                        <TokenIcon ticker={h.ticker} className="w-full h-full object-contain" />
                       </div>
                       <div>
                         <div className="font-semibold text-slate-900 dark:text-white">{h.ticker}</div>
@@ -295,53 +270,42 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-obsidian-border/80 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-base-blue/10 border border-obsidian-border flex items-center justify-center font-bold text-blue-500 dark:text-blue-400 text-xs shrink-0 overflow-hidden p-1 shadow-sm">
-                  {((selectedHolding as any).iconUrl || VERIFIED_BASE_TOKENIZED_STOCKS[selectedHolding.ticker]?.iconUrl) ? (
-                    <img
-                      src={(selectedHolding as any).iconUrl || VERIFIED_BASE_TOKENIZED_STOCKS[selectedHolding.ticker]?.iconUrl}
-                      alt={selectedHolding.ticker}
-                      className="w-full h-full object-contain rounded-md"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <span>{selectedHolding.ticker.substring(0, 3)}</span>
-                  )}
+                <div className="w-8 h-8 rounded-lg bg-base-blue/10 border border-obsidian-border flex items-center justify-center shrink-0 overflow-hidden p-1 shadow-sm">
+                  <TokenIcon ticker={selectedHolding.ticker} className="w-full h-full object-contain" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">Sell {selectedHolding.ticker} to USDC</h3>
-                  <p className="text-[10px] text-slate-400 font-mono">Base Mainnet Instant Liquidation</p>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">Sell {selectedHolding.ticker} to USDC</h3>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">Base Mainnet Instant Liquidation</p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedHolding(null)}
-                className="p-1 rounded text-slate-400 hover:text-white hover:bg-obsidian-800 transition-colors"
+                className="p-1 rounded text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-obsidian-800 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Position Summary */}
-            <div className="p-3 rounded-xl bg-obsidian-950 border border-obsidian-border/60 space-y-1.5 font-mono text-xs">
-              <div className="flex justify-between text-slate-400 text-[11px]">
+            <div className="p-3 rounded-xl bg-slate-100 dark:bg-obsidian-950 border border-slate-300 dark:border-obsidian-border/60 space-y-1.5 font-mono text-xs">
+              <div className="flex justify-between text-slate-600 dark:text-slate-400 text-[11px]">
                 <span>Available Position:</span>
-                <span className="text-white font-medium">{selectedHolding.balance.toFixed(4)} {selectedHolding.ticker}</span>
+                <span className="text-slate-900 dark:text-white font-bold">{selectedHolding.balance.toFixed(4)} {selectedHolding.ticker}</span>
               </div>
-              <div className="flex justify-between text-slate-400 text-[11px]">
+              <div className="flex justify-between text-slate-600 dark:text-slate-400 text-[11px]">
                 <span>Current Market Value:</span>
-                <span className="text-emerald-400 font-bold">${selectedHolding.balanceUSD.toFixed(2)} USDC</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">${selectedHolding.balanceUSD.toFixed(2)} USDC</span>
               </div>
-              <div className="flex justify-between text-slate-400 text-[11px]">
+              <div className="flex justify-between text-slate-600 dark:text-slate-400 text-[11px]">
                 <span>Reference Price:</span>
-                <span className="text-slate-200">${selectedHolding.currentPrice.toFixed(2)}</span>
+                <span className="text-slate-800 dark:text-slate-200 font-medium">${selectedHolding.currentPrice.toFixed(2)}</span>
               </div>
             </div>
 
             {/* Percentage Selectors */}
             {!sellSuccessTx && (
               <div className="space-y-3">
-                <label className="text-[11px] font-mono text-slate-300 block">Select Amount to Sell:</label>
+                <label className="text-[11px] font-mono text-slate-800 dark:text-slate-300 font-semibold block">Select Amount to Sell:</label>
                 <div className="grid grid-cols-4 gap-1.5 font-mono text-xs">
                   {[25, 50, 75, 100].map((pct) => (
                     <button
@@ -350,8 +314,8 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
                       onClick={() => setSellPercentage(pct)}
                       className={`py-1.5 rounded-lg border text-xs font-semibold transition-all ${
                         sellPercentage === pct
-                          ? 'bg-red-500/20 border-red-500/60 text-red-300'
-                          : 'bg-obsidian-800 border-obsidian-border text-slate-400 hover:text-white'
+                          ? 'bg-red-500/20 border-red-500/60 text-red-600 dark:text-red-300 font-bold'
+                          : 'bg-white dark:bg-obsidian-800 border-slate-300 dark:border-obsidian-border text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
                       {pct === 100 ? 'MAX (100%)' : `${pct}%`}
@@ -360,24 +324,24 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
                 </div>
 
                 {/* Estimated Proceeds Card */}
-                <div className="p-3 rounded-xl bg-red-950/20 border border-red-500/30 text-xs font-mono space-y-1">
-                  <div className="flex justify-between text-slate-300">
+                <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-300 dark:border-red-500/30 text-xs font-mono space-y-1">
+                  <div className="flex justify-between text-slate-700 dark:text-slate-300">
                     <span>Shares to liquidate:</span>
-                    <span className="font-bold text-white">
+                    <span className="font-bold text-slate-900 dark:text-white">
                       {((selectedHolding.balance * sellPercentage) / 100).toFixed(4)} {selectedHolding.ticker}
                     </span>
                   </div>
-                  <div className="flex justify-between text-slate-300 pt-1 border-t border-red-500/20">
+                  <div className="flex justify-between text-slate-700 dark:text-slate-300 pt-1 border-t border-red-200 dark:border-red-500/20">
                     <span>USDC You Receive:</span>
-                    <span className="font-bold text-emerald-400 text-sm">
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">
                       +${((selectedHolding.balanceUSD * sellPercentage) / 100).toFixed(2)} USDC
                     </span>
                   </div>
                 </div>
 
                 {sellError && (
-                  <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                  <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-300 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
                     <span>{sellError}</span>
                   </div>
                 )}
@@ -386,7 +350,7 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
                   type="button"
                   disabled={isSelling}
                   onClick={handleExecuteSell}
-                  className="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white text-xs font-bold font-mono shadow-lg shadow-red-600/25 flex items-center justify-center gap-2 transition-all"
+                  className="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white text-xs font-bold font-mono shadow-lg shadow-red-600/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
                   {isSelling ? (
                     <>
@@ -406,11 +370,11 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
             {/* Success State */}
             {sellSuccessTx && (
               <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-2 font-mono">
-                <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto">
+                <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-500 flex items-center justify-center mx-auto">
                   <Check className="w-4 h-4" />
                 </div>
-                <div className="text-xs font-bold text-white">Sell Executed Successfully!</div>
-                <div className="text-[11px] text-emerald-400">
+                <div className="text-xs font-bold text-slate-900 dark:text-white">Sell Executed Successfully!</div>
+                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
                   +${sellSuccessTx.amountUSD.toFixed(2)} USDC credited to your wallet
                 </div>
                 <div className="pt-2">
@@ -418,10 +382,10 @@ export function HoldingsTable({ holdings, onTradeCompleted, walletAddress }: Hol
                     href={sellSuccessTx.explorerUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[10px] text-blue-400 hover:underline flex items-center justify-center gap-1"
+                    className="inline-flex items-center gap-1 text-xs text-base-blue hover:underline"
                   >
-                    View on BaseScan ({sellSuccessTx.txHash.substring(0, 12)}...)
-                    <ExternalLink className="w-2.5 h-2.5" />
+                    <span>View on BaseScan</span>
+                    <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
                 <button

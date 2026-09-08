@@ -119,22 +119,22 @@ export function PortfolioTracker({ refreshTrigger, walletAddress }: PortfolioTra
   return (
     <div className="flex flex-col h-full glass-panel rounded-2xl border-obsidian-border overflow-hidden shadow-2xl">
       {/* Header Bar */}
-      <div className="px-5 py-3 border-b border-obsidian-border/80 bg-obsidian-900/90 flex items-center justify-between shrink-0">
+      <div className="px-5 py-3 border-b border-obsidian-border bg-obsidian-900 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <PieChart className="w-4 h-4 text-base-blue" />
-          <span className="text-xs font-mono font-semibold text-slate-900 dark:text-slate-200">
+          <span className="text-xs font-mono font-bold text-slate-950 dark:text-slate-100">
             live-portfolio-indexer &middot; base
           </span>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono hidden sm:inline">
+          <span className="text-[10px] text-slate-600 dark:text-slate-400 font-mono hidden sm:inline">
             Updated: {lastRefreshed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
           </span>
           <button
             onClick={fetchPortfolio}
             disabled={isLoading}
-            className="p-1 rounded text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-obsidian-800 transition-colors"
+            className="p-1 rounded text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-obsidian-800 transition-colors"
             title="Refresh Portfolio"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-blue-500 dark:text-blue-400' : ''}`} />
@@ -147,29 +147,29 @@ export function PortfolioTracker({ refreshTrigger, walletAddress }: PortfolioTra
         {/* Metric Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Total Value */}
-          <div className="p-4 rounded-xl bg-obsidian-900/80 border border-obsidian-border">
-            <div className="text-[10px] font-mono uppercase text-slate-600 dark:text-slate-400 mb-1">
+          <div className="p-4 rounded-xl bg-obsidian-900 border border-obsidian-border shadow-sm">
+            <div className="text-[10px] font-mono uppercase text-slate-600 dark:text-slate-400 font-bold mb-1">
               Indexed Portfolio Value
             </div>
-            <div className="text-2xl font-bold font-mono text-slate-900 dark:text-white tracking-tight">
+            <div className="text-2xl font-black font-mono text-slate-950 dark:text-white tracking-tight">
               ${totalValueUSD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
-            <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+            <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
               <TrendingUp className="w-3.5 h-3.5" />
               <span>+2.45% past 24h</span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">(&lt;Base Mainnet&gt;)</span>
+              <span className="text-[10px] text-slate-600 dark:text-slate-400 font-mono">(&lt;Base Mainnet&gt;)</span>
             </div>
           </div>
 
           {/* Holdings Counter & Safety */}
-          <div className="p-4 rounded-xl bg-obsidian-900/80 border border-obsidian-border flex flex-col justify-between">
-            <div className="text-[10px] font-mono uppercase text-slate-600 dark:text-slate-400 mb-1">
+          <div className="p-4 rounded-xl bg-obsidian-900 border border-obsidian-border flex flex-col justify-between shadow-sm">
+            <div className="text-[10px] font-mono uppercase text-slate-600 dark:text-slate-400 font-bold mb-1">
               On-Chain DEX Liquidity
             </div>
-            <div className="text-lg font-bold font-mono text-slate-900 dark:text-slate-200">
+            <div className="text-lg font-bold font-mono text-slate-950 dark:text-slate-100">
               {holdings.length} Base Tokens & Assets
             </div>
-            <div className="flex items-center gap-1 mt-2 text-[10px] text-slate-600 dark:text-slate-400 font-mono">
+            <div className="flex items-center gap-1 mt-2 text-[10px] text-slate-600 dark:text-slate-400 font-mono font-medium">
               <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
               <span>Aerodrome V2 Pools & Verified Base Contracts</span>
             </div>
@@ -178,7 +178,7 @@ export function PortfolioTracker({ refreshTrigger, walletAddress }: PortfolioTra
 
         {/* Doughnut Distribution Chart */}
         <div>
-          <div className="text-[11px] font-mono text-slate-900 dark:text-slate-300 font-semibold uppercase tracking-wider mb-2">
+          <div className="text-[11px] font-mono text-slate-950 dark:text-slate-100 font-bold uppercase tracking-wider mb-2">
             Target Asset Weightings
           </div>
           <AssetDistributionChart holdings={holdings} />
@@ -186,10 +186,10 @@ export function PortfolioTracker({ refreshTrigger, walletAddress }: PortfolioTra
 
         {/* Holdings Table */}
         <div>
-          <div className="text-[11px] font-mono text-slate-900 dark:text-slate-300 font-semibold uppercase tracking-wider mb-2">
+          <div className="text-[11px] font-mono text-slate-950 dark:text-slate-100 font-bold uppercase tracking-wider mb-2">
             On-Chain Balances & BaseScan Verification
           </div>
-          <div className="rounded-xl border border-obsidian-border bg-obsidian-900/40 overflow-hidden">
+          <div className="rounded-xl border border-obsidian-border bg-obsidian-900 overflow-hidden shadow-sm">
             <HoldingsTable
               holdings={holdings}
               onTradeCompleted={fetchPortfolio}

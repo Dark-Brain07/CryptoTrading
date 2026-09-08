@@ -11,11 +11,11 @@ const config: Config = {
     extend: {
       colors: {
         obsidian: {
-          950: 'var(--bg-app)',
-          900: 'var(--bg-panel)',
-          800: 'var(--bg-card)',
-          700: 'var(--bg-elevated)',
-          border: 'var(--border-color)',
+          950: 'rgb(var(--bg-app-rgb) / <alpha-value>)',
+          900: 'rgb(var(--bg-panel-rgb) / <alpha-value>)',
+          800: 'rgb(var(--bg-card-rgb) / <alpha-value>)',
+          700: 'rgb(var(--bg-elevated-rgb) / <alpha-value>)',
+          border: 'rgb(var(--border-color-rgb) / <alpha-value>)',
           textPrimary: 'var(--text-primary)',
           textSecondary: 'var(--text-secondary)',
           textMuted: 'var(--text-muted)'

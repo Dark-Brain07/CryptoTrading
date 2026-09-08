@@ -215,19 +215,19 @@ export function AgenticWalletModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/80 backdrop-blur-md animate-fade-in">
       <div className="max-w-lg w-full glass-panel rounded-2xl border-obsidian-border shadow-2xl overflow-hidden flex flex-col max-h-[92dvh]">
         {/* Header */}
-        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-obsidian-border bg-obsidian-900/90 flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-obsidian-border bg-obsidian-900 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-base-blue/20 border border-base-blue/40 flex items-center justify-center text-blue-400 shrink-0">
               <Wallet className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5 sm:gap-2">
+              <h2 className="text-xs sm:text-sm font-bold text-slate-950 dark:text-white flex items-center gap-1.5 sm:gap-2">
                 Agentic Smart Wallet
-                <span className="text-[9px] sm:text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span className="text-[9px] sm:text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-bold">
                   BASE
                 </span>
               </h2>
-              <p className="text-[10px] sm:text-[11px] text-slate-400 font-mono">
+              <p className="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 font-mono">
                 Client-Isolated &middot; 100% Self-Custodial
               </p>
             </div>
@@ -235,7 +235,7 @@ export function AgenticWalletModal({
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-obsidian-800 transition-colors"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-obsidian-800 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -248,7 +248,7 @@ export function AgenticWalletModal({
               onClick={() => setActiveTab('overview')}
               className={`flex-1 py-2 sm:py-2.5 text-center font-medium transition-colors border-b-2 text-[11px] sm:text-xs ${
                 activeTab === 'overview'
-                  ? 'border-base-blue text-slate-900 dark:text-white bg-obsidian-900/50 font-semibold'
+                  ? 'border-base-blue text-slate-900 dark:text-white bg-obsidian-900 font-semibold'
                   : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
@@ -258,31 +258,31 @@ export function AgenticWalletModal({
               onClick={() => setActiveTab('withdraw')}
               className={`flex-1 py-2 sm:py-2.5 text-center font-medium transition-colors border-b-2 text-[11px] sm:text-xs ${
                 activeTab === 'withdraw'
-                  ? 'border-base-blue text-slate-900 dark:text-white bg-obsidian-900/50 font-semibold'
+                  ? 'border-base-blue text-slate-900 dark:text-white bg-obsidian-900 font-semibold'
                   : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
-              Withdraw<span className="hidden sm:inline"> Funds</span>
+              Withdraw
             </button>
             <button
               onClick={() => setActiveTab('backup')}
               className={`flex-1 py-2 sm:py-2.5 text-center font-medium transition-colors border-b-2 text-[11px] sm:text-xs ${
                 activeTab === 'backup'
-                  ? 'border-base-blue text-slate-900 dark:text-white bg-obsidian-900/50 font-semibold'
+                  ? 'border-base-blue text-slate-900 dark:text-white bg-obsidian-900 font-semibold'
                   : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
-              Backup<span className="hidden sm:inline"> & Key</span>
+              Backup
             </button>
             <button
               onClick={() => setActiveTab('import')}
               className={`flex-1 py-2 sm:py-2.5 text-center font-medium transition-colors border-b-2 text-[11px] sm:text-xs ${
                 activeTab === 'import'
-                  ? 'border-base-blue text-slate-900 dark:text-white bg-obsidian-900/50 font-semibold'
+                  ? 'border-base-blue text-slate-900 dark:text-white bg-obsidian-900 font-semibold'
                   : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
-              Import<span className="hidden sm:inline"> / Switch</span>
+              Import
             </button>
           </div>
         )}
@@ -298,7 +298,7 @@ export function AgenticWalletModal({
                   className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 ${
                     authMode === 'create'
                       ? 'bg-base-blue text-white shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   <Sparkles className="w-3.5 h-3.5" />
@@ -309,7 +309,7 @@ export function AgenticWalletModal({
                   className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-1.5 ${
                     authMode === 'import'
                       ? 'bg-base-blue text-white shadow-md'
-                      : 'text-slate-400 hover:text-white'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   <Key className="w-3.5 h-3.5" />
@@ -319,30 +319,30 @@ export function AgenticWalletModal({
 
               {authMode === 'create' ? (
                 <div className="text-center py-4 space-y-4">
-                  <div className="w-16 h-16 rounded-2xl bg-base-blue/10 border border-base-blue/30 flex items-center justify-center mx-auto text-blue-400 shadow-xl shadow-base-blue/10">
+                  <div className="w-16 h-16 rounded-2xl bg-base-blue/10 border border-base-blue/30 flex items-center justify-center mx-auto text-blue-500 dark:text-blue-400 shadow-xl shadow-base-blue/10">
                     <Sparkles className="w-8 h-8" />
                   </div>
 
                   <div>
-                    <h3 className="text-base font-bold text-white mb-1">
+                    <h3 className="text-base font-bold text-slate-950 dark:text-white mb-1">
                       Create Your Agentic Trading Wallet
                     </h3>
-                    <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
                       Generate an isolated, autonomous on-chain wallet on Base Mainnet. Back up your private key anytime and withdraw whenever you want.
                     </p>
                   </div>
 
-                  <div className="bg-obsidian-900/80 border border-obsidian-border rounded-xl p-3.5 text-left text-[11px] text-slate-300 space-y-1.5 max-w-sm mx-auto">
-                    <div className="flex items-center gap-2 text-slate-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <div className="bg-obsidian-800 border border-obsidian-border rounded-xl p-3.5 text-left text-[11px] text-slate-700 dark:text-slate-300 space-y-1.5 max-w-sm mx-auto shadow-sm">
+                    <div className="flex items-center gap-2 text-slate-700 dark:text-slate-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                       <span>Sub-second autonomous trade execution</span>
                     </div>
-                    <div className="flex items-center gap-2 text-slate-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <div className="flex items-center gap-2 text-slate-700 dark:text-slate-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                       <span>No signature pop-ups on every trade</span>
                     </div>
-                    <div className="flex items-center gap-2 text-slate-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <div className="flex items-center gap-2 text-slate-700 dark:text-slate-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                       <span>100% exportable to MetaMask / Coinbase Wallet</span>
                     </div>
                   </div>
@@ -489,21 +489,21 @@ export function AgenticWalletModal({
 
               {/* Balances Card */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3.5 rounded-xl bg-obsidian-900/80 border border-obsidian-border">
+                <div className="p-3.5 rounded-xl bg-obsidian-900 border border-obsidian-border">
                   <div className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 mb-1">
                     Base USDC (Trading)
                   </div>
-                  <div className="text-xl font-bold font-mono text-slate-900 dark:text-white">
+                  <div className="text-xl font-bold font-mono text-slate-950 dark:text-white">
                     ${usdcBalance.toFixed(2)}
                   </div>
                   <div className="text-[10px] text-slate-500 mt-1">Native Base Settlement</div>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-obsidian-900/80 border border-obsidian-border">
+                <div className="p-3.5 rounded-xl bg-obsidian-900 border border-obsidian-border">
                   <div className="text-[10px] font-mono uppercase text-slate-500 dark:text-slate-400 mb-1">
                     ETH Balance (Gas)
                   </div>
-                  <div className="text-xl font-bold font-mono text-slate-900 dark:text-slate-200">
+                  <div className="text-xl font-bold font-mono text-slate-950 dark:text-slate-200">
                     {ethBalance.toFixed(4)} ETH
                   </div>
                   <div className="text-[10px] text-slate-500 mt-1">Gas Cost &lt;$0.003/tx</div>

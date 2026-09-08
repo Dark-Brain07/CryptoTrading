@@ -3,13 +3,23 @@ import { base } from 'viem/chains';
 import { config } from '../config';
 import { BASE_USDC, VERIFIED_BASE_TOKENIZED_STOCKS, ERC20_ABI, GasTrackerData } from '../shared';
 
+export const BASE_RPC_URLS = [
+  'https://base-rpc.publicnode.com',
+  'https://developer-access-mainnet.base.org',
+  'https://base-pokt.nodies.app',
+  'https://gateway.tenderly.co/public/base',
+  'https://mainnet.base.org',
+  'https://1rpc.io/base'
+];
+
+export const baseTransport = fallback(
+  BASE_RPC_URLS.map(url => http(url, { timeout: 10_000 })),
+  { rank: false }
+);
+
 export const publicClient = createPublicClient({
   chain: base,
-  transport: fallback([
-    http('https://base.llamarpc.com'),
-    http('https://1rpc.io/base'),
-    http('https://mainnet.base.org')
-  ])
+  transport: baseTransport
 });
 
 /**

@@ -12,8 +12,8 @@ export function ReasoningStream({ steps }: ReasoningStreamProps) {
   if (!steps || steps.length === 0) return null;
 
   return (
-    <div className="my-3 p-3.5 rounded-xl bg-obsidian-900/90 border border-obsidian-border text-xs space-y-2.5">
-      <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5 pb-1 border-b border-obsidian-border/50">
+    <div className="my-3 p-3.5 rounded-xl bg-obsidian-900 border border-obsidian-border text-xs space-y-2.5">
+      <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5 pb-1 border-b border-obsidian-border">
         <span className="w-1.5 h-1.5 rounded-full bg-base-blue animate-ping" />
         Agent Execution Pipeline
       </div>

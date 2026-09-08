@@ -22,7 +22,7 @@ import {
   VERIFIED_BASE_TOKENIZED_STOCKS,
   AerodromeRoute
 } from '../shared';
-import { publicClient, getOnChainTokenBalance } from './blockchain';
+import { publicClient, getOnChainTokenBalance, baseTransport } from './blockchain';
 import { portfolioStore } from './portfolioStore';
 
 export interface ServerSwapResult {
@@ -89,10 +89,11 @@ export async function ensureTokenAllowanceServer(
       address: tokenAddress,
       abi: ERC20_ABI,
       functionName: 'approve',
-      args: [spenderAddress, maxUint256]
+      args: [spenderAddress, maxUint256],
+      gas: 65000n
     });
     console.log(`Approval tx broadcasted: ${approveTx}. Waiting for confirmation...`);
-    await publicClient.waitForTransactionReceipt({ hash: approveTx });
+    await publicClient.waitForTransactionReceipt({ hash: approveTx, timeout: 45_000 });
     console.log(`Approval confirmed on Base Mainnet.`);
   }
 }
@@ -145,14 +146,33 @@ export async function discoverTokenMetadataServer(
   }
 
   const cleanSym = symbol.toUpperCase();
-  if (AERODROME_SWAP_ROUTES[cleanSym]) {
-    return {
-      address: resolvedAddress,
-      symbol: cleanSym,
-      decimals,
-      route: AERODROME_SWAP_ROUTES[cleanSym],
-      hasLiquidity: true
-    };
+  const preconfiguredRoute = 
+    AERODROME_SWAP_ROUTES[cleanSym] || 
+    AERODROME_SWAP_ROUTES[symbol] || 
+    Object.entries(AERODROME_SWAP_ROUTES).find(([k]) => k.toUpperCase() === cleanSym)?.[1];
+
+  if (preconfiguredRoute) {
+    try {
+      const testAmount = parseUnits('0.01', BASE_USDC.decimals);
+      const out = await publicClient.readContract({
+        address: AERODROME_ROUTER_ADDRESS,
+        abi: AERODROME_ROUTER_ABI,
+        functionName: 'getAmountsOut',
+        args: [testAmount, preconfiguredRoute]
+      }) as bigint[];
+
+      if (out && out.length > 0 && out[out.length - 1] > 0n) {
+        return {
+          address: resolvedAddress,
+          symbol: cleanSym,
+          decimals,
+          route: preconfiguredRoute,
+          hasLiquidity: true
+        };
+      }
+    } catch (e) {
+      // Preconfigured route didn't have liquidity, fall through to discovery
+    }
   }
 
   // Attempt direct USDC -> Token route
@@ -246,11 +266,7 @@ export async function executeServerBuyOnAerodrome(params: {
   const walletClient = createWalletClient({
     account,
     chain: base,
-    transport: fallback([
-      http('https://base.llamarpc.com'),
-      http('https://1rpc.io/base'),
-      http('https://mainnet.base.org')
-    ])
+    transport: baseTransport
   });
 
   // 1. Balance Checks
@@ -297,20 +313,39 @@ export async function executeServerBuyOnAerodrome(params: {
   }) as bigint[];
 
   const expectedOutRaw = amountsOut[amountsOut.length - 1];
+  if (!expectedOutRaw || expectedOutRaw <= 0n) {
+    throw new Error(`Insufficient liquidity for ${discovery.symbol} on Aerodrome router. Swap returned 0 tokens for this trade amount.`);
+  }
   const minOutRaw = (expectedOutRaw * BigInt(Math.floor((100 - slippage) * 100))) / BigInt(10000);
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800); // 30 mins
 
   // 5. Broadcast real transaction to Base Mainnet
   console.log(`[Telegram DEX Trade] Broadcasting ${amountUSD} USDC -> ${discovery.symbol} for ${account.address}...`);
+
+  let gasEstimate = 350000n;
+  try {
+    const est = await publicClient.estimateContractGas({
+      account: account.address,
+      address: AERODROME_ROUTER_ADDRESS,
+      abi: AERODROME_ROUTER_ABI,
+      functionName: 'swapExactTokensForTokens',
+      args: [amountInUSDC, minOutRaw, discovery.route, account.address, deadline]
+    });
+    gasEstimate = (est * 125n) / 100n; // 25% safety buffer
+  } catch (gasErr) {
+    console.warn(`[Telegram DEX Trade] Gas estimation fallback used (${gasEstimate}):`, gasErr);
+  }
+
   const txHash = await walletClient.writeContract({
     address: AERODROME_ROUTER_ADDRESS,
     abi: AERODROME_ROUTER_ABI,
     functionName: 'swapExactTokensForTokens',
-    args: [amountInUSDC, minOutRaw, discovery.route, account.address, deadline]
+    args: [amountInUSDC, minOutRaw, discovery.route, account.address, deadline],
+    gas: gasEstimate
   });
 
   console.log(`[Telegram DEX Trade] Broadcasted! TX: ${txHash}. Awaiting confirmation...`);
-  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash, timeout: 60_000 });
 
   if (receipt.status !== 'success') {
     throw new Error(`Transaction reverted on Base Mainnet: https://basescan.org/tx/${txHash}`);
@@ -363,11 +398,7 @@ export async function executeServerSellOrSwapOnAerodrome(params: {
   const walletClient = createWalletClient({
     account,
     chain: base,
-    transport: fallback([
-      http('https://base.llamarpc.com'),
-      http('https://1rpc.io/base'),
-      http('https://mainnet.base.org')
-    ])
+    transport: baseTransport
   });
 
   // 1. Discover source token
@@ -431,25 +462,18 @@ export async function executeServerSellOrSwapOnAerodrome(params: {
       }
     ];
   } else {
-    if (fromMeta.symbol === 'AERO') {
-      routes = [
-        {
-          from: fromMeta.address,
-          to: BASE_USDC.contractAddress as `0x${string}`,
-          stable: false,
-          factory: AERODROME_FACTORY_ADDRESS
-        }
-      ];
+    // Invert the token's buy route back to USDC, or use direct
+    if (fromMeta.route && fromMeta.route.length > 0) {
+      routes = [...fromMeta.route].reverse().map(r => ({
+        from: r.to,
+        to: r.from,
+        stable: r.stable,
+        factory: r.factory
+      }));
     } else {
       routes = [
         {
           from: fromMeta.address,
-          to: BASE_WETH_ADDRESS,
-          stable: false,
-          factory: AERODROME_FACTORY_ADDRESS
-        },
-        {
-          from: BASE_WETH_ADDRESS,
           to: BASE_USDC.contractAddress as `0x${string}`,
           stable: false,
           factory: AERODROME_FACTORY_ADDRESS
@@ -467,31 +491,60 @@ export async function executeServerSellOrSwapOnAerodrome(params: {
   }) as bigint[];
 
   const expectedOutRaw = amountsOut[amountsOut.length - 1];
+  if (!expectedOutRaw || expectedOutRaw <= 0n) {
+    throw new Error(`Insufficient liquidity to swap ${fromMeta.symbol} on Aerodrome router. Swap returned 0 tokens.`);
+  }
   const minOutRaw = (expectedOutRaw * BigInt(Math.floor((100 - slippage) * 100))) / BigInt(10000);
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800);
 
   let txHash: `0x${string}`;
 
+  let gasEstimate = 350000n;
+
   if (isTargetETH && toToken === 'ETH') {
+    try {
+      const est = await publicClient.estimateContractGas({
+        account: account.address,
+        address: AERODROME_ROUTER_ADDRESS,
+        abi: AERODROME_ROUTER_ABI,
+        functionName: 'swapExactTokensForETH',
+        args: [rawSellAmount, minOutRaw, routes, account.address, deadline]
+      });
+      gasEstimate = (est * 125n) / 100n;
+    } catch (e) {}
+
     console.log(`[Telegram DEX Sell] Swapping ${sellAmount} ${fromMeta.symbol} -> native ETH for ${account.address}...`);
     txHash = await walletClient.writeContract({
       address: AERODROME_ROUTER_ADDRESS,
       abi: AERODROME_ROUTER_ABI,
       functionName: 'swapExactTokensForETH',
-      args: [rawSellAmount, minOutRaw, routes, account.address, deadline]
+      args: [rawSellAmount, minOutRaw, routes, account.address, deadline],
+      gas: gasEstimate
     });
   } else {
+    try {
+      const est = await publicClient.estimateContractGas({
+        account: account.address,
+        address: AERODROME_ROUTER_ADDRESS,
+        abi: AERODROME_ROUTER_ABI,
+        functionName: 'swapExactTokensForTokens',
+        args: [rawSellAmount, minOutRaw, routes, account.address, deadline]
+      });
+      gasEstimate = (est * 125n) / 100n;
+    } catch (e) {}
+
     console.log(`[Telegram DEX Sell] Swapping ${sellAmount} ${fromMeta.symbol} -> ${destSymbol} for ${account.address}...`);
     txHash = await walletClient.writeContract({
       address: AERODROME_ROUTER_ADDRESS,
       abi: AERODROME_ROUTER_ABI,
       functionName: 'swapExactTokensForTokens',
-      args: [rawSellAmount, minOutRaw, routes, account.address, deadline]
+      args: [rawSellAmount, minOutRaw, routes, account.address, deadline],
+      gas: gasEstimate
     });
   }
 
   console.log(`[Telegram DEX Sell] Broadcasted! TX: ${txHash}. Awaiting confirmation...`);
-  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
+  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash, timeout: 60_000 });
 
   if (receipt.status !== 'success') {
     throw new Error(`Transaction reverted on Base Mainnet: https://basescan.org/tx/${txHash}`);

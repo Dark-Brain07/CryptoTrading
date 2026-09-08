@@ -4,6 +4,12 @@
 
 :root {
   /* Day Mode (Ash Light Grey Theme) Tokens */
+  --bg-app-rgb: 226, 232, 240;
+  --bg-panel-rgb: 255, 255, 255;
+  --bg-card-rgb: 241, 245, 249;
+  --bg-elevated-rgb: 203, 213, 225;
+  --border-color-rgb: 203, 213, 225;
+
   --bg-app: #E2E8F0; /* Soft Ash / Slate-200 Light Grey Background */
   --bg-panel: rgba(255, 255, 255, 0.96); /* Clean Crisp White Glass Panels */
   --bg-card: #F1F5F9; /* Slate-100 Soft Ash Card Surfaces */
@@ -26,26 +32,41 @@
 }
 
 .dark {
-  /* Night Mode (Dark Theme) Tokens */
-  --bg-app: #080A0F;
-  --bg-panel: rgba(14, 18, 26, 0.90);
-  --bg-card: #141A24;
-  --bg-card-hover: #1A2230;
-  --bg-input: #080A0F;
-  --bg-elevated: #1A2230;
-  --border-color: #1E2638;
-  --border-subtle: #2A364F;
+  /* Night Mode (Pure OLED Black Theme) Tokens */
+  --bg-app-rgb: 0, 0, 0;
+  --bg-panel-rgb: 0, 0, 0;
+  --bg-card-rgb: 8, 8, 10;
+  --bg-elevated-rgb: 16, 16, 20;
+  --border-color-rgb: 26, 31, 44;
+
+  --bg-app: #000000;
+  --bg-panel: #000000;
+  --bg-card: #08080A;
+  --bg-card-hover: #121216;
+  --bg-input: #000000;
+  --bg-elevated: #121216;
+  --border-color: #1A1F2C;
+  --border-subtle: #242B3D;
 
   --text-primary: #F8FAFC;
   --text-secondary: #CBD5E1;
   --text-muted: #94A3B8;
   --text-faint: #64748B;
 
-  --panel-glass: rgba(14, 18, 26, 0.75);
-  --panel-border: #1E2638;
-  --panel-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
-  --scrollbar-track: #0E121A;
-  --scrollbar-thumb: #1E2638;
+  --panel-glass: rgba(0, 0, 0, 0.92);
+  --panel-border: #1A1F2C;
+  --panel-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.95);
+  --scrollbar-track: #000000;
+  --scrollbar-thumb: #1A1F2C;
+}
+
+html {
+  background: var(--bg-app);
+}
+
+html.dark,
+.dark {
+  background: #000000;
 }
 
 html,
@@ -83,7 +104,7 @@ body::before {
 }
 
 .dark body::before {
-  background: radial-gradient(circle at 50% -20%, rgba(0, 82, 255, 0.18) 0%, rgba(8, 10, 15, 0) 70%);
+  background: radial-gradient(circle at 50% -20%, rgba(0, 82, 255, 0.16) 0%, rgba(0, 0, 0, 0) 70%);
 }
 
 /* Custom Scrollbars */

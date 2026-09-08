@@ -9,7 +9,7 @@ import { executeServerBuyOnAerodrome, executeServerSellOrSwapOnAerodrome } from 
 import { createWalletClient, http, fallback, parseUnits, formatUnits } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { base } from 'viem/chains';
-import { publicClient, getOnChainTokenBalance, scanWalletLiveHoldings } from '../services/blockchain';
+import { publicClient, getOnChainTokenBalance, scanWalletLiveHoldings, baseTransport } from '../services/blockchain';
 
 let bot: Telegraf | null = null;
 
@@ -17,12 +17,18 @@ export async function safeReplyMarkdown(ctx: any, text: string, extra?: any): Pr
   try {
     return await ctx.replyWithMarkdown(text, extra);
   } catch (err: any) {
-    console.warn('safeReplyMarkdown fallback triggered due to entity parse error:', err?.message || err);
+    console.warn('safeReplyMarkdown fallback triggered:', err?.message || err);
     try {
-      const plainText = text.replace(/[*_`]/g, '');
-      return await ctx.reply(plainText, extra);
+      const plainText = text.replace(/[*_`[\]()]/g, '');
+      const safeExtra = { ...(extra || {}) };
+      delete safeExtra.parse_mode;
+      return await ctx.reply(plainText, safeExtra);
     } catch (fallbackErr: any) {
-      return await ctx.reply(text.slice(0, 1000));
+      try {
+        return await ctx.reply(text.replace(/[*_`[\]()]/g, '').slice(0, 1000));
+      } catch (e) {
+        console.error('Failed all reply attempts:', e);
+      }
     }
   }
 }
@@ -306,11 +312,7 @@ export function initializeTelegramBot(): Telegraf | null {
         const walletClient = createWalletClient({
           account,
           chain: base,
-          transport: fallback([
-            http('https://base.llamarpc.com'),
-            http('https://1rpc.io/base'),
-            http('https://mainnet.base.org')
-          ])
+          transport: baseTransport
         });
 
         // Determine target asset
@@ -648,7 +650,7 @@ export function initializeTelegramBot(): Telegraf | null {
 
         await ctx.replyWithMarkdown(
           `⏳ *Executing 100% Real Swap on Base Mainnet (Aerodrome DEX)...*\n\n` +
-          `• *Action:* Sell \`${fromToken}\` &rarr; \`${toToken}\`\n` +
+          `• *Action:* Sell \`${fromToken}\` → \`${toToken}\`\n` +
           `• *Wallet:* \`${userWallet.address}\`\n` +
           `• *Router:* Aerodrome Router (\`0xcF77...4E43\`)`
         );
@@ -671,11 +673,15 @@ export function initializeTelegramBot(): Telegraf | null {
             `🔍 *BaseScan Explorer:*\n[View Confirmed Transaction](${result.explorerUrl})\n\n` +
             `_Funds have been credited directly to your Base deposit address!_`;
 
-          await ctx.replyWithMarkdown(sellCard, { link_preview_options: { is_disabled: false } });
+          await safeReplyMarkdown(ctx, sellCard, { link_preview_options: { is_disabled: false } });
           return;
         } catch (sellErr: any) {
           console.error('Server Aerodrome sell error:', sellErr);
-          await ctx.replyWithMarkdown(`❌ *On-Chain Swap Failed:*\n${sellErr?.message || 'Transaction error on Base node'}`);
+          const cleanErr = (sellErr?.shortMessage || sellErr?.message || 'Transaction error on Base node')
+            .split('\n')[0]
+            .replace(/https?:\/\/[^\s]+/g, '')
+            .slice(0, 300);
+          await safeReplyMarkdown(ctx, `❌ *On-Chain Swap Failed:*\n${cleanErr}`);
           return;
         }
       }
@@ -771,9 +777,10 @@ export function initializeTelegramBot(): Telegraf | null {
         }
 
         // Execute REAL On-Chain DEX Swap
-        const statusMsg = await ctx.replyWithMarkdown(
+        const statusMsg = await safeReplyMarkdown(
+          ctx,
           `⏳ *Executing 100% Real Swap on Base Mainnet (Aerodrome DEX)...*\n\n` +
-          `• *Swapping:* \`$${amountUSD.toFixed(2)} USDC\` &rarr; \`${targetToken}\`\n` +
+          `• *Swapping:* \`$${amountUSD.toFixed(2)} USDC\` → \`${targetToken}\`\n` +
           `• *Signing with Wallet:* \`${userWallet.address}\`\n` +
           `• *Router:* Aerodrome Router (\`0xcF77...4E43\`)`
         );
@@ -794,11 +801,15 @@ export function initializeTelegramBot(): Telegraf | null {
             `🔍 *BaseScan Explorer:*\n[View On-Chain Receipt](${result.explorerUrl})\n\n` +
             `_Tokens are now in your wallet address! Use /portfolio to see your updated holdings._`;
 
-          await ctx.replyWithMarkdown(successCard, { link_preview_options: { is_disabled: false } });
+          await safeReplyMarkdown(ctx, successCard, { link_preview_options: { is_disabled: false } });
           return;
         } catch (swapErr: any) {
           console.error('Server Aerodrome swap error:', swapErr);
-          await ctx.replyWithMarkdown(`❌ *On-Chain Execution Failed:*\n${swapErr?.message || 'Transaction error on Base node'}`);
+          const cleanErr = (swapErr?.shortMessage || swapErr?.message || 'Transaction error on Base node')
+            .split('\n')[0]
+            .replace(/https?:\/\/[^\s]+/g, '')
+            .slice(0, 300);
+          await safeReplyMarkdown(ctx, `❌ *On-Chain Execution Failed:*\n${cleanErr}`);
           return;
         }
       }

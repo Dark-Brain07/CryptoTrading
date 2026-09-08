@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.publicClient = void 0;
+exports.publicClient = exports.baseTransport = exports.BASE_RPC_URLS = void 0;
 exports.getLiveGasMetrics = getLiveGasMetrics;
 exports.getOnChainTokenBalance = getOnChainTokenBalance;
 exports.formatPreciseAmount = formatPreciseAmount;
@@ -8,13 +8,18 @@ exports.scanWalletLiveHoldings = scanWalletLiveHoldings;
 const viem_1 = require("viem");
 const chains_1 = require("viem/chains");
 const shared_1 = require("../shared");
+exports.BASE_RPC_URLS = [
+    'https://base-rpc.publicnode.com',
+    'https://developer-access-mainnet.base.org',
+    'https://base-pokt.nodies.app',
+    'https://gateway.tenderly.co/public/base',
+    'https://mainnet.base.org',
+    'https://1rpc.io/base'
+];
+exports.baseTransport = (0, viem_1.fallback)(exports.BASE_RPC_URLS.map(url => (0, viem_1.http)(url, { timeout: 10_000 })), { rank: false });
 exports.publicClient = (0, viem_1.createPublicClient)({
     chain: chains_1.base,
-    transport: (0, viem_1.fallback)([
-        (0, viem_1.http)('https://base.llamarpc.com'),
-        (0, viem_1.http)('https://1rpc.io/base'),
-        (0, viem_1.http)('https://mainnet.base.org')
-    ])
+    transport: exports.baseTransport
 });
 /**
  * Fetches real-time Base Mainnet gas metrics

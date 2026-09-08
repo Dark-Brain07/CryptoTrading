@@ -91,6 +91,11 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
   const [pendingExternalTrade, setPendingExternalTrade] = useState<{ target: string; symbol: string; amountUSD: number } | null>(null);
   const [isExecutingExternal, setIsExecutingExternal] = useState(false);
 
+  // Auto-scroll chat area on new message or streaming step update
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages, isLoading]);
+
   const handleExecuteWithConnectedWallet = async () => {
     if (!externalWalletClient || !pendingExternalTrade) return;
     setIsExecutingExternal(true);
@@ -477,10 +482,10 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
   return (
     <div className="flex flex-col h-full min-h-0 glass-panel rounded-2xl border-obsidian-border overflow-hidden shadow-2xl">
       {/* Terminal Bar */}
-      <div className="px-4 py-2.5 sm:py-3 border-b border-obsidian-border/80 bg-obsidian-900/90 flex items-center justify-between shrink-0">
+      <div className="px-4 py-2.5 sm:py-3 border-b border-obsidian-border bg-obsidian-900 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4 text-base-blue" />
-          <span className="text-xs font-mono font-semibold text-slate-900 dark:text-slate-200">
+          <span className="text-xs font-mono font-bold text-slate-950 dark:text-slate-100">
             agent-terminal &middot; base-mainnet
           </span>
         </div>
@@ -489,12 +494,12 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           <button
             onClick={handleReset}
             title="Reset Terminal"
-            className="p-1 rounded text-slate-500 hover:text-slate-300 hover:bg-obsidian-800 transition-colors"
+            className="p-1 rounded text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-obsidian-800 transition-colors"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
-          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-mono border border-emerald-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-[10px] font-mono font-bold border border-emerald-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             LIVE
           </div>
         </div>
@@ -502,19 +507,19 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
 
       {/* Embedded Agentic Wallet Command Center */}
       {!isCreated ? (
-        <div className="m-2.5 sm:m-3 p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-base-blue/15 via-obsidian-900 to-base-blue/10 border border-base-blue/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-lg shrink-0">
+        <div className="m-2.5 sm:m-3 p-3 rounded-xl bg-obsidian-900 border border-obsidian-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-base-blue/20 border border-base-blue/40 flex items-center justify-center text-blue-500 dark:text-blue-400 shrink-0">
-              <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-base-blue/20 border border-blue-200 dark:border-base-blue/40 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+              <Wallet className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <div className="text-xs font-black text-slate-950 dark:text-white flex items-center gap-1.5">
                 Autonomous Agent Wallet
-                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/30">
+                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30 font-bold">
                   NOT INITIALIZED
                 </span>
               </div>
-              <div className="text-[11px] text-slate-600 dark:text-slate-400 leading-tight">
+              <div className="text-[11px] text-slate-700 dark:text-slate-300 font-medium leading-tight">
                 Generate your client-isolated Base wallet for sub-second zero-signature trading.
               </div>
             </div>
@@ -522,9 +527,9 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => openWalletModal('import')}
-              className="px-2.5 py-1.5 rounded-xl bg-obsidian-800 hover:bg-obsidian-700 border border-obsidian-border text-slate-800 dark:text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
+              className="px-2.5 py-1.5 rounded-xl bg-obsidian-800 hover:bg-obsidian-700 border border-obsidian-border text-slate-900 dark:text-slate-100 text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer"
             >
-              <Key className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
+              <Key className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
               Import Key
             </button>
             <button
@@ -532,7 +537,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
                 createWallet();
                 openWalletModal('overview');
               }}
-              className="px-3 py-1.5 rounded-xl bg-base-blue hover:bg-base-blueHover text-white text-xs font-bold shadow-md shadow-base-blue/25 flex items-center justify-center gap-1.5 transition-all"
+              className="px-3 py-1.5 rounded-xl bg-base-blue hover:bg-base-blueHover text-white text-xs font-bold shadow-md shadow-base-blue/25 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
               Create Wallet
@@ -540,28 +545,28 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           </div>
         </div>
       ) : (
-        <div className="m-2.5 sm:m-3 p-2.5 sm:p-3 rounded-xl bg-obsidian-900/95 border border-obsidian-border shadow-xl space-y-2 shrink-0">
+        <div className="m-2.5 sm:m-3 p-2.5 sm:p-3 rounded-xl bg-obsidian-900 border border-obsidian-border shadow-md space-y-2 shrink-0">
           {/* Top: Address & Balances */}
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-              <span className="text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-300">Agent Wallet:</span>
-              <span className="text-xs font-mono text-slate-900 dark:text-white font-semibold">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span className="text-[11px] font-mono font-bold text-slate-700 dark:text-slate-300">Agent Wallet:</span>
+              <span className="text-xs font-mono text-slate-950 dark:text-white font-bold">
                 {truncateAddress(address || '')}
               </span>
               <div className="flex items-center gap-1">
                 <button
                   onClick={handleCopyAgenticAddress}
-                  className="p-1 rounded bg-obsidian-800 hover:bg-obsidian-700 text-slate-600 dark:text-slate-300 transition-colors"
+                  className="p-1 rounded bg-obsidian-800 hover:bg-obsidian-700 border border-obsidian-border text-slate-700 dark:text-slate-300 transition-colors"
                   title="Copy Address"
                 >
-                  {copiedAddress ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  {copiedAddress ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
                 </button>
                 <a
                   href={`${BASE_EXPLORER_URL}/address/${address}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-1 rounded bg-obsidian-800 hover:bg-obsidian-700 text-slate-600 dark:text-slate-300 transition-colors"
+                  className="p-1 rounded bg-obsidian-800 hover:bg-obsidian-700 border border-obsidian-border text-slate-700 dark:text-slate-300 transition-colors"
                   title="View on BaseScan"
                 >
                   <ExternalLink className="w-3 h-3" />
@@ -572,16 +577,16 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
             {/* Live Balance & Refresh */}
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 font-mono text-xs">
-                <span className="text-slate-500 dark:text-slate-400 text-[10px]">USDC:</span>
-                <span className="text-slate-900 dark:text-white font-bold">${usdcBalance.toFixed(2)}</span>
+                <span className="text-slate-600 dark:text-slate-400 text-[10px] font-bold">USDC:</span>
+                <span className="text-slate-950 dark:text-white font-black">${usdcBalance.toFixed(2)}</span>
                 <span className="text-slate-400 dark:text-slate-500">|</span>
-                <span className="text-slate-500 dark:text-slate-400 text-[10px]">ETH:</span>
-                <span className="text-slate-800 dark:text-slate-300 font-medium">{ethBalance.toFixed(4)}</span>
+                <span className="text-slate-600 dark:text-slate-400 text-[10px] font-bold">ETH:</span>
+                <span className="text-slate-900 dark:text-slate-200 font-bold">{ethBalance.toFixed(4)}</span>
               </div>
               <button
                 onClick={handleRefreshBalances}
                 disabled={isRefreshingBalances}
-                className="p-1 rounded bg-obsidian-800 hover:bg-obsidian-700 text-blue-500 dark:text-blue-400 transition-colors"
+                className="p-1 rounded bg-obsidian-800 hover:bg-obsidian-700 text-blue-600 dark:text-blue-400 transition-colors"
                 title="Refresh Live Balances on Base"
               >
                 <RefreshCw className={`w-3 h-3 ${isRefreshingBalances ? 'animate-spin' : ''}`} />
@@ -590,33 +595,33 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
           </div>
 
           {/* Quick-Action Controls */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 border-t border-obsidian-border/50">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 border-t border-obsidian-border">
             <button
               onClick={() => openWalletModal('overview')}
-              className="py-1.5 px-2 rounded-lg bg-obsidian-800/90 hover:bg-obsidian-700 text-[11px] font-medium text-slate-700 dark:text-slate-200 border border-obsidian-border/60 flex items-center justify-center gap-1 transition-colors"
+              className="py-1.5 px-2 rounded-lg bg-obsidian-800 hover:bg-obsidian-700 text-[11px] font-semibold text-slate-800 dark:text-slate-200 border border-obsidian-border flex items-center justify-center gap-1 transition-colors cursor-pointer"
             >
-              <ArrowDownLeft className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
+              <ArrowDownLeft className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
               Deposit
             </button>
             <button
               onClick={() => openWalletModal('withdraw')}
-              className="py-1.5 px-2 rounded-lg bg-obsidian-800/90 hover:bg-obsidian-700 text-[11px] font-medium text-slate-700 dark:text-slate-200 border border-obsidian-border/60 flex items-center justify-center gap-1 transition-colors"
+              className="py-1.5 px-2 rounded-lg bg-obsidian-800 hover:bg-obsidian-700 text-[11px] font-semibold text-slate-800 dark:text-slate-200 border border-obsidian-border flex items-center justify-center gap-1 transition-colors cursor-pointer"
             >
-              <ArrowUpRight className="w-3 h-3 text-blue-500 dark:text-blue-400" />
+              <ArrowUpRight className="w-3 h-3 text-blue-600 dark:text-blue-400" />
               Withdraw
             </button>
             <button
               onClick={() => openWalletModal('backup')}
-              className="py-1.5 px-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-[11px] font-medium text-red-600 dark:text-red-300 border border-red-500/30 flex items-center justify-center gap-1 transition-colors"
+              className="py-1.5 px-2 rounded-lg bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-[11px] font-semibold text-red-600 dark:text-red-300 border border-red-200 dark:border-red-500/30 flex items-center justify-center gap-1 transition-colors cursor-pointer"
             >
-              <Shield className="w-3 h-3 text-red-500 dark:text-red-400" />
+              <Shield className="w-3 h-3 text-red-600 dark:text-red-400" />
               Backup
             </button>
             <button
               onClick={() => openWalletModal('import')}
-              className="py-1.5 px-2 rounded-lg bg-obsidian-800/90 hover:bg-obsidian-700 text-[11px] font-medium text-slate-700 dark:text-slate-200 border border-obsidian-border/60 flex items-center justify-center gap-1 transition-colors"
+              className="py-1.5 px-2 rounded-lg bg-obsidian-800 hover:bg-obsidian-700 text-[11px] font-semibold text-slate-800 dark:text-slate-200 border border-obsidian-border flex items-center justify-center gap-1 transition-colors cursor-pointer"
             >
-              <Key className="w-3 h-3 text-blue-500 dark:text-blue-400" />
+              <Key className="w-3 h-3 text-blue-600 dark:text-blue-400" />
               Import
             </button>
           </div>
@@ -632,9 +637,9 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
       </div>
 
       {/* Quick Prompts Container */}
-      <div className="px-4 py-2 border-t border-obsidian-border/50 bg-obsidian-900/40">
-        <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 mb-1.5 flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-blue-500 dark:text-blue-400" />
+      <div className="px-4 py-2 border-t border-obsidian-border bg-obsidian-900 shrink-0">
+        <div className="text-[10px] font-mono text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1 font-bold">
+          <Sparkles className="w-3 h-3 text-blue-600 dark:text-blue-400" />
           Quick Index Templates
         </div>
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
@@ -643,10 +648,10 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
               key={idx}
               disabled={isLoading}
               onClick={() => handleSubmit(undefined, qp)}
-              className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full bg-obsidian-800 hover:bg-obsidian-700 hover:text-slate-900 dark:hover:text-white border border-obsidian-border text-slate-700 dark:text-slate-300 transition-colors flex items-center gap-1"
+              className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full bg-obsidian-800 hover:bg-obsidian-700 text-slate-800 dark:text-slate-200 border border-obsidian-border font-medium transition-colors flex items-center gap-1 shadow-sm cursor-pointer"
             >
               <span>{qp}</span>
-              <ArrowUpRight className="w-2.5 h-2.5 text-slate-400" />
+              <ArrowUpRight className="w-2.5 h-2.5 text-slate-500 dark:text-slate-400" />
             </button>
           ))}
         </div>
@@ -654,7 +659,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
 
       {/* Pending Trade Execution Action Banner */}
       {pendingExternalTrade && (
-        <div className="px-4 py-2 bg-gradient-to-r from-blue-500/15 via-obsidian-900 to-obsidian-950 border-t border-blue-500/40 flex items-center justify-between gap-3 animate-fadeIn">
+        <div className="px-4 py-2 bg-gradient-to-r from-blue-500/15 via-obsidian-900 to-obsidian-950 border-t border-blue-500/40 flex items-center justify-between gap-3 animate-fadeIn shrink-0">
           <div className="flex items-center gap-2 text-xs">
             <Zap className="w-4 h-4 text-amber-500 animate-pulse shrink-0" />
             <div>
@@ -687,7 +692,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
             <button
               type="button"
               onClick={() => setPendingExternalTrade(null)}
-              className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors text-base leading-none"
+              className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors text-base leading-none cursor-pointer"
               title="Dismiss"
             >
               &times;
@@ -699,7 +704,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
       {/* Input Form */}
       <form
         onSubmit={handleSubmit}
-        className="p-2.5 sm:p-3 border-t border-obsidian-border bg-obsidian-900/90 flex items-center gap-2 shrink-0"
+        className="p-2.5 sm:p-3 border-t border-obsidian-border bg-obsidian-900 flex items-center gap-2 shrink-0"
       >
         <div className="relative flex-1">
           <input
@@ -708,7 +713,7 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading}
             placeholder="e.g., Buy $0.10 of NVDAc, trade Tesla, or paste Base 0x..."
-            className="w-full bg-obsidian-950 border border-obsidian-border rounded-xl px-3.5 sm:px-4 py-2.5 text-[16px] sm:text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-base-blue focus:ring-1 focus:ring-base-blue transition-all disabled:opacity-50"
+            className="w-full bg-obsidian-950 border border-obsidian-border rounded-xl px-3.5 sm:px-4 py-2.5 text-[16px] sm:text-xs text-slate-950 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:outline-none focus:border-base-blue focus:ring-1 focus:ring-base-blue transition-all disabled:opacity-50"
           />
         </div>
 

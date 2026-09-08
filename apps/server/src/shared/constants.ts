@@ -348,6 +348,14 @@ export const AERODROME_SWAP_ROUTES: Record<string, AerodromeRoute[]> = {
       factory: AERODROME_FACTORY_ADDRESS
     }
   ],
+  CBBTC: [
+    {
+      from: BASE_USDC.contractAddress,
+      to: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf',
+      stable: false,
+      factory: AERODROME_FACTORY_ADDRESS
+    }
+  ],
   VIRTUAL: [
     {
       from: BASE_USDC.contractAddress,
@@ -376,86 +384,96 @@ export const AERODROME_SWAP_ROUTES: Record<string, AerodromeRoute[]> = {
       factory: AERODROME_FACTORY_ADDRESS
     }
   ],
-  // Base Tokenized Equities Swap Routes (Aerodrome Router)
+  // Base Tokenized Equities Swap Routes (Aerodrome Router - Direct USDC pairs)
   NVDAc: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb20000000000000000000078ee7ce2fE4908108C', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb20000000000000000000078ee7ce2fE4908108C', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  NVDAC: [
+    { from: BASE_USDC.contractAddress, to: '0xb20000000000000000000078ee7ce2fE4908108C', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   NVDA: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb20000000000000000000078ee7ce2fE4908108C', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb20000000000000000000078ee7ce2fE4908108C', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   METAc: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000008bC8786B856E61707C', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000008bC8786B856E61707C', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  METAC: [
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000008bC8786B856E61707C', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   META: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000008bC8786B856E61707C', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000008bC8786B856E61707C', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   AAPLc: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb200000000000000000000C2e324d24d7eEcd1fb', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb200000000000000000000C2e324d24d7eEcd1fb', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  AAPLC: [
+    { from: BASE_USDC.contractAddress, to: '0xb200000000000000000000C2e324d24d7eEcd1fb', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   AAPL: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb200000000000000000000C2e324d24d7eEcd1fb', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb200000000000000000000C2e324d24d7eEcd1fb', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   GOOGLc: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000002D0BA3164cc74f58B7', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000002D0BA3164cc74f58B7', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  GOOGLC: [
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000002D0BA3164cc74f58B7', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   GOOGL: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000002D0BA3164cc74f58B7', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000002D0BA3164cc74f58B7', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   AMZNc: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb200000000000000000000d9192b6B456483C2E8', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb200000000000000000000d9192b6B456483C2E8', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  AMZNC: [
+    { from: BASE_USDC.contractAddress, to: '0xb200000000000000000000d9192b6B456483C2E8', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   AMZN: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb200000000000000000000d9192b6B456483C2E8', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb200000000000000000000d9192b6B456483C2E8', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   MSFTc: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xB200000000000000000000Ab99cFa739E253872B', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xB200000000000000000000Ab99cFa739E253872B', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  MSFTC: [
+    { from: BASE_USDC.contractAddress, to: '0xB200000000000000000000Ab99cFa739E253872B', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   MSFT: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xB200000000000000000000Ab99cFa739E253872B', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xB200000000000000000000Ab99cFa739E253872B', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   MSTRc: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000004884b426556b92883d', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000004884b426556b92883d', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  MSTRC: [
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000004884b426556b92883d', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   MSTR: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000004884b426556b92883d', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000004884b426556b92883d', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   SNDKc: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb200000000000000000000397293Cb8cda9a10c5', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb200000000000000000000397293Cb8cda9a10c5', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  SNDKC: [
+    { from: BASE_USDC.contractAddress, to: '0xb200000000000000000000397293Cb8cda9a10c5', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   SNDK: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb200000000000000000000397293Cb8cda9a10c5', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb200000000000000000000397293Cb8cda9a10c5', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   SPCXc: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000007b9fcbd005511aCBd5', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000007b9fcbd005511aCBd5', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  SPCXC: [
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000007b9fcbd005511aCBd5', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   SPCX: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000007b9fcbd005511aCBd5', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000007b9fcbd005511aCBd5', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   TSLAc: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000001e800a7f5189430cD0', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000001e800a7f5189430cD0', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+  ],
+  TSLAC: [
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000001e800a7f5189430cD0', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ],
   TSLA: [
-    { from: BASE_USDC.contractAddress, to: BASE_WETH_ADDRESS, stable: false, factory: AERODROME_FACTORY_ADDRESS },
-    { from: BASE_WETH_ADDRESS, to: '0xb2000000000000000000001e800a7f5189430cD0', stable: false, factory: AERODROME_FACTORY_ADDRESS }
+    { from: BASE_USDC.contractAddress, to: '0xb2000000000000000000001e800a7f5189430cD0', stable: false, factory: AERODROME_FACTORY_ADDRESS }
   ]
 };
 

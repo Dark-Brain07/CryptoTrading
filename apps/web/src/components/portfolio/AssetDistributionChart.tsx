@@ -63,7 +63,7 @@ export function AssetDistributionChart({ holdings }: AssetDistributionChartProps
   });
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-obsidian-900/60 border border-obsidian-border">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-obsidian-900 border border-obsidian-border shadow-sm">
       {/* SVG Doughnut */}
       <div className="relative w-40 h-40 flex items-center justify-center shrink-0">
         <svg width="160" height="160" viewBox="0 0 160 160">
@@ -80,8 +80,8 @@ export function AssetDistributionChart({ holdings }: AssetDistributionChartProps
           ))}
         </svg>
         <div className="absolute flex flex-col items-center justify-center pointer-events-none text-center">
-          <span className="text-[10px] uppercase font-mono text-slate-500 dark:text-slate-400">Assets</span>
-          <span className="text-base font-bold text-slate-900 dark:text-white font-mono">{holdings.length}</span>
+          <span className="text-[10px] uppercase font-mono text-slate-600 dark:text-slate-400 font-bold">Assets</span>
+          <span className="text-xl font-black text-slate-950 dark:text-white font-mono">{holdings.length}</span>
         </div>
       </div>
 
@@ -90,16 +90,16 @@ export function AssetDistributionChart({ holdings }: AssetDistributionChartProps
         {holdings.map((item, idx) => (
           <div
             key={item.ticker}
-            className="flex items-center justify-between p-2 rounded-lg bg-obsidian-800/80 border border-obsidian-border text-xs shadow-sm"
+            className="flex items-center justify-between p-2 rounded-lg bg-obsidian-800 border border-obsidian-border text-xs shadow-sm hover:border-base-blue/40 transition-colors"
           >
             <div className="flex items-center gap-2">
               <span
-                className="w-2.5 h-2.5 rounded-full"
+                className="w-2.5 h-2.5 rounded-full shrink-0"
                 style={{ backgroundColor: COLORS[idx % COLORS.length] }}
               />
-              <span className="font-semibold text-slate-900 dark:text-white">{item.ticker}</span>
+              <span className="font-bold text-slate-950 dark:text-white">{item.ticker}</span>
             </div>
-            <span className="font-mono text-slate-800 dark:text-slate-300 font-bold">
+            <span className="font-mono text-slate-950 dark:text-slate-200 font-extrabold">
               {item.allocationPercentage}%
             </span>
           </div>
