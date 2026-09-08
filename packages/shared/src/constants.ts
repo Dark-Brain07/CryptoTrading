@@ -1,7 +1,7 @@
 import { StockToken } from './types';
 
 export const BASE_CHAIN_ID = 8453;
-export const BASE_RPC_URL = 'https://mainnet.base.org';
+export const BASE_RPC_URL = 'https://base-rpc.publicnode.com';
 export const BASE_EXPLORER_URL = 'https://basescan.org';
 
 // Official Base Mainnet Native USDC

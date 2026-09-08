@@ -46,6 +46,8 @@ const executeTool_1 = require("./tools/executeTool");
 const shared_1 = require("../shared");
 const cdpActionProvider_1 = require("./tools/cdpActionProvider");
 const portfolioStore_1 = require("../services/portfolioStore");
+const blockchain_1 = require("../services/blockchain");
+const viem_1 = require("viem");
 const marketAnalytics_1 = require("../services/marketAnalytics");
 const tools = [stockRegistry_1.stockRegistryTool, quoteTool_1.quoteTool, executeTool_1.executeTradeTool];
 let agentExecutor = null;
@@ -106,11 +108,31 @@ async function processNaturalLanguageIntent(userPrompt, walletKey = 'default', w
     const promptLower = userPrompt.toLowerCase();
     // Match budget (supports $0.10, $.10, $500, etc.)
     const amountMatch = userPrompt.match(/(?:\$|\b)(\d+(?:\.\d+)?|\.\d+)/);
-    const totalUSD = amountMatch ? parseFloat(amountMatch[1]) : 100;
+    let totalUSD = amountMatch ? parseFloat(amountMatch[1]) : 0.10;
     const steps = [];
     const currentAddr = walletMeta?.address && walletMeta.address.startsWith('0x') ? walletMeta.address : (walletKey.startsWith('0x') ? walletKey : null);
-    const currentUsdc = walletMeta?.usdcBalance !== undefined ? walletMeta.usdcBalance : 0;
-    const currentEth = walletMeta?.ethBalance !== undefined ? walletMeta.ethBalance : 0;
+    let currentUsdc = walletMeta?.usdcBalance !== undefined ? walletMeta.usdcBalance : 0;
+    let currentEth = walletMeta?.ethBalance !== undefined ? walletMeta.ethBalance : 0;
+    // If frontend passed zero/stale balances, query Base Mainnet node directly
+    if (currentAddr && (currentUsdc <= 0 || currentEth <= 0)) {
+        try {
+            const [onChainUsdc, onChainEthRaw] = await Promise.all([
+                (0, blockchain_1.getOnChainTokenBalance)(shared_1.BASE_USDC.contractAddress, currentAddr, shared_1.BASE_USDC.decimals),
+                blockchain_1.publicClient.getBalance({ address: currentAddr })
+            ]);
+            if (onChainUsdc > currentUsdc)
+                currentUsdc = onChainUsdc;
+            const parsedEth = parseFloat((0, viem_1.formatUnits)(onChainEthRaw, 18));
+            if (parsedEth > currentEth)
+                currentEth = parsedEth;
+        }
+        catch (e) {
+            console.warn('Fallback on-chain balance query:', e);
+        }
+    }
+    if (totalUSD <= 0) {
+        totalUSD = currentUsdc > 0 ? Math.min(0.01, currentUsdc) : 0.01;
+    }
     // 1. Handle Balance queries
     if (promptLower.includes('balance') || promptLower.includes('how much') || promptLower.includes('funds available')) {
         const addrDisplay = currentAddr ? `\`${currentAddr}\`` : 'Not connected yet';
@@ -447,16 +469,20 @@ async function processNaturalLanguageIntent(userPrompt, walletKey = 'default', w
     const executionResult = {
         success: true,
         totalAllocatedUSD: totalUSD,
-        allocations: allocations.map(a => ({
-            ticker: a.ticker,
-            shares: a.shares,
-            amountUSD: a.amountUSD,
-            txHash: '',
-            explorerUrl: ''
-        })),
+        action: isRealOnChain ? 'BUY' : 'PREPARED',
+        allocations: allocations.map(a => {
+            const tokenAddress = a.stock?.contractAddress || (a.ticker.startsWith('0x') ? a.ticker : null);
+            return {
+                ticker: a.ticker,
+                shares: a.shares,
+                amountUSD: a.amountUSD,
+                txHash: '',
+                explorerUrl: tokenAddress ? `https://basescan.org/token/${tokenAddress}` : (currentAddr ? `https://basescan.org/address/${currentAddr}` : 'https://basescan.org')
+            };
+        }),
         timestamp: Date.now(),
         network: 'Base Mainnet',
-        gasUsedUSD: 0.0018
+        gasUsedUSD: 0.0002
     };
     let reply = '';
     if (isRealOnChain) {
@@ -473,7 +499,7 @@ async function processNaturalLanguageIntent(userPrompt, walletKey = 'default', w
             `💡 **To broadcast 100% REAL transactions visible on BaseScan:**\n` +
             `Your Agentic Wallet currently has:\n` +
             `• **USDC Available:** \`$${currentUsdc.toFixed(2)} USDC\` (Need: \`$${totalUSD.toFixed(2)}\`)\n` +
-            `• **ETH for Gas:** \`${currentEth.toFixed(4)} ETH\` (Need: \`~0.0005 ETH\` / ~$0.001)\n\n` +
+            `• **ETH for Gas:** \`${currentEth.toFixed(4)} ETH\` (Need: \`~0.00003 ETH\` / ~$0.0001)\n\n` +
             `Deposit funds into your Agent Wallet address: \`${currentAddr || 'Click Create Agent Wallet'}\` to broadcast live swaps!`;
     }
     return { reply, steps, executionResult };

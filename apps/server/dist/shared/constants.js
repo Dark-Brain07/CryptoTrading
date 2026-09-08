@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ERC20_ABI = exports.AERODROME_ROUTER_ABI = exports.AERODROME_SWAP_ROUTES = exports.UNISWAP_V3_ROUTER_ADDRESS = exports.AERODROME_FACTORY_ADDRESS = exports.AERODROME_ROUTER_ADDRESS = exports.VERIFIED_BASE_TOKENIZED_STOCKS = exports.BASE_WETH_ADDRESS = exports.BASE_USDC = exports.BASE_EXPLORER_URL = exports.BASE_RPC_URL = exports.BASE_CHAIN_ID = void 0;
 exports.BASE_CHAIN_ID = 8453;
-exports.BASE_RPC_URL = 'https://mainnet.base.org';
+exports.BASE_RPC_URL = 'https://base-rpc.publicnode.com';
 exports.BASE_EXPLORER_URL = 'https://basescan.org';
 // Official Base Mainnet Native USDC
 exports.BASE_USDC = {

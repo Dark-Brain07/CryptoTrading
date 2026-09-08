@@ -16,6 +16,8 @@ import {
   discoverTokenMetadata
 } from '../lib/dexTrading';
 
+import { baseTransport } from '../lib/baseRpc';
+
 const STORAGE_KEY = 'baseindex_agentic_wallet_key';
 
 export interface AgenticWalletState {
@@ -30,7 +32,7 @@ export interface AgenticWalletState {
 
 const publicClient = createPublicClient({
   chain: base,
-  transport: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || 'https://mainnet.base.org')
+  transport: baseTransport
 });
 
 export function useAgenticWallet() {
@@ -170,7 +172,7 @@ export function useAgenticWallet() {
         const walletClient = createWalletClient({
           account,
           chain: base,
-          transport: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || 'https://mainnet.base.org')
+          transport: baseTransport
         });
 
         let txHash: `0x${string}`;
@@ -242,7 +244,7 @@ export function useAgenticWallet() {
         const walletClient = createWalletClient({
           account,
           chain: base,
-          transport: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || 'https://mainnet.base.org')
+          transport: baseTransport
         });
 
         // 100% Real Aerodrome DEX Swap on Base Mainnet
@@ -336,7 +338,7 @@ export function useAgenticWallet() {
     const walletClient = createWalletClient({
       account,
       chain: base,
-      transport: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || 'https://mainnet.base.org')
+      transport: baseTransport
     });
 
     // Execute real reverse Aerodrome swap (Token -> USDC)

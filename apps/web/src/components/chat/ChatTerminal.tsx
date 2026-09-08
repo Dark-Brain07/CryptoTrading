@@ -33,9 +33,11 @@ import {
 } from '../../lib/dexTrading';
 import { useAccount, useWalletClient } from 'wagmi';
 
+import { baseTransport } from '../../lib/baseRpc';
+
 const publicClient = createPublicClient({
   chain: base,
-  transport: http(process.env.NEXT_PUBLIC_BASE_RPC_URL || 'https://mainnet.base.org')
+  transport: baseTransport
 });
 
 interface ChatTerminalProps {
