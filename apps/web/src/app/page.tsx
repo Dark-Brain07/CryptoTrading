@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useAccount } from 'wagmi';
 import { Header } from '../components/navigation/Header';
+import { TelegramBanner } from '../components/navigation/TelegramBanner';
 import { ChatTerminal } from '../components/chat/ChatTerminal';
 import { PortfolioTracker } from '../components/portfolio/PortfolioTracker';
 
@@ -20,6 +21,9 @@ export default function Home() {
     <div className="h-full min-h-screen lg:min-h-0 lg:h-screen flex flex-col bg-obsidian-950 selection:bg-base-blue selection:text-white lg:overflow-hidden">
       {/* Top Navigation */}
       <Header />
+
+      {/* Telegram Banner: Trade Tokenized Stocks on Base */}
+      <TelegramBanner />
 
       {/* Mobile Tab Switcher (Visible only on < lg screens) */}
       <div className="lg:hidden px-3 pt-2 pb-1 bg-obsidian-950/90 border-b border-obsidian-border/60 sticky top-14 sm:top-16 z-40 backdrop-blur-md">

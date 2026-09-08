@@ -4,12 +4,13 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
-import { ShieldCheck, Zap, Activity, Wallet, Sun, Moon } from 'lucide-react';
+import { ShieldCheck, Zap, Activity, Wallet, Sun, Moon, ArrowUpRight } from 'lucide-react';
 import { GasTrackerData } from '@baseindex/shared';
 import { AgenticWalletModal } from '../wallet/AgenticWalletModal';
 import { useAgenticWallet } from '../../hooks/useAgenticWallet';
 import { useTheme } from '../../context/ThemeContext';
 import { truncateAddress } from '../../lib/utils';
+import { TelegramIcon } from '../common/TelegramIcon';
 
 export function Header() {
   const { address: connectedAddress } = useAccount();
@@ -86,8 +87,22 @@ export function Header() {
           </div>
         </div>
 
-        {/* Right: Theme Toggle, Agentic Wallet & Wallet Connect */}
+        {/* Right: Telegram Bot, Theme Toggle, Agentic Wallet & Wallet Connect */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          {/* Telegram Trading Bot Link */}
+          <a
+            href="https://t.me/CryptoStocksTrd_bot"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Use Telegram to Trade Tokenized Stocks on Base (@CryptoStocksTrd_bot)"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#229ED9]/10 hover:bg-[#229ED9]/20 border border-[#229ED9]/30 hover:border-[#229ED9]/60 text-[#229ED9] text-xs font-semibold transition-all shadow-sm group cursor-pointer"
+          >
+            <TelegramIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current group-hover:scale-110 transition-transform" />
+            <span className="hidden md:inline">Telegram Bot</span>
+            <span className="md:hidden">Bot</span>
+            <ArrowUpRight className="w-3 h-3 opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </a>
+
           {/* Day / Night Mode Toggle */}
           <button
             type="button"

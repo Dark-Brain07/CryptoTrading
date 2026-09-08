@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { AgentMessage, VERIFIED_BASE_TOKENIZED_STOCKS } from '@baseindex/shared';
 import { MessageBubble } from './MessageBubble';
+import { TelegramIcon } from '../common/TelegramIcon';
 import { useAgenticWallet } from '../../hooks/useAgenticWallet';
 import { AgenticWalletModal } from '../wallet/AgenticWalletModal';
 import { truncateAddress } from '../../lib/utils';
@@ -493,6 +494,16 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
         </div>
 
         <div className="flex items-center gap-2">
+          <a
+            href="https://t.me/CryptoStocksTrd_bot"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open Telegram Bot (@CryptoStocksTrd_bot)"
+            className="flex items-center gap-1 text-[11px] font-medium text-[#229ED9] hover:text-sky-300 transition-colors px-1.5 py-0.5 rounded hover:bg-[#229ED9]/10"
+          >
+            <TelegramIcon className="w-3 h-3 fill-current" />
+            <span className="hidden sm:inline">Bot</span>
+          </a>
           <button
             onClick={handleReset}
             title="Reset Terminal"
