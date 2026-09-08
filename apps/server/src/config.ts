@@ -9,8 +9,8 @@ const envSchema = z.object({
   
   // AI Brain
   OPENAI_API_KEY: z.string().optional(),
-  OPENAI_BASE_URL: z.string().optional(),
-  OPENAI_MODEL_NAME: z.string().default('gpt-4o'),
+  OPENAI_BASE_URL: z.string().default('https://api.groq.com/openai/v1'),
+  OPENAI_MODEL_NAME: z.string().default('openai/gpt-oss-120b'),
   
   // CDP AgentKit (Base Mainnet)
   CDP_API_KEY_NAME: z.string().optional(),

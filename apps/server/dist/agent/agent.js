@@ -420,6 +420,50 @@ async function processNaturalLanguageIntent(userPrompt, walletKey = 'default', w
                 console.warn('LangChain agent invocation fallback:', e);
             }
         }
+        // Built-in intelligent conversational fallback when LLM executor is offline
+        let fallbackReply = `🤖 **I am BaseIndex Agent** – your autonomous on-chain trading copilot on **Base Mainnet (Chain ID 8453)** powered by **Aerodrome DEX**.\n\n` +
+            `⚡ **What I can do for you:**\n` +
+            `• **Chat-to-Trade:** Say *"Buy $0.10 of NVDA"* or *"Buy $0.05 of AERO"* to execute real swaps directly on Base Mainnet.\n` +
+            `• **Portfolio Management:** Track live balances, inspect on-chain stock tokens, or liquidate holdings to USDC.\n` +
+            `• **Agentic Wallet:** Self-custodial 1-click execution signed directly with your secure Base wallet.\n` +
+            `• **Supported Assets:** Tokenized stocks (\`NVDAc\`, \`METAc\`, \`AAPLc\`, \`GOOGLc\`, \`AMZNc\`, \`MSFTc\`, \`TSLAc\`, etc.) and Base ecosystem tokens (\`AERO\`, \`WETH\`, \`cbBTC\`, \`VIRTUAL\`, \`DEGEN\`).\n\n` +
+            `💡 *Try typing:* \`Buy $0.01 of NVDA\` *or* \`Show my balance\``;
+        if (promptLower.includes('who are you') || promptLower.includes('what are you') || promptLower.includes('about')) {
+            fallbackReply = `🤖 **I am BaseIndex Agent**\n\n` +
+                `I am an autonomous AI trading agent built specifically for **Base Mainnet**.\n\n` +
+                `I allow you to buy, sell, and rebalance real tokenized stocks and crypto assets directly via **Aerodrome DEX** using natural language chat.\n\n` +
+                `• **Network:** Base Mainnet (Chain ID 8453)\n` +
+                `• **DEX Engine:** Aerodrome V2 & Slipstream\n` +
+                `• **Execution:** 100% Real on-chain transactions signed by your Agentic Wallet\n\n` +
+                `To execute a trade, try asking: \`Buy $0.01 of NVDA\` or \`Buy $0.05 of AERO\`!`;
+        }
+        else if (promptLower.includes('hello') || promptLower.includes('hi') || promptLower.includes('hey')) {
+            fallbackReply = `👋 **Hello! Welcome to BaseIndex Agent.**\n\n` +
+                `I'm your autonomous trading copilot on Base Mainnet. How can I help you today?\n\n` +
+                `• **Trade:** \`Buy $0.01 of NVDA\` or \`Buy $0.05 of AERO\`\n` +
+                `• **Check Portfolio:** \`Show my balance\` or \`What tokens are trending?\`\n` +
+                `• **Sell:** \`Sell all AERO\` or \`Liquidate NVDA to USDC\``;
+        }
+        else if (promptLower.includes('help') || promptLower.includes('how to') || promptLower.includes('commands')) {
+            fallbackReply = `📖 **BaseIndex Agent Quick Help & Commands**\n\n` +
+                `Here is how to interact with me:\n\n` +
+                `1️⃣ **Buy Tokenized Stocks & Crypto:**\n` +
+                `• \`Buy $0.01 of NVDA\`\n` +
+                `• \`Buy $0.05 of AERO\`\n` +
+                `• \`Allocate $0.10 between NVDA and VIRTUAL\`\n\n` +
+                `2️⃣ **Sell / Liquidate to USDC:**\n` +
+                `• \`Sell NVDA\` or \`Liquidate all AERO to USDC\`\n\n` +
+                `3️⃣ **Check Balances & Market:**\n` +
+                `• \`Show my balance\`\n` +
+                `• \`What tokens have the most liquidity on Base?\`\n` +
+                `• \`Show recent whale transactions\``;
+        }
+        return {
+            reply: fallbackReply,
+            steps: [
+                { id: '1', title: 'Intent Parsed', detail: 'Identified general conversational query', status: 'completed' }
+            ]
+        };
     }
     // Handle common basket queries like "ai basket", "defi basket", "crypto basket"
     if (matchedTickers.length === 0) {

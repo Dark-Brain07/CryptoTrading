@@ -12,8 +12,8 @@ const envSchema = zod_1.z.object({
     FRONTEND_URL: zod_1.z.string().default('https://baseindex-agent.vercel.app'),
     // AI Brain
     OPENAI_API_KEY: zod_1.z.string().optional(),
-    OPENAI_BASE_URL: zod_1.z.string().optional(),
-    OPENAI_MODEL_NAME: zod_1.z.string().default('gpt-4o'),
+    OPENAI_BASE_URL: zod_1.z.string().default('https://api.groq.com/openai/v1'),
+    OPENAI_MODEL_NAME: zod_1.z.string().default('openai/gpt-oss-120b'),
     // CDP AgentKit (Base Mainnet)
     CDP_API_KEY_NAME: zod_1.z.string().optional(),
     CDP_API_KEY_PRIVATE_KEY: zod_1.z.string().optional(),
