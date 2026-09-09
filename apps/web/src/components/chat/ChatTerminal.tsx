@@ -641,103 +641,73 @@ export function ChatTerminal({ onTradeExecuted, walletAddress }: ChatTerminalPro
         </div>
       )}
 
-      {/* Messages Scroll Area - Automatically pushes older messages upward */}
-      <div className="flex-1 min-h-0 p-3 sm:p-4 overflow-y-auto space-y-4">
-        {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} />
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
+      {/* Messages & Telegram Hub Area */}
+      <div className="flex-1 min-h-0 p-3 sm:p-4 overflow-y-auto space-y-3 flex flex-col">
+        {/* Welcome Info Message */}
+        <MessageBubble message={INITIAL_MESSAGES[0]} />
 
-      {/* Quick Prompts Container */}
-      <div className="px-4 py-2 border-t border-obsidian-border bg-obsidian-900 shrink-0">
-        <div className="text-[10px] font-mono text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1 font-bold">
-          <Sparkles className="w-3 h-3 text-blue-600 dark:text-blue-400" />
-          Quick Index Templates
-        </div>
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-          {QUICK_PROMPTS.map((qp, idx) => (
-            <button
-              key={idx}
-              disabled={isLoading}
-              onClick={() => handleSubmit(undefined, qp)}
-              className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full bg-obsidian-800 hover:bg-obsidian-700 text-slate-800 dark:text-slate-200 border border-obsidian-border font-medium transition-colors flex items-center gap-1 shadow-sm cursor-pointer"
+        {/* Telegram Bot Trading Hub Card (Replaces Web Chat Interface) */}
+        <div className="flex-1 flex flex-col justify-between p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-[#229ED9]/12 via-obsidian-900/80 to-obsidian-900 border border-[#229ED9]/30 shadow-lg mt-1">
+          <div className="flex flex-col items-center text-center my-auto py-2">
+            {/* Telegram Icon with Glow */}
+            <div className="relative mb-3 group">
+              <div className="absolute -inset-1 rounded-2xl bg-[#229ED9] opacity-40 blur-md group-hover:opacity-70 transition-opacity" />
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-[#229ED9] to-[#0088cc] flex items-center justify-center text-white shadow-xl shadow-[#229ED9]/30 group-hover:scale-105 transition-transform">
+                <TelegramIcon className="w-7 h-7 sm:w-8 sm:h-8 fill-white" />
+              </div>
+            </div>
+
+            {/* Section Header */}
+            <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white max-w-sm mb-2 leading-snug">
+              Use Telegram Bot for Trading Tokenize asset &amp; Others token on Base
+            </h3>
+
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 max-w-sm mb-4 leading-relaxed">
+              Trade official Base tokenized stocks (<span className="font-mono text-slate-700 dark:text-slate-200">NVDAc, TSLAc, AAPLc</span>) and Base tokens (<span className="font-mono text-slate-700 dark:text-slate-200">AERO, VIRTUAL, cbBTC, WETH</span>) with 24/7 autonomous 1-click execution on Aerodrome DEX.
+            </p>
+
+            {/* Direct Launch Button */}
+            <a
+              href="https://t.me/CryptoStocksTrd_bot"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full max-w-xs py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#229ED9] to-[#0088cc] hover:from-[#1d8bc0] hover:to-[#0077b5] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-[#229ED9]/30 hover:shadow-lg hover:shadow-[#229ED9]/40 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
-              <span>{qp}</span>
-              <ArrowUpRight className="w-2.5 h-2.5 text-slate-500 dark:text-slate-400" />
-            </button>
-          ))}
-        </div>
-      </div>
+              <TelegramIcon className="w-4 h-4 fill-white" />
+              <span>Open @CryptoStocksTrd_bot</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </a>
+          </div>
 
-      {/* Pending Trade Execution Action Banner */}
-      {pendingExternalTrade && (
-        <div className="px-4 py-2 bg-gradient-to-r from-blue-500/15 via-obsidian-900 to-obsidian-950 border-t border-blue-500/40 flex items-center justify-between gap-3 animate-fadeIn shrink-0">
-          <div className="flex items-center gap-2 text-xs">
-            <Zap className="w-4 h-4 text-amber-500 animate-pulse shrink-0" />
-            <div>
-              <span className="font-semibold text-slate-900 dark:text-white">Execute ${pendingExternalTrade.amountUSD.toFixed(2)} of {pendingExternalTrade.symbol} on BaseScan:</span>
-              <span className="text-slate-500 dark:text-slate-400 ml-1 text-[11px] hidden sm:inline">Choose signing method</span>
+          {/* Supported Telegram Commands Cheatsheet */}
+          <div className="p-2.5 sm:p-3 rounded-xl bg-obsidian-950/70 border border-obsidian-border text-left mt-3">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] font-mono font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                <Sparkles className="w-2.5 h-2.5 text-[#229ED9]" />
+                Example Telegram Commands
+              </span>
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-bold">
+                Aerodrome DEX &middot; Base 8453
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-1 text-[10px] sm:text-[11px] font-mono text-slate-600 dark:text-slate-400">
+              <div className="p-1.5 rounded bg-obsidian-900/80 border border-obsidian-border/50 truncate flex items-center gap-1">
+                <span className="text-[#229ED9] font-bold">&gt;</span> Buy $0.10 NVDAc
+              </div>
+              <div className="p-1.5 rounded bg-obsidian-900/80 border border-obsidian-border/50 truncate flex items-center gap-1">
+                <span className="text-[#229ED9] font-bold">&gt;</span> Buy $0.05 AERO
+              </div>
+              <div className="p-1.5 rounded bg-obsidian-900/80 border border-obsidian-border/50 truncate flex items-center gap-1">
+                <span className="text-[#229ED9] font-bold">&gt;</span> /portfolio
+              </div>
+              <div className="p-1.5 rounded bg-obsidian-900/80 border border-obsidian-border/50 truncate flex items-center gap-1">
+                <span className="text-[#229ED9] font-bold">&gt;</span> Sell NVDAc to USDC
+              </div>
             </div>
           </div>
-
-          <div className="flex items-center gap-2">
-            {isExternalConnected ? (
-              <button
-                type="button"
-                onClick={handleExecuteWithConnectedWallet}
-                disabled={isExecutingExternal}
-                className="px-3 py-1.5 rounded-lg bg-base-blue hover:bg-blue-600 text-white font-medium text-xs flex items-center gap-1.5 shadow-md shadow-base-blue/30 transition-all cursor-pointer"
-              >
-                {isExecutingExternal ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5 text-yellow-300" />}
-                <span>Sign with MetaMask</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => openWalletModal('overview')}
-                className="px-3 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-600 dark:text-blue-300 border border-blue-500/30 font-medium text-xs flex items-center gap-1.5 transition-all cursor-pointer"
-              >
-                <Wallet className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
-                <span>Deposit to Agent Wallet</span>
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => setPendingExternalTrade(null)}
-              className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors text-base leading-none cursor-pointer"
-              title="Dismiss"
-            >
-              &times;
-            </button>
-          </div>
         </div>
-      )}
-
-      {/* Input Form */}
-      <form
-        onSubmit={handleSubmit}
-        className="p-2.5 sm:p-3 border-t border-obsidian-border bg-obsidian-900 flex items-center gap-2 shrink-0"
-      >
-        <div className="relative flex-1">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={isLoading}
-            placeholder="e.g., Buy $0.10 of NVDAc, trade Tesla, or paste Base 0x..."
-            className="w-full bg-obsidian-950 border border-obsidian-border rounded-xl px-3.5 sm:px-4 py-2.5 text-[16px] sm:text-xs text-slate-950 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:outline-none focus:border-base-blue focus:ring-1 focus:ring-base-blue transition-all disabled:opacity-50"
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={!input.trim() || isLoading}
-          className="p-2.5 sm:p-2.5 w-10 h-10 flex items-center justify-center rounded-xl bg-base-blue hover:bg-base-blueHover disabled:opacity-40 text-white font-medium shadow-md shadow-base-blue/20 transition-all shrink-0 cursor-pointer"
-        >
-          <Send className="w-4 h-4" />
-        </button>
-      </form>
+      </div>
 
       {/* Agentic Smart Wallet Modal */}
       <AgenticWalletModal
