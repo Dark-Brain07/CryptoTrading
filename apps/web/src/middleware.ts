@@ -20,13 +20,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Strictly block United States traffic for regulatory compliance with tokenized equities
-  if (country.toUpperCase() === 'US') {
-    const complianceUrl = new URL('/compliance', request.url);
-    return NextResponse.redirect(complianceUrl);
+  // Attach geo header for UI compliance indicator without blocking verification crawlers
+  const response = NextResponse.next();
+  if (country) {
+    response.headers.set('x-user-country', country);
   }
-
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {

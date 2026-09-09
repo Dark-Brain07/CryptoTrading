@@ -24,7 +24,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="bg-obsidian-950">
       <head>
-        <meta name="base:app_id" content="6aa13b703ebd729e7bff107b" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
