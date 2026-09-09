@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   description: 'Institutional-grade autonomous stock index builder on Base Mainnet. Allocate real-world tokenized equities (TSLA, NVDA, AAPL, SPY) via natural language chat with CDP AgentKit.',
   icons: {
     icon: '/favicon.ico'
+  },
+  other: {
+    'base:app_id': '6aa13b703ebd729e7bff107b'
   }
 };
 
@@ -21,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="bg-obsidian-950">
       <head>
+        <meta name="base:app_id" content="6aa13b703ebd729e7bff107b" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
